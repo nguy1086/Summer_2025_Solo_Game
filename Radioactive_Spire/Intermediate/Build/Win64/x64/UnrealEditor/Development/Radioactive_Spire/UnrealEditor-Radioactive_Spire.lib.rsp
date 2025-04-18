@@ -1,0 +1,12 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-Radioactive_Spire.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"C:\Users\nguy1086\Desktop\Summer_2025_Solo_Game\Radioactive_Spire\Intermediate\Build\Win64\x64\Radioactive_SpireEditor\Development\Engine\SharedPCH.Engine.Cpp20.h.obj"
+"C:\Users\nguy1086\Desktop\Summer_2025_Solo_Game\Radioactive_Spire\Intermediate\Build\Win64\x64\UnrealEditor\Development\Radioactive_Spire\Radioactive_Spire.cpp.obj"
+"C:\Users\nguy1086\Desktop\Summer_2025_Solo_Game\Radioactive_Spire\Intermediate\Build\Win64\x64\UnrealEditor\Development\Radioactive_Spire\Default.rc2.res"
+/OUT:"C:\Users\nguy1086\Desktop\Summer_2025_Solo_Game\Radioactive_Spire\Intermediate\Build\Win64\x64\UnrealEditor\Development\Radioactive_Spire\UnrealEditor-Radioactive_Spire.lib"
