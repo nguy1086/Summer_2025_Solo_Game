@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "Radioactive_Spire",
+			"Path": "..\\Source\\Radioactive_Spire.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "Radioactive_SpireEditor",
+			"Path": "..\\Source\\Radioactive_SpireEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}
