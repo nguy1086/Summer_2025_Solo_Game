@@ -3,7 +3,7 @@
 Radioactive Spire is a 2D pixel art roguelite game by ***COMPANY NAME WIP***.<br/>
 You play as the Batter, one day during a normal day in high school a nuclear fallout happened.<br/>
 Years later, a corrupted government has taken over the world.<br/>
-Miraculously surviving the fallout and years without food and water, you rise up from the debris of what was left of your old life,<br/>
+Miraculously surviving the fallout and years without food and water, you rise up from the debris of what was left of your old life,
 and forcibly enter a new life of fighting.<br/>
 
 Reach the Spire and all goes back to normal.
