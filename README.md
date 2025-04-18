@@ -7,3 +7,10 @@ Miraculously surviving the fallout and years without food and water, you rise up
 and forcibly enter a new life of fighting.
 
 Reach the Spire and all goes back to normal.
+
+
+
+# Notes
+
+This project is meant to be practice for Algonquin College Game Development Program's third year capstone and improve upon portfolio.
+This project is entirely made by Brendon Nguyen, any outside source will be credited.
