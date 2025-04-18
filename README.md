@@ -15,7 +15,7 @@ This project is entirely made by Brendon Nguyen, any outside source will be cred
 
 ## Planned features
 
-• Multiple playable characters
-• Randomized rooms
-• Multiple levels
-• Skill tree (each character having their own)
+• Multiple playable characters<br/>
+• Randomized rooms<br/>
+• Multiple levels<br/>
+• Skill tree (each character having their own)<br/>
