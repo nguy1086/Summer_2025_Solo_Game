@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Camera/CameraComponent.h"
-#include "PlayerCamera.generated.h"
+#include "Inheritance/PlayableCharacter.h"
+#include "Test_Character.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class RADIOACTIVE_SPIRE_API UPlayerCamera : public UCameraComponent
+class RADIOACTIVE_SPIRE_API ATest_Character : public APlayableCharacter
 {
 	GENERATED_BODY()
 	

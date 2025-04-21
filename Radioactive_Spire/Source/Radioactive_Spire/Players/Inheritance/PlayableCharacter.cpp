@@ -3,3 +3,6 @@
 
 #include "PlayableCharacter.h"
 
+APlayableCharacter::APlayableCharacter()
+{
+}

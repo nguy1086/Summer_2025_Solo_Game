@@ -14,4 +14,6 @@ class RADIOACTIVE_SPIRE_API APlayableCharacter : public APaperCharacter
 {
 	GENERATED_BODY()
 	
+public:
+	APlayableCharacter();
 };

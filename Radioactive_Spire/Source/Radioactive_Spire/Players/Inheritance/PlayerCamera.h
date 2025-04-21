@@ -3,15 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/PlayerController.h"
-#include "PlayableController.generated.h"
+#include "Camera/CameraComponent.h"
+#include "PlayerCamera.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class RADIOACTIVE_SPIRE_API APlayableController : public APlayerController
+class RADIOACTIVE_SPIRE_API UPlayerCamera : public UCameraComponent
 {
 	GENERATED_BODY()
+	
+public:
 	
 };
