@@ -3,17 +3,44 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Camera/CameraComponent.h"
+#include "GameFramework/Actor.h"
 #include "PlayerCamera.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class RADIOACTIVE_SPIRE_API UPlayerCamera : public UCameraComponent
+class RADIOACTIVE_SPIRE_API APlayerCamera : public AActor
 {
 	GENERATED_BODY()
 	
 public:
+	APlayerCamera();
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
+	class UCameraComponent* Camera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess), Category = "Components")
+	class USphereComponent* SphereComponent;
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	void ApplyCameraShake();
+
+private:
+	void OnShake();
+
+	class APlayableCharacter* Player;
+	FVector InitialLocation;
+	FVector ShakeOffset;
+	FTimerHandle ShakeTimer;
+	int32 ShakeCount;
+
+	float OriginalZ;
 };

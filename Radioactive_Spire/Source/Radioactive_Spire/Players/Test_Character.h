@@ -14,4 +14,6 @@ class RADIOACTIVE_SPIRE_API ATest_Character : public APlayableCharacter
 {
 	GENERATED_BODY()
 	
+public:
+	ATest_Character();
 };
