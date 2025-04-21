@@ -18,6 +18,12 @@ enum class EState : uint8
 };
 
 UENUM(BlueprintType)
+enum class EPlayerType : uint8
+{
+	Test		UMETA(DisplayName = "Test")
+};
+
+UENUM(BlueprintType)
 enum class EDirection : uint8
 {
 	Right	UMETA(DisplayName = "Right"),

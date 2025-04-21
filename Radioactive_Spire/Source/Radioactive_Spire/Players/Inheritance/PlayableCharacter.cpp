@@ -10,6 +10,7 @@
 
 #include "PaperFlipbook.h"
 #include "PaperFlipbookComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 APlayableCharacter::APlayableCharacter() :
     PlayerState(nullptr),
@@ -49,7 +50,7 @@ void APlayableCharacter::BeginPlay()
 
     PlayerState = GetPlayerState<APlayableCharacterState>();
 
-    // Restart the Character before spawning
+    // restart the Character before spawning
     Restart();
 }
 
@@ -69,7 +70,7 @@ void APlayableCharacter::Tick(float DeltaTime)
 			if (GetMovementComponent()->IsFalling() && PlayerState->IsOnGround)
 				PlayerState->IsOnGround = false;
 
-			// Handle the situation where player is invincible, this 
+			// handle the situation where player is invincible, this 
 			// occurs right after player takes damage
 			if (IsInvincible())
 			{
@@ -130,6 +131,29 @@ void APlayableCharacter::ApplyStateChange(EState newState)
 
 	EState old = PlayerState->State;
 	PlayerState->State = newState;
+
+	if (newState == EState::Ducking)
+	{
+
+		GetCapsuleComponent()->SetCapsuleHalfHeight(PlayerConstants::DefaultCapsuleRadius);
+		GetSprite()->SetRelativeLocation(FVector(0.0f, 0.0f, -17.0f));
+
+		FVector location = GetActorLocation();
+		location.Z -= 11.0f;
+		SetActorLocation(location);
+	}
+	else
+	{
+		if (old == EState::Ducking)
+		{
+			GetCapsuleComponent()->SetCapsuleHalfHeight(PlayerConstants::DefaultCapsuleHalfHeight);
+			GetSprite()->SetRelativeLocation(FVector(0.0f, 0.0f, -27.0f));
+
+			FVector location = GetActorLocation();
+			location.Z += 11.0f;
+			SetActorLocation(location);
+		}
+	}
 
 	UpdateFlipbook();
 }
@@ -220,7 +244,12 @@ void APlayableCharacter::UpdateFlipbook()
 	UPaperFlipbook* currentFlipbook = GetSprite()->GetFlipbook();
 	UPaperFlipbook* newFlipbook = nullptr;
 
-	// Safety check that the new flipbook is not null and different than the current flipbook
+	if (Type == EPlayerType::Test)
+	{
+		newFlipbook = GetTestFlipbook();
+	}
+
+	// safety check that the new flipbook is not null and different than the current flipbook
 	if (currentFlipbook != newFlipbook && newFlipbook != nullptr)
 	{
 		GetSprite()->SetFlipbook(newFlipbook);
@@ -247,4 +276,35 @@ void APlayableCharacter::Death(bool spawnDeathAnimation)
 		//	gameMode->MarioHasDied(spawnDeadMario);
 		//}
 	}
+}
+
+UPaperFlipbook* APlayableCharacter::GetTestFlipbook()
+{
+	if (PlayerState == nullptr)
+		return nullptr;
+
+	UPaperFlipbook* flipbook = nullptr;
+
+	if (PlayerState->State == EState::Idle)
+	{
+		flipbook = TestIdleFlipbook;
+	}
+	else if (PlayerState->State == EState::Walking)
+	{
+		flipbook = TestWalkFlipbook;
+	}
+	else if (PlayerState->State == EState::Jumping)
+	{
+		flipbook = TestJumpFlipbook;
+	}
+	else if (PlayerState->State == EState::Falling)
+	{
+		flipbook = TestFallingFlipbook;
+	}
+	else if (PlayerState->State == EState::Ducking)
+	{
+		flipbook = TestDuckFlipbook;
+	}
+
+	return flipbook;
 }
