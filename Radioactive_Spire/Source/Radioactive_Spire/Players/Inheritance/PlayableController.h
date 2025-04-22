@@ -24,16 +24,16 @@ protected:
 	virtual void SetupInputComponent() override;
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced input")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	class UInputMappingContext* InputMappingContext;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced input")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* MoveInputAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced input")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* JumpInputAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced input")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* DuckInputAction;
 
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced input")

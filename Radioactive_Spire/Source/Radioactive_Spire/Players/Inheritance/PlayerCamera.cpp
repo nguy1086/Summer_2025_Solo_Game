@@ -40,7 +40,7 @@ void APlayerCamera::BeginPlay()
 
 	playerController->SetViewTargetWithBlend(this);
 
-	OriginalZ = Camera->GetComponentLocation().Z - 32.0f;
+	OriginalZ = Camera->GetComponentLocation().Z;
 }
 
 void APlayerCamera::Tick(float DeltaTime)

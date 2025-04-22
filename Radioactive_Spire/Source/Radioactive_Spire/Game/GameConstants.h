@@ -3,8 +3,8 @@
 namespace GameConstants
 {
 	// res and cam
-	constexpr float ResolutionWidth = 640.0f;
-	constexpr float ResolutionHeight = 480.0f;
+	constexpr float ResolutionWidth = 1920.0f;
+	constexpr float ResolutionHeight = 1440.0f;
 	constexpr float ResolutionAspectRatio = ResolutionWidth / ResolutionHeight;
 	constexpr float CameraDepthY = 200.0f;
 	constexpr float CameraRotationYaw = 270.0f;
