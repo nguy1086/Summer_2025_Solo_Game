@@ -15,7 +15,7 @@ APlayableController::APlayableController() :
 	MoveInputAction(nullptr),
 	JumpInputAction(nullptr),
 	DuckInputAction(nullptr),
-	UpInputAction(nullptr),
+	//UpInputAction(nullptr),
 	PlayablePlayer(nullptr),
 	PlayablePlayerState(nullptr),
 	InputSubsystem(nullptr)
@@ -64,7 +64,7 @@ void APlayableController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(DuckInputAction, ETriggerEvent::Started, this, &APlayableController::OnDuckPressed);
 		EnhancedInputComponent->BindAction(DuckInputAction, ETriggerEvent::Completed, this, &APlayableController::OnDuckReleased);
 
-		EnhancedInputComponent->BindAction(UpInputAction, ETriggerEvent::Started, this, &APlayableController::OnUpPressed);
+		//EnhancedInputComponent->BindAction(UpInputAction, ETriggerEvent::Started, this, &APlayableController::OnUpPressed);
 	}
 }
 
@@ -98,15 +98,15 @@ bool APlayableController::IsDuckPressed()
 	return false;
 }
 
-bool APlayableController::IsUpPressed()
-{
-	if (InputSubsystem != nullptr)
-	{
-		FInputActionValue InputActionValue = InputSubsystem->GetPlayerInput()->GetActionValue(UpInputAction);
-		return InputActionValue.Get<bool>();
-	}
-	return false;
-}
+//bool APlayableController::IsUpPressed()
+//{
+//	if (InputSubsystem != nullptr)
+//	{
+//		FInputActionValue InputActionValue = InputSubsystem->GetPlayerInput()->GetActionValue(UpInputAction);
+//		return InputActionValue.Get<bool>();
+//	}
+//	return false;
+//}
 
 void APlayableController::OnMove(const FInputActionValue& Value)
 {
@@ -116,8 +116,8 @@ void APlayableController::OnMove(const FInputActionValue& Value)
 	{
 		if (PlayablePlayerState->State != EState::Ducking)
 		{
-			//if (PlayablePlayerState->IsOnGround)
-			//	PlayablePlayerState->ApplyStateChange(EState::Walking);
+			if (PlayablePlayerState->IsOnGround)
+				PlayablePlayer->ApplyStateChange(EState::Walking);
 
 			PlayablePlayer->AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Direction);
 
@@ -138,12 +138,8 @@ void APlayableController::OnMove(const FInputActionValue& Value)
 void APlayableController::OnMoveReleased(const FInputActionValue& Value)
 {
 	if (PlayablePlayer != nullptr && PlayablePlayerState != nullptr)
-	{
 		if (PlayablePlayerState->IsOnGround && PlayablePlayerState->State != EState::Ducking)
-		{
-			//PlayablePlayer->ApplyStateChange(EState::Idle);
-		}
-	}
+			PlayablePlayer->ApplyStateChange(EState::Idle);
 }
 
 void APlayableController::OnJumpPressed(const FInputActionValue& Value)
@@ -160,16 +156,16 @@ void APlayableController::OnJumpReleased(const FInputActionValue& Value)
 
 void APlayableController::OnDuckPressed(const FInputActionValue& Value)
 {
-	//if (PlayablePlayer != nullptr)
-	//	PlayablePlayer->Duck();
+	if (PlayablePlayer != nullptr)
+		PlayablePlayer->Duck();
 }
 
 void APlayableController::OnDuckReleased(const FInputActionValue& Value)
 {
-	//if (PlayablePlayer != nullptr)
-	//	PlayablePlayer->StopDucking();
+	if (PlayablePlayer != nullptr)
+		PlayablePlayer->StopDucking();
 }
 
-void APlayableController::OnUpPressed(const FInputActionValue& Value)
-{
-}
+//void APlayableController::OnUpPressed(const FInputActionValue& Value)
+//{
+//}

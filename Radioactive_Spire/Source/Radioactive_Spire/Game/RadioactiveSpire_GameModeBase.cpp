@@ -2,18 +2,30 @@
 
 
 #include "RadioactiveSpire_GameModeBase.h"
+#include "RadioactiveSpire_GameStateBase.h"
+#include "DeadActor.h"
+
 #include "../Players/Inheritance/PlayableCharacter.h"
 #include "../Players/Inheritance/PlayableCharacterState.h"
 #include "../Players/Inheritance/PlayerCamera.h"
-//#include "EngineUtils.h"
+
+#include "EngineUtils.h"
+
+#include "PaperFlipbook.h"
+#include "PaperFlipbookComponent.h"
 ARadioactiveSpire_GameModeBase::ARadioactiveSpire_GameModeBase() :
     Camera(nullptr)
 {
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 void ARadioactiveSpire_GameModeBase::BeginPlay()
 {
     Super::BeginPlay();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	Camera = GetWorld()->SpawnActor<APlayerCamera>(APlayerCamera::StaticClass(), FVector(), FRotator(), SpawnParams);
 }
 
 void ARadioactiveSpire_GameModeBase::Tick(float DeltaTime)
@@ -21,40 +33,62 @@ void ARadioactiveSpire_GameModeBase::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
 }
 
-void ARadioactiveSpire_GameModeBase::PlayerDied(bool spawnDeadMario)
+void ARadioactiveSpire_GameModeBase::PlayerDied()
 {
+	APlayableCharacter* player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
+	if (player)
+		SpawnDeathAnimation(player->GetActorLocation());
 }
 
 void ARadioactiveSpire_GameModeBase::SpawnDeathAnimation(FVector location)
 {
+	PauseActors();
+
+	APlayableCharacter* player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
+	if (player)
+	{
+		// HANDLE TYPE OF PLAYER
+		if (player->Type == EPlayerType::Test)
+		{
+			if (DeadTestTemplate != nullptr)
+			{
+				UWorld* const world = GetWorld();
+				if (world != nullptr)
+				{
+					FActorSpawnParameters SpawnParams;
+					SpawnParams.Owner = this;
+					SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+					FTransform SpawnTransform(location);
+
+					ADeadActor* deadActor = world->SpawnActor<ADeadActor>(DeadTestTemplate, SpawnTransform, SpawnParams);
+				}
+			}
+		}
+	}
 }
 
 void ARadioactiveSpire_GameModeBase::PauseActors()
 {
-	//for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
-	//{
-	//	AActor* actor = *ActorItr;
-	//	actor->CustomTimeDilation = 0.0f;
+	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		AActor* actor = *ActorItr;
+		actor->CustomTimeDilation = 0.0f;
 
-	//	if (actor->ActorHasTag("Player"))
-	//	{
-	//		APlayableCharacter* player = Cast<APlayableCharacter>(actor);
-	//		player->GetSprite()->SetVisibility(false);
-	//	}
-	//}
+		APlayableCharacter* player = Cast<APlayableCharacter>(actor);
+		if (player)
+			player->GetSprite()->SetVisibility(false);
+	}
 }
 
 void ARadioactiveSpire_GameModeBase::UnpauseActors()
 {
-	//for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
-	//{
-	//	AActor* actor = *ActorItr;
-	//	actor->CustomTimeDilation = 1.0f;
+	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		AActor* actor = *ActorItr;
+		actor->CustomTimeDilation = 1.0f;
 
-	//	if (actor->ActorHasTag("Player"))
-	//	{
-	//		APlayableCharacter* player = Cast<APlayableCharacter>(actor);
-	//		player->GetSprite()->SetVisibility(true);
-	//	}
-	//}
+		APlayableCharacter* player = Cast<APlayableCharacter>(actor);
+		if (player)
+			player->GetSprite()->SetVisibility(true);
+	}
 }

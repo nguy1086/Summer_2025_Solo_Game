@@ -12,6 +12,8 @@
 #include "PaperFlipbookComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "../../Game/RadioactiveSpire_GameModeBase.h"
+
 APlayableCharacter::APlayableCharacter() :
     PlayerState(nullptr),
     Camera(nullptr)
@@ -108,7 +110,7 @@ void APlayableCharacter::Duck()
 void APlayableCharacter::StopDucking()
 {
 	APlayableController* controller = Cast<APlayableController>(Controller);
-	if (controller != nullptr)
+	if (controller)
 	{
 		if (controller->GetMoveValue() == 0.0f)
 		{
@@ -123,7 +125,7 @@ void APlayableCharacter::StopDucking()
 
 void APlayableCharacter::ApplyStateChange(EState newState)
 {
-	if (PlayerState == nullptr)
+	if (!PlayerState)
 		return;
 
 	if (PlayerState->State == newState)
@@ -166,7 +168,7 @@ void APlayableCharacter::ApplyBounce()
 
 void APlayableCharacter::HandleDamage(float damage)
 {
-	if (PlayerState != nullptr && (IsInvincible() == false))
+	if (PlayerState && !IsInvincible())
 	{
 		Health -= damage;
 		if (Health <= 0)
@@ -194,7 +196,7 @@ void APlayableCharacter::OnJumped_Implementation()
 {
 	Super::OnJumped_Implementation();
 
-	if (PlayerState != nullptr)
+	if (PlayerState)
 		PlayerState->IsOnGround = false;
 
 	ApplyStateChange(EState::Jumping);
@@ -202,7 +204,7 @@ void APlayableCharacter::OnJumped_Implementation()
 
 void APlayableCharacter::NotifyJumpApex()
 {
-	if (PlayerState != nullptr && PlayerState->IsOnGround == false)
+	if (PlayerState && !PlayerState->IsOnGround)
 		ApplyStateChange(EState::Falling);
 }
 
@@ -210,7 +212,7 @@ void APlayableCharacter::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
 
-	if (PlayerState != nullptr)
+	if (PlayerState)
 	{
 		PlayerState->IsOnGround = true;
 
@@ -238,7 +240,7 @@ void APlayableCharacter::Landed(const FHitResult& Hit)
 
 void APlayableCharacter::UpdateFlipbook()
 {
-	if (PlayerState == nullptr)
+	if (!PlayerState)
 		return;
 
 	UPaperFlipbook* currentFlipbook = GetSprite()->GetFlipbook();
@@ -250,7 +252,7 @@ void APlayableCharacter::UpdateFlipbook()
 	}
 
 	// safety check that the new flipbook is not null and different than the current flipbook
-	if (currentFlipbook != newFlipbook && newFlipbook != nullptr)
+	if (currentFlipbook != newFlipbook && newFlipbook)
 	{
 		GetSprite()->SetFlipbook(newFlipbook);
 		GetSprite()->PlayFromStart();
@@ -270,41 +272,29 @@ void APlayableCharacter::Death(bool spawnDeathAnimation)
 
 		SetActorHiddenInGame(true);
 
-		//APlatformerGameModeBase* gameMode = GetWorld()->GetAuthGameMode<APlatformerGameModeBase>();
-		//if (gameMode != nullptr)
-		//{
-		//	gameMode->MarioHasDied(spawnDeadMario);
-		//}
+		ARadioactiveSpire_GameModeBase* gameMode = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
+		if (gameMode)
+			gameMode->PlayerDied();
 	}
 }
 
 UPaperFlipbook* APlayableCharacter::GetTestFlipbook()
 {
-	if (PlayerState == nullptr)
+	if (!PlayerState)
 		return nullptr;
 
 	UPaperFlipbook* flipbook = nullptr;
 
 	if (PlayerState->State == EState::Idle)
-	{
 		flipbook = TestIdleFlipbook;
-	}
 	else if (PlayerState->State == EState::Walking)
-	{
 		flipbook = TestWalkFlipbook;
-	}
 	else if (PlayerState->State == EState::Jumping)
-	{
 		flipbook = TestJumpFlipbook;
-	}
 	else if (PlayerState->State == EState::Falling)
-	{
 		flipbook = TestFallingFlipbook;
-	}
 	else if (PlayerState->State == EState::Ducking)
-	{
 		flipbook = TestDuckFlipbook;
-	}
 
 	return flipbook;
 }

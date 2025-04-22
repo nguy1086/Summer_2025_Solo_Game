@@ -23,7 +23,7 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	void PlayerDied(bool spawnDeadMario);
+	void PlayerDied();
 
 private:
 	void SpawnDeathAnimation(FVector location);
@@ -34,6 +34,6 @@ private:
 	UPROPERTY() class APlayerCamera* Camera;
 
 public:
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GameMode Templates")
-	//TSubclassOf<class ADeadActor> DeadTestTemplate;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GameMode Templates")
+	TSubclassOf<class ADeadActor> DeadTestTemplate;
 };

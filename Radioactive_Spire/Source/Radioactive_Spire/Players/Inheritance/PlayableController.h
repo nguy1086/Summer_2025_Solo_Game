@@ -36,13 +36,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced input")
 	class UInputAction* DuckInputAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced input")
-	class UInputAction* UpInputAction;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced input")
+	//class UInputAction* UpInputAction;
 
 	float GetMoveValue();
 	bool IsJumpPressed();
 	bool IsDuckPressed();
-	bool IsUpPressed();
+	//bool IsUpPressed();
 
 protected:
 	void OnMove(const struct FInputActionValue& Value);
@@ -54,7 +54,7 @@ protected:
 	void OnDuckPressed(const struct FInputActionValue& Value);
 	void OnDuckReleased(const struct FInputActionValue& Value);
 
-	void OnUpPressed(const struct FInputActionValue& Value);
+	//void OnUpPressed(const struct FInputActionValue& Value);
 
 private:
 	class APlayableCharacter* PlayablePlayer;
