@@ -16,10 +16,10 @@ namespace PlayerConstants
     //jump
     constexpr float DefaultGravityScale = 3.75f;
     constexpr float DefaultAirControl = 1.0f;
-    constexpr float DefaultJumpZVelocity = 750.0f;
+    constexpr float DefaultJumpZVelocity = 800.0f;
     constexpr float DefaultJumpMaxHoldTimeWalking = 0.15f;
     constexpr float DefaultJumpMaxHoldTimeRunning = 0.19f;
-    constexpr float DefaultJumpIncreasePerSegment = 0.0025f;
+    constexpr float DefaultJumpIncreasePerSegment = 0.0005f;
 
     constexpr float DefaultInvincibleTime = 1.5f;
     constexpr float DefaultInvincibleVisibilityDuration = 0.05f;

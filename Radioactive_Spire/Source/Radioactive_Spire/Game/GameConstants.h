@@ -9,6 +9,7 @@ namespace GameConstants
 	constexpr float CameraDepthY = 200.0f;
 	constexpr float CameraRotationYaw = 270.0f;
 	constexpr int32 MaxCameraShakes = 9;
+	constexpr float CameraZOffset = 128.0f;
 
 	// dead
 	constexpr float DeadHoldTime = 1.5f;

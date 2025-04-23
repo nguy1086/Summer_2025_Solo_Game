@@ -40,7 +40,7 @@ void APlayerCamera::BeginPlay()
 
 	playerController->SetViewTargetWithBlend(this);
 
-	OriginalZ = Camera->GetComponentLocation().Z;
+	OriginalZ = Camera->GetComponentLocation().Z + GameConstants::CameraZOffset;
 }
 
 void APlayerCamera::Tick(float DeltaTime)
@@ -50,14 +50,14 @@ void APlayerCamera::Tick(float DeltaTime)
 	if (Player != nullptr)
 	{
 		// get player and the camera locations
-		FVector marioLocation = Player->GetActorLocation();
+		FVector playerLocation = Player->GetActorLocation();
 		FVector cameraLocation = Camera->GetComponentLocation();
 
 		// set the X value
-		cameraLocation.X = FMath::FInterpTo(cameraLocation.X, marioLocation.X, DeltaTime, 8.0f) + ShakeOffset.X;
+		cameraLocation.X = FMath::FInterpTo(cameraLocation.X, playerLocation.X, DeltaTime, 8.0f) + ShakeOffset.X;
 
 		// set the Z value
-		cameraLocation.Z = InitialLocation.Z + ShakeOffset.Z;
+		cameraLocation.Z = InitialLocation.Z + GameConstants::CameraZOffset + ShakeOffset.Z;
 
 		// set the camera location
 		Camera->SetWorldLocation(FVector(cameraLocation.X, Camera->GetComponentLocation().Y, cameraLocation.Z));

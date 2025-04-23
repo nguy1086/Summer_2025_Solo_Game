@@ -35,6 +35,7 @@ APlayableCharacter::APlayableCharacter() :
     GetCharacterMovement()->GravityScale = PlayerConstants::DefaultGravityScale;
     GetCharacterMovement()->AirControl = PlayerConstants::DefaultAirControl;
     GetCharacterMovement()->JumpZVelocity = PlayerConstants::DefaultJumpZVelocity;
+	GetCharacterMovement()->bNotifyApex = true;
     JumpMaxHoldTime = 0.15f;
 
     //walking
@@ -104,21 +105,21 @@ void APlayableCharacter::Tick(float DeltaTime)
 
 void APlayableCharacter::Duck()
 {
-	ApplyStateChange(EState::Ducking);
+	if (PlayerState->IsOnGround)
+		ApplyStateChange(EState::Ducking);
 }
 
 void APlayableCharacter::StopDucking()
 {
-	APlayableController* controller = Cast<APlayableController>(Controller);
-	if (controller)
+	if (PlayerState->IsOnGround)
 	{
-		if (controller->GetMoveValue() == 0.0f)
+		APlayableController* controller = Cast<APlayableController>(Controller);
+		if (controller)
 		{
-			ApplyStateChange(EState::Idle);
-		}
-		else
-		{
-			ApplyStateChange(EState::Walking);
+			if (controller->GetMoveValue() == 0.0f)
+				ApplyStateChange(EState::Idle);
+			else
+				ApplyStateChange(EState::Walking);
 		}
 	}
 }
@@ -204,6 +205,8 @@ void APlayableCharacter::OnJumped_Implementation()
 
 void APlayableCharacter::NotifyJumpApex()
 {
+	Super::NotifyJumpApex();
+
 	if (PlayerState && !PlayerState->IsOnGround)
 		ApplyStateChange(EState::Falling);
 }
