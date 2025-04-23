@@ -25,7 +25,7 @@ namespace PlayerConstants
     constexpr float DefaultInvincibleVisibilityDuration = 0.05f;
 
     //collision
-    constexpr float DefaultCapsuleRadius = 14.0f;
-    constexpr float DefaultCapsuleHalfHeight = 25.0f;
+    constexpr float DefaultCapsuleRadius = 28.0f;
+    constexpr float DefaultCapsuleHalfHeight = 75.0f;
     //END DEFAULT   ----------------------------------------------------------------------
 }

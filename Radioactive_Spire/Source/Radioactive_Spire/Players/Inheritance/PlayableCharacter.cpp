@@ -139,7 +139,7 @@ void APlayableCharacter::ApplyStateChange(EState newState)
 	{
 
 		GetCapsuleComponent()->SetCapsuleHalfHeight(PlayerConstants::DefaultCapsuleRadius);
-		//GetSprite()->SetRelativeLocation(FVector(0.0f, 0.0f, -17.0f));
+		//GetSprite()->SetRelativeLocation(FVector(0.0f, 0.0f, 40.0f));
 
 		FVector location = GetActorLocation();
 		location.Z -= 11.0f;
@@ -150,7 +150,7 @@ void APlayableCharacter::ApplyStateChange(EState newState)
 		if (old == EState::Ducking)
 		{
 			GetCapsuleComponent()->SetCapsuleHalfHeight(PlayerConstants::DefaultCapsuleHalfHeight);
-			//GetSprite()->SetRelativeLocation(FVector(0.0f, 0.0f, -27.0f));
+			//GetSprite()->SetRelativeLocation(FVector(0.0f, 0.0f, 20.0f));
 
 			FVector location = GetActorLocation();
 			location.Z += 11.0f;
@@ -229,13 +229,9 @@ void APlayableCharacter::Landed(const FHitResult& Hit)
 			else
 			{
 				if (controller->GetMoveValue() == 0.0f)
-				{
 					ApplyStateChange(EState::Idle);
-				}
 				else
-				{
 					ApplyStateChange(EState::Walking);
-				}
 			}
 		}
 	}
