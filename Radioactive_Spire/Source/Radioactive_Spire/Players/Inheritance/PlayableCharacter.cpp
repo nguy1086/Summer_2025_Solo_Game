@@ -35,7 +35,6 @@ APlayableCharacter::APlayableCharacter() :
     GetCharacterMovement()->GravityScale = PlayerConstants::DefaultGravityScale;
     GetCharacterMovement()->AirControl = PlayerConstants::DefaultAirControl;
     GetCharacterMovement()->JumpZVelocity = PlayerConstants::DefaultJumpZVelocity;
-	GetCharacterMovement()->bNotifyApex = true;
     JumpMaxHoldTime = 0.15f;
 
     //walking
@@ -134,6 +133,9 @@ void APlayableCharacter::ApplyStateChange(EState newState)
 
 	EState old = PlayerState->State;
 	PlayerState->State = newState;
+
+	if (newState == EState::Jumping)
+		GetCharacterMovement()->bNotifyApex = true;
 
 	if (newState == EState::Ducking)
 	{
