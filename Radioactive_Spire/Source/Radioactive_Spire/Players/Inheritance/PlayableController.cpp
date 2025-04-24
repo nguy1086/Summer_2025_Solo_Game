@@ -66,6 +66,8 @@ void APlayableController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(DuckInputAction, ETriggerEvent::Started, this, &APlayableController::OnDuckPressed);
 		EnhancedInputComponent->BindAction(DuckInputAction, ETriggerEvent::Completed, this, &APlayableController::OnDuckReleased);
 
+		EnhancedInputComponent->BindAction(AttackInputAction, ETriggerEvent::Started, this, &APlayableController::OnAttackPressed);
+
 		//EnhancedInputComponent->BindAction(UpInputAction, ETriggerEvent::Started, this, &APlayableController::OnUpPressed);
 	}
 }
@@ -95,6 +97,16 @@ bool APlayableController::IsDuckPressed()
 	if (InputSubsystem != nullptr)
 	{
 		FInputActionValue InputActionValue = InputSubsystem->GetPlayerInput()->GetActionValue(DuckInputAction);
+		return InputActionValue.Get<bool>();
+	}
+	return false;
+}
+
+bool APlayableController::IsAttackPressed()
+{
+	if (InputSubsystem != nullptr)
+	{
+		FInputActionValue InputActionValue = InputSubsystem->GetPlayerInput()->GetActionValue(AttackInputAction);
 		return InputActionValue.Get<bool>();
 	}
 	return false;
@@ -166,6 +178,12 @@ void APlayableController::OnDuckReleased(const FInputActionValue& Value)
 {
 	if (PlayablePlayer != nullptr)
 		PlayablePlayer->StopDucking();
+}
+
+void APlayableController::OnAttackPressed(const FInputActionValue& Value)
+{
+	if (PlayablePlayer != nullptr)
+		PlayablePlayer->Attack();
 }
 
 //void APlayableController::OnUpPressed(const FInputActionValue& Value)

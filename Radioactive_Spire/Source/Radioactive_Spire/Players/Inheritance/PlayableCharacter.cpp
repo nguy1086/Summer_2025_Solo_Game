@@ -123,6 +123,11 @@ void APlayableCharacter::StopDucking()
 	}
 }
 
+void APlayableCharacter::Attack()
+{
+
+}
+
 void APlayableCharacter::ApplyStateChange(EState newState)
 {
 	if (!PlayerState)

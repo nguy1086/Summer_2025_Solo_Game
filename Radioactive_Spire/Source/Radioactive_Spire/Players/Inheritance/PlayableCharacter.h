@@ -29,6 +29,8 @@ public:
 	void Duck();
 	void StopDucking();
 
+	void Attack();
+
 	void ApplyStateChange(EState newState);
 	void ApplyBounce();
 

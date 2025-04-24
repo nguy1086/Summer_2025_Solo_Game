@@ -36,12 +36,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* DuckInputAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* AttackInputAction;
+
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced input")
 	//class UInputAction* UpInputAction;
 
 	float GetMoveValue();
 	bool IsJumpPressed();
 	bool IsDuckPressed();
+	bool IsAttackPressed();
 	//bool IsUpPressed();
 
 protected:
@@ -53,6 +57,8 @@ protected:
 
 	void OnDuckPressed(const struct FInputActionValue& Value);
 	void OnDuckReleased(const struct FInputActionValue& Value);
+
+	void OnAttackPressed(const struct FInputActionValue& Value);
 
 	//void OnUpPressed(const struct FInputActionValue& Value);
 
