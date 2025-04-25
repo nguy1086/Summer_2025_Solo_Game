@@ -16,7 +16,9 @@
 
 APlayableCharacter::APlayableCharacter() :
     PlayerState(nullptr),
-    Camera(nullptr)
+    Camera(nullptr),
+	DamagedTimer(0.0f),
+	AttackCooldown(0.0f)
 {
     PrimaryActorTick.bCanEverTick = true;
 
@@ -98,6 +100,9 @@ void APlayableCharacter::Tick(float DeltaTime)
 
 			if (GetActorLocation().Z < -250.0f)
 				Death(false);
+
+			if (AttackCooldown >= 0.0f)
+				AttackCooldown -= DeltaTime;
 		}
 	}
 }
@@ -125,7 +130,13 @@ void APlayableCharacter::StopDucking()
 
 void APlayableCharacter::Attack()
 {
+	if (AttackCooldown <= 0.0f)
+	{
+		ApplyStateChange(EState::Attacking);
 
+
+		AttackCooldown = PlayerConstants::DefaultAttackCooldown;
+	}
 }
 
 void APlayableCharacter::ApplyStateChange(EState newState)
@@ -301,6 +312,8 @@ UPaperFlipbook* APlayableCharacter::GetTestFlipbook()
 		flipbook = TestFallingFlipbook;
 	else if (PlayerState->State == EState::Ducking)
 		flipbook = TestDuckFlipbook;
+	else if (PlayerState->State == EState::Attacking)
+		flipbook = TestAttackFlipbook;
 
 	return flipbook;
 }

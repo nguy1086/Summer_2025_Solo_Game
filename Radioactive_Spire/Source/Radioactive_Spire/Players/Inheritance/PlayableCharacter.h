@@ -56,6 +56,7 @@ private:
 	class APlayableCharacterState* PlayerState;
 	class APlayerCamera* Camera;
 	float DamagedTimer;
+	float AttackCooldown;
 
 	class UPaperFlipbook* GetTestFlipbook();
 
@@ -75,4 +76,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Test flipbooks")
 	class UPaperFlipbook* TestDuckFlipbook;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Test flipbooks")
+	class UPaperFlipbook* TestAttackFlipbook;
 };

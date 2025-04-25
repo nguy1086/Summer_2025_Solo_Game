@@ -27,5 +27,8 @@ namespace PlayerConstants
     //collision
     constexpr float DefaultCapsuleRadius = 28.0f;
     constexpr float DefaultCapsuleHalfHeight = 75.0f;
+
+    //attack
+    constexpr float DefaultAttackCooldown = 0.3f;
     //END DEFAULT   ----------------------------------------------------------------------
 }
