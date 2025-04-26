@@ -23,7 +23,7 @@ APlayableCharacter::APlayableCharacter() :
     PrimaryActorTick.bCanEverTick = true;
 
     //collision
-    GetCapsuleComponent()->SetCollisionProfileName("Player");
+    GetCapsuleComponent()->SetCollisionProfileName("Entity");
     GetCapsuleComponent()->SetCapsuleRadius(14.0f);
     GetCapsuleComponent()->SetCapsuleHalfHeight(25.0f);
 
