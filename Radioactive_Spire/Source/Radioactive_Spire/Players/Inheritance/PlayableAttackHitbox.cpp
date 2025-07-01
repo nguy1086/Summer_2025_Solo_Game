@@ -43,7 +43,10 @@ void APlayableAttackHitbox::Spawn(FString name)
 
 		FlipbookComponent->SetFlipbook(flipbook);
 		FlipbookComponent->SetLooping(false);
-		FlipbookComponent->OnFinishedPlaying.AddDynamic(this, &APlayableAttackHitbox::OnFinishPlaying());
+
+		//FlipbookComponent->OnFinishedPlaying.AddDynamic(this, &APlayableAttackHitbox::OnFinishPlaying());
+		GetWorldTimerManager().SetTimer(MyTimerHandle, this, &APlayableAttackHitbox::OnFinishPlaying,FlipbookComponent->GetFlipbookLength(), true);
+
 		FlipbookComponent->PlayFromStart();
 	}
 }
