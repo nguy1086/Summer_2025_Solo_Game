@@ -15,7 +15,10 @@ APlayableAttackHitbox::APlayableAttackHitbox() :
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	
+	FlipbookComponent = CreateDefaultSubobject<UPaperFlipbookComponent>("HitboxFlipbook");
+	FlipbookComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	FlipbookComponent->SetCollisionProfileName("NoCollision");
+	FlipbookComponent->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -30,7 +33,7 @@ void APlayableAttackHitbox::OnOverlapBegin(UPrimitiveComponent* OverlapComponent
 
 void APlayableAttackHitbox::Spawn(FString name)
 {
-	if (!name.IsEmpty())
+	if (!name.IsEmpty() && FlipbookComponent)
 	{
 		UPaperFlipbook* flipbook = nullptr;
 
@@ -38,8 +41,6 @@ void APlayableAttackHitbox::Spawn(FString name)
 		{
 			flipbook = TestBasicFlipbook;
 		}
-
-
 
 		FlipbookComponent->SetFlipbook(flipbook);
 		FlipbookComponent->SetLooping(false);

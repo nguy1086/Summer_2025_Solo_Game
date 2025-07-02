@@ -79,4 +79,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Test flipbooks")
 	class UPaperFlipbook* TestAttackFlipbook;
+
+	//Test Attacks
+	UPROPERTY(EditAnyWhere, Category = "Test attack")
+	TSubclassOf<class APlayableAttackHitbox> AttackHitboxTemplate;
 };

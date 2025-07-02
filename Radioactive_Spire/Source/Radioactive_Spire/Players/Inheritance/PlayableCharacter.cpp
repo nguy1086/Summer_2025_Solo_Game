@@ -5,6 +5,8 @@
 #include "PlayableCharacterState.h"
 #include "PlayableController.h"
 #include "PlayerCamera.h"
+#include "PlayableAttackHitbox.h"
+
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -134,6 +136,22 @@ void APlayableCharacter::Attack()
 	{
 		ApplyStateChange(EState::Attacking);
 
+		if (AttackHitboxTemplate)
+		{
+			FVector location = GetActorLocation();
+			FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
+			if (PlayerState->Direction == EDirection::Left)
+			{
+				location.X -= 32.0f;
+				rotation = FRotator(0.0f, 180.0f, 0.0f);
+			}
+			else if (PlayerState->Direction == EDirection::Right)
+				location.X += 32.0f;
+
+			APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
+			hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+			hitbox->Spawn(TEXT("Test_Basic"));
+		}
 
 		AttackCooldown = PlayerConstants::DefaultAttackCooldown;
 	}

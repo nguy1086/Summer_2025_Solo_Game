@@ -26,14 +26,14 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	void Spawn(FString name);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlapComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	void Spawn(FString name);
 
 	UFUNCTION()
 	void OnFinishPlaying();
