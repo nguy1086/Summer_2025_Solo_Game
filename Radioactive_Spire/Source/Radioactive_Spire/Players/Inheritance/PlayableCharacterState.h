@@ -15,13 +15,15 @@ enum class EState : uint8
 	Falling		UMETA(DisplayName = "Falling"),
 	Ducking		UMETA(DisplayName = "Ducking"),
 	Attacking	UMETA(DisplayName = "Attacking"),
+	HeavyAttack	UMETA(DisplayName = "HeavyAttack"),
 	Dead		UMETA(DisplayName = "Dead"),
 };
 
 UENUM(BlueprintType)
 enum class EPlayerType : uint8
 {
-	Test		UMETA(DisplayName = "Test")
+	Test		UMETA(DisplayName = "Test"),
+	Batter		UMETA(DisplayName = "Batter")
 };
 
 UENUM(BlueprintType)

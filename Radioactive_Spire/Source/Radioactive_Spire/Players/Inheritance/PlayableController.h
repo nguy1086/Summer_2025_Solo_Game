@@ -60,6 +60,8 @@ protected:
 
 	void OnAttackPressed(const struct FInputActionValue& Value);
 
+	void OnHeavyPressed(const struct FInputActionValue& Value);
+
 	//void OnUpPressed(const struct FInputActionValue& Value);
 
 private:

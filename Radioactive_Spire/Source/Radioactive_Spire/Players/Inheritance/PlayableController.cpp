@@ -186,6 +186,12 @@ void APlayableController::OnAttackPressed(const FInputActionValue& Value)
 		PlayablePlayer->Attack();
 }
 
+void APlayableController::OnHeavyPressed(const FInputActionValue& Value)
+{
+	if (PlayablePlayer != nullptr)
+		PlayablePlayer->Heavy();
+}
+
 //void APlayableController::OnUpPressed(const FInputActionValue& Value)
 //{
 //}

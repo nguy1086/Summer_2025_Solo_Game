@@ -157,6 +157,31 @@ void APlayableCharacter::Attack()
 	}
 }
 
+void APlayableCharacter::Heavy()
+{
+	if (PlayerState->State != EState::HeavyAttack)
+	{
+		ApplyStateChange(EState::HeavyAttack);
+
+		if (AttackHitboxTemplate)
+		{
+			FVector location = GetActorLocation();
+			FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
+			if (PlayerState->Direction == EDirection::Left)
+			{
+				location.X -= 32.0f;
+				rotation = FRotator(0.0f, 180.0f, 0.0f);
+			}
+			else if (PlayerState->Direction == EDirection::Right)
+				location.X += 32.0f;
+
+			APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
+			hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+			hitbox->Spawn(TEXT("Test_Basic"));
+		}
+	}
+}
+
 void APlayableCharacter::ApplyStateChange(EState newState)
 {
 	if (!PlayerState)
@@ -285,6 +310,10 @@ void APlayableCharacter::UpdateFlipbook()
 	{
 		newFlipbook = GetTestFlipbook();
 	}
+	else if (Type == EPlayerType::Batter)
+	{
+		newFlipbook = GetBatterFlipbook();
+	}
 
 	// safety check that the new flipbook is not null and different than the current flipbook
 	if (currentFlipbook != newFlipbook && newFlipbook)
@@ -332,6 +361,31 @@ UPaperFlipbook* APlayableCharacter::GetTestFlipbook()
 		flipbook = TestDuckFlipbook;
 	else if (PlayerState->State == EState::Attacking)
 		flipbook = TestAttackFlipbook;
+
+	return flipbook;
+}
+
+UPaperFlipbook* APlayableCharacter::GetBatterFlipbook()
+{
+	if (!PlayerState)
+		return nullptr;
+
+	UPaperFlipbook* flipbook = nullptr;
+
+	if (PlayerState->State == EState::Idle)
+		flipbook = BatterIdleFlipbook;
+	else if (PlayerState->State == EState::Walking)
+		flipbook = BatterWalkFlipbook;
+	else if (PlayerState->State == EState::Jumping)
+		flipbook = BatterJumpFlipbook;
+	else if (PlayerState->State == EState::Falling)
+		flipbook = BatterFallingFlipbook;
+	else if (PlayerState->State == EState::Ducking)
+		flipbook = BatterDuckFlipbook;
+	else if (PlayerState->State == EState::Attacking)
+		flipbook = BatterAttackFlipbook;
+	else if (PlayerState->State == EState::HeavyAttack)
+		flipbook = BatterHeavyFlipbook;
 
 	return flipbook;
 }

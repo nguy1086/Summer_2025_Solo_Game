@@ -30,6 +30,7 @@ public:
 	void StopDucking();
 
 	void Attack();
+	void Heavy();
 
 	void ApplyStateChange(EState newState);
 	void ApplyBounce();
@@ -59,26 +60,39 @@ private:
 	float AttackCooldown;
 
 	class UPaperFlipbook* GetTestFlipbook();
+	class UPaperFlipbook* GetBatterFlipbook();
 
 public:
+
 	//Test
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Test flipbooks")
 	class UPaperFlipbook* TestIdleFlipbook;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Test flipbooks")
 	class UPaperFlipbook* TestWalkFlipbook;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Test flipbooks")
 	class UPaperFlipbook* TestJumpFlipbook;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Test flipbooks")
 	class UPaperFlipbook* TestFallingFlipbook;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Test flipbooks")
 	class UPaperFlipbook* TestDuckFlipbook;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Test flipbooks")
 	class UPaperFlipbook* TestAttackFlipbook;
+
+	//Batter
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterIdleFlipbook;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterWalkFlipbook;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterJumpFlipbook;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterFallingFlipbook;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterDuckFlipbook;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterAttackFlipbook;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterHeavyFlipbook;
 
 	//Test Attacks
 	UPROPERTY(EditAnyWhere, Category = "Test attack")
