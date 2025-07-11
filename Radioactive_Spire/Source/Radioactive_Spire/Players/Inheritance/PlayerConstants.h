@@ -3,6 +3,10 @@
 namespace PlayerConstants
 {
     //DEFAULTS      ----------------------------------------------------------------------
+    //sprite offset
+    const FVector DefaultSpriteOffset = FVector(0, 0, 17.0f);
+    const FVector DefaultSpriteCrouchOffset = FVector(0, 0, 63.0f);
+
     //stats
     constexpr float DefaultHealth = 100.0f;
 
@@ -31,4 +35,36 @@ namespace PlayerConstants
     //attack
     constexpr float DefaultAttackCooldown = 0.3f;
     //END DEFAULT   ----------------------------------------------------------------------
+
+    //BATTER        ----------------------------------------------------------------------
+    //sprite offset
+    const FVector BatterSpriteOffset = FVector(0, 0, 7.0f);
+    const FVector BatterSpriteCrouchOffset = FVector(0, 0, 53.0f);
+
+    //stats
+    constexpr float BatterHealth = 250.0f;
+
+    //walk
+    constexpr float BatterGroundFriction = 3.5f;
+    constexpr float BatterMinSpeed = 200.0f;
+    constexpr float BatterMaxAcceleration = 300.0f;
+    constexpr float BatterMaxSpeed = 300.0f;
+    constexpr float BatterMaxStepHeight = 10.0f;
+
+    //jump
+    constexpr float BatterGravityScale = 3.75f;
+    constexpr float BatterAirControl = 1.0f;
+    constexpr float BatterJumpZVelocity = 800.0f;
+    constexpr float BatterJumpMaxHoldTimeWalking = 0.15f;
+    constexpr float BatterJumpMaxHoldTimeRunning = 0.19f;
+    constexpr float BatterJumpIncreasePerSegment = 0.0005f;
+                    
+    constexpr float BatterInvincibleTime = 1.5f;
+    constexpr float BatterInvincibleVisibilityDuration = 0.05f;
+
+    //collision
+    constexpr float BatterCapsuleRadius = 28.0f;
+    constexpr float BatterCapsuleHalfHeight = 75.0f;
+
+    //END BATTER    ----------------------------------------------------------------------
 }

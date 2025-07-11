@@ -24,28 +24,7 @@ APlayableCharacter::APlayableCharacter() :
 {
     PrimaryActorTick.bCanEverTick = true;
 
-    //collision
-    GetCapsuleComponent()->SetCollisionProfileName("Entity");
-    GetCapsuleComponent()->SetCapsuleRadius(14.0f);
-    GetCapsuleComponent()->SetCapsuleHalfHeight(25.0f);
-
-    //ground
-    GetCharacterMovement()->bUseFlatBaseForFloorChecks = true;
-    GetCharacterMovement()->bConstrainToPlane = true;
-    GetCharacterMovement()->MaxStepHeight = PlayerConstants::DefaultMaxStepHeight;
-    GetCharacterMovement()->SetPlaneConstraintNormal(FVector(0.0f, 1.0f, 0.0f));
-
-    //jump
-    GetCharacterMovement()->GravityScale = PlayerConstants::DefaultGravityScale;
-    GetCharacterMovement()->AirControl = PlayerConstants::DefaultAirControl;
-    GetCharacterMovement()->JumpZVelocity = PlayerConstants::DefaultJumpZVelocity;
-    JumpMaxHoldTime = 0.15f;
-
-    //walking
-    GetCharacterMovement()->GroundFriction = PlayerConstants::DefaultGroundFriction;
-    GetCharacterMovement()->MaxWalkSpeed = PlayerConstants::DefaultMaxSpeed;
-    GetCharacterMovement()->MaxAcceleration = PlayerConstants::DefaultMaxAcceleration;
-    GetCharacterMovement()->MinAnalogWalkSpeed = PlayerConstants::DefaultMinSpeed;
+	InitializeType();
 
     Tags.Add("Player");
 }
@@ -55,6 +34,11 @@ void APlayableCharacter::BeginPlay()
     Super::BeginPlay();
 
     PlayerState = GetPlayerState<APlayableCharacterState>();
+
+	if (Type == EPlayerType::Test)
+		GetSprite()->SetRelativeLocation(PlayerConstants::DefaultSpriteOffset);
+	else if (Type == EPlayerType::Batter)
+		GetSprite()->SetRelativeLocation(PlayerConstants::BatterSpriteOffset);
 
     // restart the Character before spawning
     Restart();
@@ -196,28 +180,57 @@ void APlayableCharacter::ApplyStateChange(EState newState)
 	if (newState == EState::Jumping)
 		GetCharacterMovement()->bNotifyApex = true;
 
-	if (newState == EState::Ducking)
+	if (Type == EPlayerType::Test)
 	{
-
-		GetCapsuleComponent()->SetCapsuleHalfHeight(PlayerConstants::DefaultCapsuleRadius);
-		GetSprite()->SetRelativeLocation(FVector(0.0f, 0.0f, 63.0f));//half height - 12
-
-		FVector location = GetActorLocation();
-		location.Z -= 47.0f;//half height - radius
-		SetActorLocation(location);
-	}
-	else
-	{
-		if (old == EState::Ducking)
+		if (newState == EState::Ducking)
 		{
-			GetCapsuleComponent()->SetCapsuleHalfHeight(PlayerConstants::DefaultCapsuleHalfHeight);
-			GetSprite()->SetRelativeLocation(FVector(0.0f, 0.0f, 17.0f));//17 is offset to center
+
+			GetCapsuleComponent()->SetCapsuleHalfHeight(PlayerConstants::DefaultCapsuleRadius);
+			GetSprite()->SetRelativeLocation(PlayerConstants::DefaultSpriteCrouchOffset);//half height - 12
 
 			FVector location = GetActorLocation();
-			location.Z += 47.0f;//half height - radius
+			location.Z -= 47.0f;//half height - radius
 			SetActorLocation(location);
 		}
+		else
+		{
+			if (old == EState::Ducking)
+			{
+				GetCapsuleComponent()->SetCapsuleHalfHeight(PlayerConstants::DefaultCapsuleHalfHeight);
+				GetSprite()->SetRelativeLocation(PlayerConstants::DefaultSpriteOffset);//17 is offset to center
+
+				FVector location = GetActorLocation();
+				location.Z += 47.0f;//half height - radius
+				SetActorLocation(location);
+			}
+		}
 	}
+	else if (Type == EPlayerType::Batter)
+	{
+		if (newState == EState::Ducking)
+		{
+
+			GetCapsuleComponent()->SetCapsuleHalfHeight(PlayerConstants::DefaultCapsuleRadius);
+			GetSprite()->SetRelativeLocation(PlayerConstants::BatterSpriteCrouchOffset);//half height - 12
+
+			FVector location = GetActorLocation();
+			location.Z -= 47.0f;//half height - radius
+			SetActorLocation(location);
+		}
+		else
+		{
+			if (old == EState::Ducking)
+			{
+				GetCapsuleComponent()->SetCapsuleHalfHeight(PlayerConstants::DefaultCapsuleHalfHeight);
+				GetSprite()->SetRelativeLocation(PlayerConstants::BatterSpriteOffset);//17 is offset to center
+
+				FVector location = GetActorLocation();
+				location.Z += 47.0f;//half height - radius
+				SetActorLocation(location);
+			}
+		}
+	}
+
 
 	UpdateFlipbook();
 }
@@ -388,4 +401,60 @@ UPaperFlipbook* APlayableCharacter::GetBatterFlipbook()
 		flipbook = BatterHeavyFlipbook;
 
 	return flipbook;
+}
+
+void APlayableCharacter::InitializeType()
+{
+	if (Type == EPlayerType::Test)
+	{
+		Health = PlayerConstants::DefaultHealth;
+		//collision
+		GetCapsuleComponent()->SetCollisionProfileName("Entity");
+		GetCapsuleComponent()->SetCapsuleRadius(14.0f);
+		GetCapsuleComponent()->SetCapsuleHalfHeight(25.0f);
+
+		//ground
+		GetCharacterMovement()->bUseFlatBaseForFloorChecks = true;
+		GetCharacterMovement()->bConstrainToPlane = true;
+		GetCharacterMovement()->MaxStepHeight = PlayerConstants::DefaultMaxStepHeight;
+		GetCharacterMovement()->SetPlaneConstraintNormal(FVector(0.0f, 1.0f, 0.0f));
+
+		//jump
+		GetCharacterMovement()->GravityScale = PlayerConstants::DefaultGravityScale;
+		GetCharacterMovement()->AirControl = PlayerConstants::DefaultAirControl;
+		GetCharacterMovement()->JumpZVelocity = PlayerConstants::DefaultJumpZVelocity;
+		JumpMaxHoldTime = 0.15f;
+
+		//walking
+		GetCharacterMovement()->GroundFriction = PlayerConstants::DefaultGroundFriction;
+		GetCharacterMovement()->MaxWalkSpeed = PlayerConstants::DefaultMaxSpeed;
+		GetCharacterMovement()->MaxAcceleration = PlayerConstants::DefaultMaxAcceleration;
+		GetCharacterMovement()->MinAnalogWalkSpeed = PlayerConstants::DefaultMinSpeed;
+	}
+	else if (Type == EPlayerType::Batter)
+	{
+		Health = PlayerConstants::BatterHealth;
+		//collision
+		GetCapsuleComponent()->SetCollisionProfileName("Entity");
+		GetCapsuleComponent()->SetCapsuleRadius(14.0f);
+		GetCapsuleComponent()->SetCapsuleHalfHeight(25.0f);
+
+		//ground
+		GetCharacterMovement()->bUseFlatBaseForFloorChecks = true;
+		GetCharacterMovement()->bConstrainToPlane = true;
+		GetCharacterMovement()->MaxStepHeight = PlayerConstants::BatterMaxStepHeight;
+		GetCharacterMovement()->SetPlaneConstraintNormal(FVector(0.0f, 1.0f, 0.0f));
+
+		//jump
+		GetCharacterMovement()->GravityScale = PlayerConstants::BatterGravityScale;
+		GetCharacterMovement()->AirControl = PlayerConstants::BatterAirControl;
+		GetCharacterMovement()->JumpZVelocity = PlayerConstants::BatterJumpZVelocity;
+		JumpMaxHoldTime = 0.15f;
+
+		//walking
+		GetCharacterMovement()->GroundFriction = PlayerConstants::BatterGroundFriction;
+		GetCharacterMovement()->MaxWalkSpeed = PlayerConstants::BatterMaxSpeed;
+		GetCharacterMovement()->MaxAcceleration = PlayerConstants::BatterMaxAcceleration;
+		GetCharacterMovement()->MinAnalogWalkSpeed = PlayerConstants::BatterMinSpeed;
+	}
 }

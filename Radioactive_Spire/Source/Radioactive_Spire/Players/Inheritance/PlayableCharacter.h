@@ -62,6 +62,8 @@ private:
 	class UPaperFlipbook* GetTestFlipbook();
 	class UPaperFlipbook* GetBatterFlipbook();
 
+	void InitializeType();
+
 public:
 
 	//Test
