@@ -26,6 +26,9 @@ APlayableCharacter::APlayableCharacter() :
 
 	//InitializeType();
 
+	//DEBUG
+	GetCapsuleComponent()->SetHiddenInGame(false);
+
     Tags.Add("Player");
 }
 

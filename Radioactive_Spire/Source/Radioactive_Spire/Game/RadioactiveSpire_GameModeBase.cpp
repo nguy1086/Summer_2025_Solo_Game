@@ -10,6 +10,8 @@
 #include "../Players/Inheritance/PlayerCamera.h"
 
 #include "EngineUtils.h"
+#include "Engine/World.h"
+#include "Engine/GameViewportClient.h"
 
 #include "PaperFlipbook.h"
 #include "PaperFlipbookComponent.h"
@@ -26,6 +28,7 @@ void ARadioactiveSpire_GameModeBase::BeginPlay()
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	Camera = GetWorld()->SpawnActor<APlayerCamera>(APlayerCamera::StaticClass(), FVector(), FRotator(), SpawnParams);
+	ApplyViewMode(EViewModeIndex::VMI_Unlit, false, *GetWorld()->GetGameViewport()->GetEngineShowFlags());
 }
 
 void ARadioactiveSpire_GameModeBase::Tick(float DeltaTime)

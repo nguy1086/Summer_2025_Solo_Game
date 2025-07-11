@@ -68,6 +68,8 @@ void APlayableController::SetupInputComponent()
 
 		EnhancedInputComponent->BindAction(AttackInputAction, ETriggerEvent::Started, this, &APlayableController::OnAttackPressed);
 
+		EnhancedInputComponent->BindAction(HeavyInputAction, ETriggerEvent::Started, this, &APlayableController::OnHeavyPressed);
+
 		//EnhancedInputComponent->BindAction(UpInputAction, ETriggerEvent::Started, this, &APlayableController::OnUpPressed);
 	}
 }

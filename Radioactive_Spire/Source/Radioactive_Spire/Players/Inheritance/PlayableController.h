@@ -39,6 +39,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* AttackInputAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* HeavyInputAction;
+
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced input")
 	//class UInputAction* UpInputAction;
 
