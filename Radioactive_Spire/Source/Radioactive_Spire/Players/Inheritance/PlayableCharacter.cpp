@@ -24,7 +24,7 @@ APlayableCharacter::APlayableCharacter() :
 {
     PrimaryActorTick.bCanEverTick = true;
 
-	InitializeType();
+	//InitializeType();
 
     Tags.Add("Player");
 }
@@ -34,6 +34,8 @@ void APlayableCharacter::BeginPlay()
     Super::BeginPlay();
 
     PlayerState = GetPlayerState<APlayableCharacterState>();
+
+	InitializeType();
 
 	if (Type == EPlayerType::Test)
 		GetSprite()->SetRelativeLocation(PlayerConstants::DefaultSpriteOffset);
@@ -410,8 +412,8 @@ void APlayableCharacter::InitializeType()
 		Health = PlayerConstants::DefaultHealth;
 		//collision
 		GetCapsuleComponent()->SetCollisionProfileName("Entity");
-		GetCapsuleComponent()->SetCapsuleRadius(14.0f);
-		GetCapsuleComponent()->SetCapsuleHalfHeight(25.0f);
+		GetCapsuleComponent()->SetCapsuleRadius(PlayerConstants::DefaultCapsuleRadius);
+		GetCapsuleComponent()->SetCapsuleHalfHeight(PlayerConstants::DefaultCapsuleHalfHeight);
 
 		//ground
 		GetCharacterMovement()->bUseFlatBaseForFloorChecks = true;
@@ -436,8 +438,8 @@ void APlayableCharacter::InitializeType()
 		Health = PlayerConstants::BatterHealth;
 		//collision
 		GetCapsuleComponent()->SetCollisionProfileName("Entity");
-		GetCapsuleComponent()->SetCapsuleRadius(14.0f);
-		GetCapsuleComponent()->SetCapsuleHalfHeight(25.0f);
+		GetCapsuleComponent()->SetCapsuleRadius(PlayerConstants::BatterCapsuleRadius);
+		GetCapsuleComponent()->SetCapsuleHalfHeight(PlayerConstants::BatterCapsuleHalfHeight);
 
 		//ground
 		GetCharacterMovement()->bUseFlatBaseForFloorChecks = true;

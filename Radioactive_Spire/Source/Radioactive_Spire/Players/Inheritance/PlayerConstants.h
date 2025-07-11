@@ -47,7 +47,7 @@ namespace PlayerConstants
     //walk
     constexpr float BatterGroundFriction = 3.5f;
     constexpr float BatterMinSpeed = 200.0f;
-    constexpr float BatterMaxAcceleration = 300.0f;
+    constexpr float BatterMaxAcceleration = 1200.0f;
     constexpr float BatterMaxSpeed = 300.0f;
     constexpr float BatterMaxStepHeight = 10.0f;
 
