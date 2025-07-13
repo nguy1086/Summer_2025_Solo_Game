@@ -17,4 +17,12 @@ This project is entirely made by Brendon Nguyen and not intended to get help fro
 • Multiple playable characters<br/>
 • Randomized rooms<br/>
 • Multiple levels<br/>
-• Skill tree (each character having their own)<br/>
+~~• Skill tree (each character having their own)~~<br/>
+
+## Controls
+
+• Arrows/Left stick      Movement/Crouch
+• Up Arrow/Bottom Button Jump
+• Z/Left Button          Normal Attack
+• X/Top Button           Heavy Attack
+• Space/Right Button     Dodge
