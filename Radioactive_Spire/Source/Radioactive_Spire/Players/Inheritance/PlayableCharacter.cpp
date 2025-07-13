@@ -215,7 +215,7 @@ void APlayableCharacter::ApplyStateChange(EState newState)
 		if (newState == EState::Ducking)
 		{
 
-			GetCapsuleComponent()->SetCapsuleHalfHeight(PlayerConstants::DefaultCapsuleRadius);
+			GetCapsuleComponent()->SetCapsuleHalfHeight(PlayerConstants::BatterCapsuleRadius);
 			GetSprite()->SetRelativeLocation(PlayerConstants::BatterSpriteCrouchOffset);//half height - 12
 
 			FVector location = GetActorLocation();
@@ -226,7 +226,7 @@ void APlayableCharacter::ApplyStateChange(EState newState)
 		{
 			if (old == EState::Ducking)
 			{
-				GetCapsuleComponent()->SetCapsuleHalfHeight(PlayerConstants::DefaultCapsuleHalfHeight);
+				GetCapsuleComponent()->SetCapsuleHalfHeight(PlayerConstants::BatterCapsuleHalfHeight);
 				GetSprite()->SetRelativeLocation(PlayerConstants::BatterSpriteOffset);//17 is offset to center
 
 				FVector location = GetActorLocation();

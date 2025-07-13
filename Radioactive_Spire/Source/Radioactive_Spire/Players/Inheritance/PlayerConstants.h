@@ -38,8 +38,8 @@ namespace PlayerConstants
 
     //BATTER        ----------------------------------------------------------------------
     //sprite offset
-    const FVector BatterSpriteOffset = FVector(0, 0, 7.0f);
-    const FVector BatterSpriteCrouchOffset = FVector(0, 0, 53.0f);
+    const FVector BatterSpriteOffset = FVector(0, 0, 17.0f);
+    const FVector BatterSpriteCrouchOffset = FVector(0, 0, 54.0f);
 
     //stats
     constexpr float BatterHealth = 250.0f;
@@ -64,7 +64,7 @@ namespace PlayerConstants
 
     //collision
     constexpr float BatterCapsuleRadius = 28.0f;
-    constexpr float BatterCapsuleHalfHeight = 75.0f;
+    constexpr float BatterCapsuleHalfHeight = 65.0f;
 
     //END BATTER    ----------------------------------------------------------------------
 }
