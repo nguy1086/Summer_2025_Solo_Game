@@ -58,11 +58,17 @@ private:
 	class APlayerCamera* Camera;
 	float DamagedTimer;
 	float AttackCooldown;
+	FTimerHandle AttackTimerHandle;
+	FTimerHandle InputTimerHandle;
 
 	class UPaperFlipbook* GetTestFlipbook();
 	class UPaperFlipbook* GetBatterFlipbook();
 
 	void InitializeType();
+
+	void EnableControls();
+	void DisableControls();
+	void BatterHeavyAttackSpawn();
 
 public:
 

@@ -40,5 +40,5 @@ protected:
 
 private:
 	float Timer;
-	FTimerHandle MyTimerHandle;
+	FTimerHandle HitboxTimerHandle;
 };

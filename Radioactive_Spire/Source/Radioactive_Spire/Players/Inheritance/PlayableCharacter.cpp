@@ -150,23 +150,17 @@ void APlayableCharacter::Heavy()
 {
 	if (PlayerState->State != EState::HeavyAttack)
 	{
-		ApplyStateChange(EState::HeavyAttack);
-
 		if (AttackHitboxTemplate)
 		{
-			FVector location = GetActorLocation();
-			FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
-			if (PlayerState->Direction == EDirection::Left)
-			{
-				location.X -= 32.0f;
-				rotation = FRotator(0.0f, 180.0f, 0.0f);
-			}
-			else if (PlayerState->Direction == EDirection::Right)
-				location.X += 32.0f;
+			DisableControls();
+			ApplyStateChange(EState::HeavyAttack);
 
-			APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
-			hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-			hitbox->Spawn(TEXT("Test_Basic"));
+			float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
+			float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
+			float DesiredFrame = (TotalDuration-3.0f) / FramesPerSecond;//get total frame subtract to the frame you want to spawn in,
+																		//i want to spawn at frame 4, so 7 (total) - 3 = 4
+			GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterHeavyAttackSpawn, DesiredFrame, false);
+			GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, TotalDuration, false);
 		}
 	}
 }
@@ -462,4 +456,33 @@ void APlayableCharacter::InitializeType()
 		GetCharacterMovement()->MaxAcceleration = PlayerConstants::BatterMaxAcceleration;
 		GetCharacterMovement()->MinAnalogWalkSpeed = PlayerConstants::BatterMinSpeed;
 	}
+}
+
+void APlayableCharacter::EnableControls()
+{
+	APlayableController* PlayerController = Cast<APlayableController>(GetWorld()->GetFirstPlayerController());
+	EnableInput(GetLocalViewingPlayerController());
+}
+
+void APlayableCharacter::DisableControls()
+{
+	APlayableController* PlayerController = Cast<APlayableController>(GetWorld()->GetFirstPlayerController());
+	DisableInput(GetLocalViewingPlayerController());
+}
+
+void APlayableCharacter::BatterHeavyAttackSpawn()
+{
+	FVector location = GetActorLocation();
+	FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
+	if (PlayerState->Direction == EDirection::Left)
+	{
+		location.X -= 64.0f;
+		rotation = FRotator(0.0f, 180.0f, 0.0f);
+	}
+	else if (PlayerState->Direction == EDirection::Right)
+		location.X += 64.0f;
+
+	APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
+	hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+	hitbox->Spawn(TEXT("Test_Basic"));
 }
