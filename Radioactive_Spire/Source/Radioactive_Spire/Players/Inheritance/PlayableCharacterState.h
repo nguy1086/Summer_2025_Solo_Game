@@ -20,6 +20,12 @@ enum class EState : uint8
 };
 
 UENUM(BlueprintType)
+enum class EComboNumber : uint8
+{
+
+};
+
+UENUM(BlueprintType)
 enum class EPlayerType : uint8
 {
 	Test		UMETA(DisplayName = "Test"),

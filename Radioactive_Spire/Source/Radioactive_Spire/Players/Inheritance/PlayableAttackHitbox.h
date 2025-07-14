@@ -26,7 +26,7 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	void Spawn(FString name);
+	void Spawn(FString name, float damage);
 
 protected:
 	// Called when the game starts or when spawned
@@ -40,5 +40,6 @@ protected:
 
 private:
 	float Timer;
+	float Damage;
 	FTimerHandle HitboxTimerHandle;
 };

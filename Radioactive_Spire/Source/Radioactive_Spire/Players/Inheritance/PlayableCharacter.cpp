@@ -20,8 +20,7 @@ APlayableCharacter::APlayableCharacter() :
     PlayerState(nullptr),
     Camera(nullptr),
 	PlayableController(nullptr),
-	DamagedTimer(0.0f),
-	AttackCooldown(0.0f)
+	DamagedTimer(0.0f)
 {
     PrimaryActorTick.bCanEverTick = true;
 
@@ -93,9 +92,6 @@ void APlayableCharacter::Tick(float DeltaTime)
 
 			if (GetActorLocation().Z < -250.0f)
 				Death(false);
-
-			if (AttackCooldown >= 0.0f)
-				AttackCooldown -= DeltaTime;
 		}
 	}
 }
@@ -124,49 +120,63 @@ void APlayableCharacter::StopDucking()
 
 void APlayableCharacter::Attack()
 {
-	if (AttackCooldown <= 0.0f)
+	if (Type == EPlayerType::Test)
 	{
-		ApplyStateChange(EState::Attacking);
-
-		if (AttackHitboxTemplate)
+		FVector location = GetActorLocation();
+		FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
+		if (PlayerState->Direction == EDirection::Left)
 		{
-			FVector location = GetActorLocation();
-			FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
-			if (PlayerState->Direction == EDirection::Left)
-			{
-				location.X -= 32.0f;
-				rotation = FRotator(0.0f, 180.0f, 0.0f);
-			}
-			else if (PlayerState->Direction == EDirection::Right)
-				location.X += 32.0f;
-
-			APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
-			hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-			hitbox->Spawn(TEXT("Test_Basic"));
+			location.X -= 32.0f;
+			rotation = FRotator(0.0f, 180.0f, 0.0f);
 		}
+		else if (PlayerState->Direction == EDirection::Right)
+			location.X += 32.0f;
 
-		AttackCooldown = PlayerConstants::DefaultAttackCooldown;
+		APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
+		hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+		hitbox->Spawn(TEXT("Test_Basic"), PlayerConstants::DefaultDamage);
 	}
-}
-
-void APlayableCharacter::Heavy()
-{
-	if (PlayerState->State != EState::HeavyAttack)
+	else if (Type == EPlayerType::Batter)
 	{
 		if (AttackHitboxTemplate)
 		{
 			DisableControls();
 			StopDucking();
-			ApplyStateChange(EState::HeavyAttack);
+			ApplyStateChange(EState::Attacking);
+
 
 			float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
 			float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
-			float DesiredFrame = (TotalDuration-3.0f) / FramesPerSecond;//get total frame subtract to the frame you want to spawn in,
-																		//i want to spawn at frame 4, so 7 (total) - 3 = 4 divide by the fps
-			GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterHeavyAttackSpawn, DesiredFrame, false);
+
+			GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterHeavyAttackSpawn, (TotalDuration / FramesPerSecond), false);
 			GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, (TotalDuration / FramesPerSecond), false);
 			GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
-		}																					//total frames / fps to get the total frame duration
+			ComboNumber++;
+		}
+	}
+}
+
+void APlayableCharacter::Heavy()
+{
+	if (Type == EPlayerType::Batter)
+	{
+		if (PlayerState->State != EState::HeavyAttack)
+		{
+			if (AttackHitboxTemplate)
+			{
+				DisableControls();
+				StopDucking();
+				ApplyStateChange(EState::HeavyAttack);
+
+				float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
+				float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
+				float DesiredFrame = (TotalDuration - 3.0f) / FramesPerSecond;//get total frame subtract to the frame you want to spawn in,
+				//i want to spawn at frame 4, so 7 (total) - 3 = 4 divide by the fps
+				GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterHeavyAttackSpawn, DesiredFrame, false);
+				GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, (TotalDuration / FramesPerSecond), false);
+				GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
+			}																					//total frames / fps to get the total frame duration
+		}
 	}
 }
 
@@ -297,7 +307,9 @@ void APlayableCharacter::Landed(const FHitResult& Hit)
 	{
 		PlayerState->IsOnGround = true;
 
-		if (PlayableController && PlayerState->State != EState::HeavyAttack)//make sures the launchcharacter() doesnt reset the frames
+		if (PlayableController && 
+			PlayerState->State != EState::HeavyAttack && 
+			PlayerState->State != EState::Attacking)//make sures the launchcharacter() doesnt reset the frames when attack/heavy
 		{
 			if (PlayableController->IsDuckPressed())
 			{
@@ -482,8 +494,12 @@ void APlayableCharacter::ResetPlayerState()
 	{
 		if (PlayableController->GetMoveValue() == 0.0f)
 			ApplyStateChange(EState::Idle);
+		else if (!PlayerState->IsOnGround)
+			ApplyStateChange(EState::Falling);
 		else
 			ApplyStateChange(EState::Walking);
+
+		ComboNumber = 0;
 	}
 }
 
@@ -505,5 +521,37 @@ void APlayableCharacter::BatterHeavyAttackSpawn()
 
 	APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
 	hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-	hitbox->Spawn(TEXT("Test_Basic"));
+	hitbox->Spawn(TEXT("Test_Basic"), PlayerConstants::BatterHeavyAttackDamage);
+}
+
+void APlayableCharacter::BatterComboAttackSpawn()
+{
+	if (ComboNumber == 0)
+	{
+		FVector location = GetActorLocation();
+		FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
+		if (PlayerState->Direction == EDirection::Left)
+		{
+			location.X -= 32.0f;
+			rotation = FRotator(0.0f, 180.0f, 0.0f);
+		}
+		else if (PlayerState->Direction == EDirection::Right)
+			location.X += 32.0f;
+
+		APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
+		hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+		hitbox->Spawn(TEXT("Test_Basic"), PlayerConstants::BatterComboOneDamage);
+	}
+	else if (ComboNumber == 1)
+	{
+
+	}
+	else if (ComboNumber == 2)
+	{
+
+	}
+	else
+	{
+
+	}
 }

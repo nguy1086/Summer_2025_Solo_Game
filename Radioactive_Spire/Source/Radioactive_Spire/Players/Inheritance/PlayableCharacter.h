@@ -58,7 +58,7 @@ private:
 	class APlayerCamera* Camera;
 	class APlayableController* PlayableController;
 	float DamagedTimer;
-	float AttackCooldown;
+	int ComboNumber;
 	FTimerHandle AttackTimerHandle;
 	FTimerHandle InputTimerHandle;
 	FTimerHandle StateTimerHandle;
@@ -73,6 +73,7 @@ private:
 	void ResetPlayerState();
 
 	void BatterHeavyAttackSpawn();
+	void BatterComboAttackSpawn();
 
 public:
 

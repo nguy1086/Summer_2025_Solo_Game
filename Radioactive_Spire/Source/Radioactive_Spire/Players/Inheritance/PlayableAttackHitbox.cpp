@@ -31,16 +31,16 @@ void APlayableAttackHitbox::OnOverlapBegin(UPrimitiveComponent* OverlapComponent
 {
 }
 
-void APlayableAttackHitbox::Spawn(FString name)
+void APlayableAttackHitbox::Spawn(FString name, float damage)
 {
 	if (!name.IsEmpty() && FlipbookComponent)
 	{
 		UPaperFlipbook* flipbook = nullptr;
 
+		Damage = damage;
+
 		if (name == TEXT("Test_Basic"))
-		{
 			flipbook = TestBasicFlipbook;
-		}
 
 		FlipbookComponent->SetFlipbook(flipbook);
 		FlipbookComponent->SetLooping(false);

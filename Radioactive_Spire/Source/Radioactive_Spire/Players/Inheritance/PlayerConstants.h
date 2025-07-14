@@ -9,6 +9,7 @@ namespace PlayerConstants
 
     //stats
     constexpr float DefaultHealth = 100.0f;
+    constexpr float DefaultDamage = 50.0f;
 
     //walk
     constexpr float DefaultGroundFriction = 3.5f;
@@ -43,6 +44,11 @@ namespace PlayerConstants
 
     //stats
     constexpr float BatterHealth = 250.0f;
+    constexpr float BatterHeavyAttackDamage = 75.0f;
+    constexpr float BatterComboOneDamage = 16.0f;
+    constexpr float BatterComboTwoDamage = 20.0f;
+    constexpr float BatterComboThreeDamage = 24.0f;
+    constexpr float BatterComboFinisherDamage = 50.0f;
 
     //walk
     constexpr float BatterGroundFriction = 3.5f;
