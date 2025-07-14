@@ -25,6 +25,9 @@ public:
 
 	void PlayerDied();
 
+	void EnableControls();
+	void DisableControls();
+
 private:
 	void SpawnDeathAnimation(FVector location);
 

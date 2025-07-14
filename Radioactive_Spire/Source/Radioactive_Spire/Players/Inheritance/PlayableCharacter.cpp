@@ -158,10 +158,10 @@ void APlayableCharacter::Heavy()
 			float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
 			float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
 			float DesiredFrame = (TotalDuration-3.0f) / FramesPerSecond;//get total frame subtract to the frame you want to spawn in,
-																		//i want to spawn at frame 4, so 7 (total) - 3 = 4
+																		//i want to spawn at frame 4, so 7 (total) - 3 = 4 divide by the fps
 			GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterHeavyAttackSpawn, DesiredFrame, false);
-			GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, TotalDuration, false);
-		}
+			GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, (TotalDuration / FramesPerSecond), false);
+		}																					//total frames / fps to get the total frame duration
 	}
 }
 
@@ -460,14 +460,16 @@ void APlayableCharacter::InitializeType()
 
 void APlayableCharacter::EnableControls()
 {
-	APlayableController* PlayerController = Cast<APlayableController>(GetWorld()->GetFirstPlayerController());
-	EnableInput(GetLocalViewingPlayerController());
+	ARadioactiveSpire_GameModeBase* gameMode = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
+	if (gameMode)
+		gameMode->EnableControls();
 }
 
 void APlayableCharacter::DisableControls()
 {
-	APlayableController* PlayerController = Cast<APlayableController>(GetWorld()->GetFirstPlayerController());
-	DisableInput(GetLocalViewingPlayerController());
+	ARadioactiveSpire_GameModeBase* gameMode = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
+	if (gameMode)
+		gameMode->DisableControls();
 }
 
 void APlayableCharacter::BatterHeavyAttackSpawn()

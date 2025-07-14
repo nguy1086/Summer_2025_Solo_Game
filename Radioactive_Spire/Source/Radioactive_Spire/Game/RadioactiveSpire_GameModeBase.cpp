@@ -8,6 +8,7 @@
 #include "../Players/Inheritance/PlayableCharacter.h"
 #include "../Players/Inheritance/PlayableCharacterState.h"
 #include "../Players/Inheritance/PlayerCamera.h"
+#include "../Players/Inheritance/PlayableController.h"
 
 #include "EngineUtils.h"
 #include "Engine/World.h"
@@ -41,6 +42,20 @@ void ARadioactiveSpire_GameModeBase::PlayerDied()
 	APlayableCharacter* player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
 	if (player)
 		SpawnDeathAnimation(player->GetActorLocation());
+}
+
+void ARadioactiveSpire_GameModeBase::EnableControls()
+{
+	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+		if (ActorItr->ActorHasTag("Controller"))
+			ActorItr->CustomTimeDilation = 1.0f;
+}//disable/enableinput(controller) doesnt work apparently, even using every getcontroller function
+	//so this is just an elaborate way to work through this problem
+void ARadioactiveSpire_GameModeBase::DisableControls()
+{
+	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+		if (ActorItr->ActorHasTag("Controller"))
+			ActorItr->CustomTimeDilation = 0.0f;
 }
 
 void ARadioactiveSpire_GameModeBase::SpawnDeathAnimation(FVector location)
