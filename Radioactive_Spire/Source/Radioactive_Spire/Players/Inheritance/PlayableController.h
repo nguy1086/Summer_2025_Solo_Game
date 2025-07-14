@@ -49,6 +49,7 @@ public:
 	bool IsJumpPressed();
 	bool IsDuckPressed();
 	bool IsAttackPressed();
+	bool IsHeavyPressed();
 	//bool IsUpPressed();
 
 protected:

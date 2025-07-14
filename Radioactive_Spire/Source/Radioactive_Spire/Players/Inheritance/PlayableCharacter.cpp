@@ -111,7 +111,9 @@ void APlayableCharacter::StopDucking()
 		APlayableController* controller = Cast<APlayableController>(Controller);
 		if (controller)
 		{
-			if (controller->GetMoveValue() == 0.0f)
+			if (controller->IsHeavyPressed() || PlayerState->State == EState::HeavyAttack)
+				ApplyStateChange(EState::HeavyAttack);
+			else if (controller->GetMoveValue() == 0.0f)
 				ApplyStateChange(EState::Idle);
 			else
 				ApplyStateChange(EState::Walking);
@@ -153,6 +155,7 @@ void APlayableCharacter::Heavy()
 		if (AttackHitboxTemplate)
 		{
 			DisableControls();
+			StopDucking();
 			ApplyStateChange(EState::HeavyAttack);
 
 			float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
@@ -478,11 +481,11 @@ void APlayableCharacter::BatterHeavyAttackSpawn()
 	FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
 	if (PlayerState->Direction == EDirection::Left)
 	{
-		location.X -= 64.0f;
+		location.X -= 96.0f;
 		rotation = FRotator(0.0f, 180.0f, 0.0f);
 	}
 	else if (PlayerState->Direction == EDirection::Right)
-		location.X += 64.0f;
+		location.X += 96.0f;
 
 	APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
 	hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);

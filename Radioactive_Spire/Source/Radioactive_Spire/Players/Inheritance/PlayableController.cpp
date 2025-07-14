@@ -114,6 +114,16 @@ bool APlayableController::IsAttackPressed()
 	return false;
 }
 
+bool APlayableController::IsHeavyPressed()
+{
+	if (InputSubsystem != nullptr)
+	{
+		FInputActionValue InputActionValue = InputSubsystem->GetPlayerInput()->GetActionValue(HeavyInputAction);
+		return InputActionValue.Get<bool>();
+	}
+	return false;
+}
+
 //bool APlayableController::IsUpPressed()
 //{
 //	if (InputSubsystem != nullptr)
@@ -130,7 +140,8 @@ void APlayableController::OnMove(const FInputActionValue& Value)
 
 	if (PlayablePlayer != nullptr && PlayablePlayerState != nullptr)
 	{
-		if (PlayablePlayerState->State != EState::Ducking)
+		if (PlayablePlayerState->State != EState::Ducking && 
+			PlayablePlayerState->State != EState::HeavyAttack)
 		{
 			if (PlayablePlayerState->IsOnGround)
 				PlayablePlayer->ApplyStateChange(EState::Walking);
@@ -154,7 +165,9 @@ void APlayableController::OnMove(const FInputActionValue& Value)
 void APlayableController::OnMoveReleased(const FInputActionValue& Value)
 {
 	if (PlayablePlayer != nullptr && PlayablePlayerState != nullptr)
-		if (PlayablePlayerState->IsOnGround && PlayablePlayerState->State != EState::Ducking)
+		if (PlayablePlayerState->IsOnGround && 
+			PlayablePlayerState->State != EState::Ducking && 
+			PlayablePlayerState->State != EState::HeavyAttack)
 			PlayablePlayer->ApplyStateChange(EState::Idle);
 }
 
