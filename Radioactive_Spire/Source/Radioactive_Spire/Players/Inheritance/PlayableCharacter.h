@@ -56,10 +56,12 @@ private:
 
 	class APlayableCharacterState* PlayerState;
 	class APlayerCamera* Camera;
+	class APlayableController* PlayableController;
 	float DamagedTimer;
 	float AttackCooldown;
 	FTimerHandle AttackTimerHandle;
 	FTimerHandle InputTimerHandle;
+	FTimerHandle StateTimerHandle;
 
 	class UPaperFlipbook* GetTestFlipbook();
 	class UPaperFlipbook* GetBatterFlipbook();
@@ -68,6 +70,8 @@ private:
 
 	void EnableControls();
 	void DisableControls();
+	void ResetPlayerState();
+
 	void BatterHeavyAttackSpawn();
 
 public:

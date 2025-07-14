@@ -19,6 +19,7 @@
 APlayableCharacter::APlayableCharacter() :
     PlayerState(nullptr),
     Camera(nullptr),
+	PlayableController(nullptr),
 	DamagedTimer(0.0f),
 	AttackCooldown(0.0f)
 {
@@ -37,6 +38,7 @@ void APlayableCharacter::BeginPlay()
     Super::BeginPlay();
 
     PlayerState = GetPlayerState<APlayableCharacterState>();
+	PlayableController = Cast<APlayableController>(Controller);
 
 	InitializeType();
 
@@ -108,12 +110,11 @@ void APlayableCharacter::StopDucking()
 {
 	if (PlayerState->IsOnGround)
 	{
-		APlayableController* controller = Cast<APlayableController>(Controller);
-		if (controller)
+		if (PlayableController)
 		{
-			if (controller->IsHeavyPressed() || PlayerState->State == EState::HeavyAttack)
+			if (PlayableController->IsHeavyPressed() || PlayerState->State == EState::HeavyAttack)//make sures crouch doesnt interfere with heavy attack animation
 				ApplyStateChange(EState::HeavyAttack);
-			else if (controller->GetMoveValue() == 0.0f)
+			else if (PlayableController->GetMoveValue() == 0.0f)
 				ApplyStateChange(EState::Idle);
 			else
 				ApplyStateChange(EState::Walking);
@@ -164,6 +165,7 @@ void APlayableCharacter::Heavy()
 																		//i want to spawn at frame 4, so 7 (total) - 3 = 4 divide by the fps
 			GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterHeavyAttackSpawn, DesiredFrame, false);
 			GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, (TotalDuration / FramesPerSecond), false);
+			GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
 		}																					//total frames / fps to get the total frame duration
 	}
 }
@@ -295,16 +297,15 @@ void APlayableCharacter::Landed(const FHitResult& Hit)
 	{
 		PlayerState->IsOnGround = true;
 
-		APlayableController* controller = Cast<APlayableController>(Controller);
-		if (controller != nullptr)
+		if (PlayableController)
 		{
-			if (controller->IsDuckPressed())
+			if (PlayableController->IsDuckPressed())
 			{
 				ApplyStateChange(EState::Ducking);
 			}
 			else
 			{
-				if (controller->GetMoveValue() == 0.0f)
+				if (PlayableController->GetMoveValue() == 0.0f)
 					ApplyStateChange(EState::Idle);
 				else
 					ApplyStateChange(EState::Walking);
@@ -475,6 +476,17 @@ void APlayableCharacter::DisableControls()
 		gameMode->DisableControls();
 }
 
+void APlayableCharacter::ResetPlayerState()
+{
+	if (PlayableController)
+	{
+		if (PlayableController->GetMoveValue() == 0.0f)
+			ApplyStateChange(EState::Idle);
+		else
+			ApplyStateChange(EState::Walking);
+	}
+}
+
 void APlayableCharacter::BatterHeavyAttackSpawn()
 {
 	FVector location = GetActorLocation();
@@ -483,9 +495,13 @@ void APlayableCharacter::BatterHeavyAttackSpawn()
 	{
 		location.X -= 96.0f;
 		rotation = FRotator(0.0f, 180.0f, 0.0f);
+		//LaunchCharacter(FVector(-96.0f, 0.0f, 32.0f), false, true);
 	}
 	else if (PlayerState->Direction == EDirection::Right)
+	{
 		location.X += 96.0f;
+		//LaunchCharacter(FVector(96.0f, 0.0f, 32.0f), false, true);
+	}
 
 	APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
 	hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
