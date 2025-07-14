@@ -297,7 +297,7 @@ void APlayableCharacter::Landed(const FHitResult& Hit)
 	{
 		PlayerState->IsOnGround = true;
 
-		if (PlayableController)
+		if (PlayableController && PlayerState->State != EState::HeavyAttack)//make sures the launchcharacter() doesnt reset the frames
 		{
 			if (PlayableController->IsDuckPressed())
 			{
@@ -495,12 +495,12 @@ void APlayableCharacter::BatterHeavyAttackSpawn()
 	{
 		location.X -= 96.0f;
 		rotation = FRotator(0.0f, 180.0f, 0.0f);
-		//LaunchCharacter(FVector(-96.0f, 0.0f, 32.0f), false, true);
+		LaunchCharacter(FVector(-300.0f, 0.0f, 64.0f), false, false);
 	}
 	else if (PlayerState->Direction == EDirection::Right)
 	{
 		location.X += 96.0f;
-		//LaunchCharacter(FVector(96.0f, 0.0f, 32.0f), false, true);
+		LaunchCharacter(FVector(300.0f, 0.0f, 64.0f), false, false);
 	}
 
 	APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
