@@ -52,7 +52,7 @@ protected:
 	void UpdateFlipbook();
 
 private:
-	void Death(bool spawnDeathAnimation);
+	void Death();
 
 	class APlayableCharacterState* PlayerState;
 	class APlayerCamera* Camera;

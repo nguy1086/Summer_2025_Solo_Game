@@ -82,6 +82,19 @@ void ARadioactiveSpire_GameModeBase::SpawnDeathAnimation(FVector location)
 				}
 			}
 		}
+		else if (player->Type == EPlayerType::Batter)
+		{
+			UWorld* const world = GetWorld();
+			if (world != nullptr)
+			{
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.Owner = this;
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				FTransform SpawnTransform(location);
+
+				ADeadActor* deadActor = world->SpawnActor<ADeadActor>(DeadBatterTemplate, SpawnTransform, SpawnParams);
+			}
+		}
 	}
 }
 
@@ -95,6 +108,11 @@ void ARadioactiveSpire_GameModeBase::PauseActors()
 		APlayableCharacter* player = Cast<APlayableCharacter>(actor);
 		if (player)
 			player->GetSprite()->SetVisibility(false);
+
+		//if (actor->ActorHasTag("Controller"))
+		//{
+		//	actor->CustomTimeDilation = 1.0f;
+		//}
 	}
 }
 

@@ -91,7 +91,7 @@ void APlayableCharacter::Tick(float DeltaTime)
 			}
 
 			if (GetActorLocation().Z < -250.0f)
-				Death(false);
+				Death();
 		}
 	}
 }
@@ -265,7 +265,7 @@ void APlayableCharacter::HandleDamage(float damage)
 			DamagedTimer = PlayerConstants::DefaultInvincibleVisibilityDuration;
 			PlayerState->InvincibilityTimer = PlayerConstants::DefaultInvincibleTime;
 			GetCapsuleComponent()->SetCollisionProfileName("Invincible");
-			Death(true);
+			Death();
 		}
 		else
 		{
@@ -353,7 +353,7 @@ void APlayableCharacter::UpdateFlipbook()
 	}
 }
 
-void APlayableCharacter::Death(bool spawnDeathAnimation)
+void APlayableCharacter::Death()
 {
 	if (PlayerState->State != EState::Dead)
 	{
@@ -445,6 +445,8 @@ void APlayableCharacter::InitializeType()
 		GetCharacterMovement()->MaxWalkSpeed = PlayerConstants::DefaultMaxSpeed;
 		GetCharacterMovement()->MaxAcceleration = PlayerConstants::DefaultMaxAcceleration;
 		GetCharacterMovement()->MinAnalogWalkSpeed = PlayerConstants::DefaultMinSpeed;
+
+		Tags.Add("Test");
 	}
 	else if (Type == EPlayerType::Batter)
 	{
@@ -471,6 +473,8 @@ void APlayableCharacter::InitializeType()
 		GetCharacterMovement()->MaxWalkSpeed = PlayerConstants::BatterMaxSpeed;
 		GetCharacterMovement()->MaxAcceleration = PlayerConstants::BatterMaxAcceleration;
 		GetCharacterMovement()->MinAnalogWalkSpeed = PlayerConstants::BatterMinSpeed;
+
+		Tags.Add("Batter");
 	}
 }
 

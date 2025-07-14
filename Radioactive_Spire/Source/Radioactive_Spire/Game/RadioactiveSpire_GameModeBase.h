@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "RadioactiveSpire_GameModeBase.generated.h"
 
+enum class EPlayerType : uint8;
+
 /**
  * 
  */
@@ -37,6 +39,9 @@ private:
 	UPROPERTY() class APlayerCamera* Camera;
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GameMode Templates")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Death Templates")
 	TSubclassOf<class ADeadActor> DeadTestTemplate;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Death Templates")
+	TSubclassOf<class ADeadActor> DeadBatterTemplate;
 };
