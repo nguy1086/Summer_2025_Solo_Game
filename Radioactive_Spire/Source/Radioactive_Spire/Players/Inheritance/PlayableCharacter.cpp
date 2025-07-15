@@ -148,10 +148,9 @@ void APlayableCharacter::Attack()
 			float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
 			float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
 
-			GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterHeavyAttackSpawn, (TotalDuration / FramesPerSecond), false);
-			GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, (TotalDuration / FramesPerSecond), false);
+			GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterComboAttackSpawn, (4.0f / FramesPerSecond), false);
+			GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, ((TotalDuration - 2.0f) / FramesPerSecond), false);
 			GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
-			ComboNumber++;
 		}
 	}
 }
@@ -170,9 +169,9 @@ void APlayableCharacter::Heavy()
 
 				float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
 				float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
-				float DesiredFrame = (TotalDuration - 3.0f) / FramesPerSecond;//get total frame subtract to the frame you want to spawn in,
+				//float DesiredFrame = (TotalDuration - 3.0f) / FramesPerSecond;//get total frame subtract to the frame you want to spawn in,
 				//i want to spawn at frame 4, so 7 (total) - 3 = 4 divide by the fps
-				GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterHeavyAttackSpawn, DesiredFrame, false);
+				GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterHeavyAttackSpawn, (5.0f / FramesPerSecond), false);
 				GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, (TotalDuration / FramesPerSecond), false);
 				GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
 			}																					//total frames / fps to get the total frame duration
@@ -504,6 +503,9 @@ void APlayableCharacter::ResetPlayerState()
 			ApplyStateChange(EState::Walking);
 
 		ComboNumber = 0;
+		GetWorldTimerManager().ClearTimer(AttackTimerHandle);
+		GetWorldTimerManager().ClearTimer(InputTimerHandle);
+		GetWorldTimerManager().ClearTimer(StateTimerHandle);
 	}
 }
 
@@ -513,13 +515,13 @@ void APlayableCharacter::BatterHeavyAttackSpawn()
 	FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
 	if (PlayerState->Direction == EDirection::Left)
 	{
-		location.X -= 96.0f;
+		location.X -= 128.0f;
 		rotation = FRotator(0.0f, 180.0f, 0.0f);
 		LaunchCharacter(FVector(-300.0f, 0.0f, 64.0f), false, false);
 	}
 	else if (PlayerState->Direction == EDirection::Right)
 	{
-		location.X += 96.0f;
+		location.X += 128.0f;
 		LaunchCharacter(FVector(300.0f, 0.0f, 64.0f), false, false);
 	}
 
@@ -536,15 +538,20 @@ void APlayableCharacter::BatterComboAttackSpawn()
 		FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
 		if (PlayerState->Direction == EDirection::Left)
 		{
-			location.X -= 32.0f;
+			location.X -= 96.0f;
 			rotation = FRotator(0.0f, 180.0f, 0.0f);
+			LaunchCharacter(FVector(-300.0f, 0.0f, 64.0f), false, false);
 		}
 		else if (PlayerState->Direction == EDirection::Right)
-			location.X += 32.0f;
+		{
+			location.X += 96.0f;
+			LaunchCharacter(FVector(300.0f, 0.0f, 64.0f), false, false);
+		}
 
 		APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
 		hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 		hitbox->Spawn(TEXT("Test_Basic"), PlayerConstants::BatterComboOneDamage);
+		ComboNumber++;
 	}
 	else if (ComboNumber == 1)
 	{
