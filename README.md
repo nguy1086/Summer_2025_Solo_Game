@@ -26,3 +26,10 @@ This project is entirely made by Brendon Nguyen and not intended to get help fro
 • Z/Left Button = Normal Attack<br/>
 • X/Top Button = Heavy Attack<br/>
 • Space/Right Button = Dodge<br/>
+
+## Inspirations
+
+• Rabbit Hole<br/>
+• Nuclear Throne<br/>
+• Sundered: Eldritch Edition<br/>
+• Tunche<br/>
