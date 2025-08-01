@@ -39,8 +39,8 @@ namespace PlayerConstants
 
     //BATTER        ----------------------------------------------------------------------
     //sprite offset
-    const FVector BatterSpriteOffset = FVector(0, 0, 17.0f);
-    const FVector BatterSpriteCrouchOffset = FVector(0, 0, 54.0f);
+    const FVector BatterSpriteOffset = FVector(0, 0, 13.0f);
+    const FVector BatterSpriteCrouchOffset = FVector(0, 0, 50.0f);
 
     //stats
     constexpr float BatterHealth = 250.0f;
@@ -52,6 +52,8 @@ namespace PlayerConstants
     constexpr float BatterComboTwoDamage = 20.0f;
     constexpr float BatterComboThreeDamage = 24.0f;
     constexpr float BatterComboFinisherDamage = 50.0f;
+
+    constexpr float BatterMaxCombo = 4;
 
     //walk
     constexpr float BatterGroundFriction = 3.5f;

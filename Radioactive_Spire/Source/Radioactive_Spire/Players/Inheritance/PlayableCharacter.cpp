@@ -147,11 +147,15 @@ void APlayableCharacter::Attack()
 
 			float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
 			float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
+			//float DesiredFrame = (TotalDuration - 3.0f) / FramesPerSecond;//get total frame subtract to the frame you want to spawn in,
+			//i want to spawn at frame 4, so 7 (total) - 3 = 4 divide by the fps, or literally just setting it to the exact frame instead of subtracting lol
+			float Delay = ComboNumber == 1 || ComboNumber == 3 ? 4.0f : 5.0f;
+			Delay = ComboNumber >= PlayerConstants::BatterMaxCombo ? 5.0f : Delay;
 
-			GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterComboAttackSpawn, ((TotalDuration - (ComboNumber >= 4 ? 1.0f : 2.0f)) / FramesPerSecond), false);
-			GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, ((TotalDuration - (ComboNumber >=4 ? 1.0f : 2.0f)) / FramesPerSecond), false);
+			GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterComboAttackSpawn, ((TotalDuration - Delay) / FramesPerSecond), false);
+			GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, ((TotalDuration - Delay + (ComboNumber >= PlayerConstants::BatterMaxCombo ? 4.0f : 0.0f)) / FramesPerSecond), false);
 			GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
-		}
+		}																						//total frames / fps to get the total frame duration
 	}
 }
 
@@ -169,12 +173,11 @@ void APlayableCharacter::Special()
 
 				float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
 				float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
-				//float DesiredFrame = (TotalDuration - 3.0f) / FramesPerSecond;//get total frame subtract to the frame you want to spawn in,
-				//i want to spawn at frame 4, so 7 (total) - 3 = 4 divide by the fps
-				GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterSpecialSpawn, (5.0f / FramesPerSecond), false);
-				GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, (TotalDuration / FramesPerSecond), false);
+
+				GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterSpecialSpawn, (1.0f / FramesPerSecond), false);
+				GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, (1.0f / FramesPerSecond), false);
 				GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
-			}																					//total frames / fps to get the total frame duration
+			}
 		}
 	}
 }
@@ -271,6 +274,7 @@ void APlayableCharacter::HandleDamage(float damage)
 			DamagedTimer = PlayerConstants::DefaultInvincibleVisibilityDuration;
 			PlayerState->InvincibilityTimer = PlayerConstants::DefaultInvincibleTime;
 			GetCapsuleComponent()->SetCollisionProfileName("Invincible");
+			ResetPlayerState();
 		}
 	}
 }
@@ -410,11 +414,11 @@ UPaperFlipbook* APlayableCharacter::GetBatterFlipbook()
 	else if (PlayerState->State == EState::Ducking)
 		flipbook = BatterDuckFlipbook;
 	else if (PlayerState->State == EState::Attacking)
-		if (ComboNumber == 0 || ComboNumber == 2)
+		if ((ComboNumber == 0 || ComboNumber == 2) && PlayableController->IsAttackPressed())
 			flipbook = BatterAttackOneFlipbook;
-		else if (ComboNumber == 1 || ComboNumber == 3)
+		else if ((ComboNumber == 1 || ComboNumber == 3) && PlayableController->IsAttackPressed())
 			flipbook = BatterAttackTwoFlipbook;
-		else
+		else if(ComboNumber >= PlayerConstants::BatterMaxCombo && PlayableController->IsAttackPressed())
 			flipbook = BatterFinisherFlipbook;
 	else if (PlayerState->State == EState::Special)
 		flipbook = BatterSpecialFlipbook;
@@ -576,7 +580,7 @@ void APlayableCharacter::BatterComboAttackSpawn()
 
 		APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
 		hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-		hitbox->Spawn(TEXT("Test_Basic"), PlayerConstants::BatterComboOneDamage);
+		hitbox->Spawn(TEXT("Test_Basic"), (ComboNumber == 1 ? PlayerConstants::BatterComboTwoDamage : PlayerConstants::BatterComboThreeDamage));
 		ComboNumber++;
 	}
 	else
@@ -597,7 +601,7 @@ void APlayableCharacter::BatterComboAttackSpawn()
 
 		APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
 		hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-		hitbox->Spawn(TEXT("Test_Basic"), PlayerConstants::BatterComboOneDamage);
+		hitbox->Spawn(TEXT("Test_Basic"), PlayerConstants::BatterComboFinisherDamage);
 		ComboNumber = 0;
 	}
 }
