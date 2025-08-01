@@ -68,7 +68,7 @@ void APlayableController::SetupInputComponent()
 
 		EnhancedInputComponent->BindAction(AttackInputAction, ETriggerEvent::Started, this, &APlayableController::OnAttackPressed);
 
-		EnhancedInputComponent->BindAction(HeavyInputAction, ETriggerEvent::Started, this, &APlayableController::OnHeavyPressed);
+		EnhancedInputComponent->BindAction(SpecialInputAction, ETriggerEvent::Started, this, &APlayableController::OnHeavyPressed);
 
 		//EnhancedInputComponent->BindAction(UpInputAction, ETriggerEvent::Started, this, &APlayableController::OnUpPressed);
 	}
@@ -114,11 +114,11 @@ bool APlayableController::IsAttackPressed()
 	return false;
 }
 
-bool APlayableController::IsHeavyPressed()
+bool APlayableController::IsSpecialPressed()
 {
 	if (InputSubsystem != nullptr)
 	{
-		FInputActionValue InputActionValue = InputSubsystem->GetPlayerInput()->GetActionValue(HeavyInputAction);
+		FInputActionValue InputActionValue = InputSubsystem->GetPlayerInput()->GetActionValue(SpecialInputAction);
 		return InputActionValue.Get<bool>();
 	}
 	return false;
@@ -141,7 +141,7 @@ void APlayableController::OnMove(const FInputActionValue& Value)
 	if (PlayablePlayer != nullptr && PlayablePlayerState != nullptr)
 	{
 		if (PlayablePlayerState->State != EState::Ducking && 
-			PlayablePlayerState->State != EState::HeavyAttack && 
+			PlayablePlayerState->State != EState::Special && 
 			PlayablePlayerState->State != EState::Attacking)
 		{
 			if (PlayablePlayerState->IsOnGround)
@@ -168,7 +168,7 @@ void APlayableController::OnMoveReleased(const FInputActionValue& Value)
 	if (PlayablePlayer != nullptr && PlayablePlayerState != nullptr)
 		if (PlayablePlayerState->IsOnGround && 
 			PlayablePlayerState->State != EState::Ducking && 
-			PlayablePlayerState->State != EState::HeavyAttack &&
+			PlayablePlayerState->State != EState::Special &&
 			PlayablePlayerState->State != EState::Attacking)
 			PlayablePlayer->ApplyStateChange(EState::Idle);
 }
@@ -206,7 +206,7 @@ void APlayableController::OnAttackPressed(const FInputActionValue& Value)
 void APlayableController::OnHeavyPressed(const FInputActionValue& Value)
 {
 	if (PlayablePlayer != nullptr)
-		PlayablePlayer->Heavy();
+		PlayablePlayer->Special();
 }
 
 //void APlayableController::OnUpPressed(const FInputActionValue& Value)

@@ -40,7 +40,7 @@ public:
 	class UInputAction* AttackInputAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* HeavyInputAction;
+	class UInputAction* SpecialInputAction;
 
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced input")
 	//class UInputAction* UpInputAction;
@@ -49,7 +49,7 @@ public:
 	bool IsJumpPressed();
 	bool IsDuckPressed();
 	bool IsAttackPressed();
-	bool IsHeavyPressed();
+	bool IsSpecialPressed();
 	//bool IsUpPressed();
 
 protected:

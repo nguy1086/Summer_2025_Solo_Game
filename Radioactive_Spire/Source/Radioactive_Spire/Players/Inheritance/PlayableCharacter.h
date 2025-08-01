@@ -30,7 +30,7 @@ public:
 	void StopDucking();
 
 	void Attack();
-	void Heavy();
+	void Special();
 
 	void ApplyStateChange(EState newState);
 	void ApplyBounce();
@@ -72,7 +72,7 @@ private:
 	void DisableControls();
 	void ResetPlayerState();
 
-	void BatterHeavyAttackSpawn();
+	void BatterSpecialSpawn();
 	void BatterComboAttackSpawn();
 
 public:
@@ -103,9 +103,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
 	class UPaperFlipbook* BatterDuckFlipbook;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
-	class UPaperFlipbook* BatterAttackFlipbook;
+	class UPaperFlipbook* BatterAttackOneFlipbook;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
-	class UPaperFlipbook* BatterHeavyFlipbook;
+	class UPaperFlipbook* BatterAttackTwoFlipbook;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterFinisherFlipbook;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterSpecialFlipbook;
 
 	//Test Attacks
 	UPROPERTY(EditAnyWhere, Category = "Test attack")

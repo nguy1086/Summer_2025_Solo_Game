@@ -44,7 +44,10 @@ namespace PlayerConstants
 
     //stats
     constexpr float BatterHealth = 250.0f;
-    constexpr float BatterHeavyAttackDamage = 75.0f;
+
+    constexpr float BatterSpecialAttackDamage = 10.0f;
+    constexpr float BatterSpecialMaxAttackDamage = 125.0f;
+
     constexpr float BatterComboOneDamage = 16.0f;
     constexpr float BatterComboTwoDamage = 20.0f;
     constexpr float BatterComboThreeDamage = 24.0f;

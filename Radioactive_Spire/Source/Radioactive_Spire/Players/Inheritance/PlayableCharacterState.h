@@ -15,7 +15,7 @@ enum class EState : uint8
 	Falling		UMETA(DisplayName = "Falling"),
 	Ducking		UMETA(DisplayName = "Ducking"),
 	Attacking	UMETA(DisplayName = "Attacking"),
-	HeavyAttack	UMETA(DisplayName = "HeavyAttack"),
+	Special		UMETA(DisplayName = "Special"),
 	Dead		UMETA(DisplayName = "Dead"),
 };
 
