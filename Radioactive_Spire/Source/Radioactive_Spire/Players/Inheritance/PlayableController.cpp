@@ -68,7 +68,8 @@ void APlayableController::SetupInputComponent()
 
 		EnhancedInputComponent->BindAction(AttackInputAction, ETriggerEvent::Started, this, &APlayableController::OnAttackPressed);
 
-		EnhancedInputComponent->BindAction(SpecialInputAction, ETriggerEvent::Started, this, &APlayableController::OnHeavyPressed);
+		EnhancedInputComponent->BindAction(SpecialInputAction, ETriggerEvent::Started, this, &APlayableController::OnSpecialPressed);
+		EnhancedInputComponent->BindAction(SpecialInputAction, ETriggerEvent::Completed, this, &APlayableController::OnSpecialReleased);
 
 		//EnhancedInputComponent->BindAction(UpInputAction, ETriggerEvent::Started, this, &APlayableController::OnUpPressed);
 	}
@@ -203,10 +204,20 @@ void APlayableController::OnAttackPressed(const FInputActionValue& Value)
 		PlayablePlayer->Attack();
 }
 
-void APlayableController::OnHeavyPressed(const FInputActionValue& Value)
+void APlayableController::OnSpecialPressed(const FInputActionValue& Value)
 {
 	if (PlayablePlayer != nullptr)
+	{
 		PlayablePlayer->Special();
+		PlayablePlayer->SpecialHeld = true;
+	}
+
+}
+
+void APlayableController::OnSpecialReleased(const FInputActionValue& Value)
+{
+	if (PlayablePlayer != nullptr)
+		PlayablePlayer->SpecialHeld = false;
 }
 
 //void APlayableController::OnUpPressed(const FInputActionValue& Value)

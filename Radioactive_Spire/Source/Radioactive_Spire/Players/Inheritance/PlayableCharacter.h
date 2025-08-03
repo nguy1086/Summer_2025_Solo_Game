@@ -44,6 +44,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	EPlayerType Type;
 
+	bool SpecialHeld;
+
 protected:
 	void OnJumped_Implementation() override;
 	void NotifyJumpApex() override;
@@ -74,6 +76,7 @@ private:
 
 	void BatterSpecialSpawn();
 	void BatterComboAttackSpawn();
+	float SpecialTimer;
 
 public:
 
@@ -93,23 +96,27 @@ public:
 
 	//Batter
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
-	class UPaperFlipbook* BatterIdleFlipbook;
+	class UPaperFlipbook* BatterIdleFlipbook;//IDLE
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
-	class UPaperFlipbook* BatterWalkFlipbook;
+	class UPaperFlipbook* BatterWalkFlipbook;//WALK
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
-	class UPaperFlipbook* BatterJumpFlipbook;
+	class UPaperFlipbook* BatterJumpFlipbook;//JUMP
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
-	class UPaperFlipbook* BatterFallingFlipbook;
+	class UPaperFlipbook* BatterFallingFlipbook;//FALL
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
-	class UPaperFlipbook* BatterDuckFlipbook;
+	class UPaperFlipbook* BatterDuckFlipbook;//DUCK
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
-	class UPaperFlipbook* BatterAttackOneFlipbook;
+	class UPaperFlipbook* BatterAttackOneFlipbook;//ATK1
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
-	class UPaperFlipbook* BatterAttackTwoFlipbook;
+	class UPaperFlipbook* BatterAttackTwoFlipbook;//ATK2
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
-	class UPaperFlipbook* BatterFinisherFlipbook;
+	class UPaperFlipbook* BatterFinisherFlipbook;//FINISHER
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
-	class UPaperFlipbook* BatterSpecialFlipbook;
+	class UPaperFlipbook* BatterSpecialFlipbook;//SPECIAL STARTUP
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterSpecialPressFlipbook;//SPECIAL PRESS
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterSpecialHoldFlipbook;//SPECIAL HOLD
 
 	//Test Attacks
 	UPROPERTY(EditAnyWhere, Category = "Test attack")

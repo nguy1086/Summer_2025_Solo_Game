@@ -16,11 +16,17 @@
 
 #include "../../Game/RadioactiveSpire_GameModeBase.h"
 
+#include "InputAction.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+
 APlayableCharacter::APlayableCharacter() :
     PlayerState(nullptr),
     Camera(nullptr),
 	PlayableController(nullptr),
-	DamagedTimer(0.0f)
+	DamagedTimer(0.0f),
+	SpecialHeld(false),
+	SpecialTimer(0.0f)
 {
     PrimaryActorTick.bCanEverTick = true;
 
@@ -93,6 +99,10 @@ void APlayableCharacter::Tick(float DeltaTime)
 			if (GetActorLocation().Z < -250.0f)
 				Death();
 		}
+	}
+	if (SpecialHeld)
+	{
+		SpecialTimer += DeltaTime;
 	}
 }
 
@@ -167,16 +177,16 @@ void APlayableCharacter::Special()
 		{
 			if (AttackHitboxTemplate)
 			{
-				DisableControls();
+				//DisableControls();
 				StopDucking();
 				ApplyStateChange(EState::Special);
 
 				float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
 				float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
 
-				GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterSpecialSpawn, (1.0f / FramesPerSecond), false);
-				GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, (1.0f / FramesPerSecond), false);
-				GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
+				//GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterSpecialSpawn, (1.0f / FramesPerSecond), false);
+				//GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, (1.0f / FramesPerSecond), false);
+				//GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
 			}
 		}
 	}
@@ -512,6 +522,7 @@ void APlayableCharacter::ResetPlayerState()
 			ApplyStateChange(EState::Walking);
 
 		ComboNumber = 0;
+		SpecialTimer = 0;
 		GetWorldTimerManager().ClearTimer(AttackTimerHandle);
 		GetWorldTimerManager().ClearTimer(InputTimerHandle);
 		GetWorldTimerManager().ClearTimer(StateTimerHandle);
@@ -524,19 +535,18 @@ void APlayableCharacter::BatterSpecialSpawn()
 	FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
 	if (PlayerState->Direction == EDirection::Left)
 	{
-		location.X -= 128.0f;
+		location.X -= 64.0f;
 		rotation = FRotator(0.0f, 180.0f, 0.0f);
-		LaunchCharacter(FVector(-300.0f, 0.0f, 64.0f), false, false);
+		location.Z += 32.0f;
 	}
 	else if (PlayerState->Direction == EDirection::Right)
 	{
-		location.X += 128.0f;
-		LaunchCharacter(FVector(300.0f, 0.0f, 64.0f), false, false);
+		location.X += 64.0f;
+		location.Z += 32.0f;
 	}
 
 	APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
-	hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-	hitbox->Spawn(TEXT("Test_Basic"), PlayerConstants::BatterSpecialAttackDamage);
+	hitbox->Spawn(TEXT("Batter_Special"), PlayerConstants::BatterSpecialAttackDamage);
 }
 
 void APlayableCharacter::BatterComboAttackSpawn()

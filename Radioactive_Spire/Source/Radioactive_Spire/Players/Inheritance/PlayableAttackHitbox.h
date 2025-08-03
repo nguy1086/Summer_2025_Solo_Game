@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "PlayerConstants.h"
 #include "PlayableAttackHitbox.generated.h"
 
 UCLASS()
@@ -17,16 +18,23 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UBoxComponent* BoxComponent;
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class USphereComponent* SphereComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UPaperFlipbookComponent* FlipbookComponent;
+	UPROPERTY(EditAnywhere)
+	class UProjectileMovementComponent* ProjectileMovementComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Test flipbooks")
 	class UPaperFlipbook* TestBasicFlipbook;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterSpecialFlipbook;
+
 	virtual void Tick(float DeltaTime) override;
 
 	void Spawn(FString name, float damage);
+	void Projectile(FString name, float damage);
 
 protected:
 	// Called when the game starts or when spawned
@@ -34,11 +42,21 @@ protected:
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlapComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComp,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		FVector NormalImpulse,
+		const FHitResult& Hit);
 
 	UFUNCTION()
 	void OnFinishPlaying();
 
+	void InitializeHitbox();
+
 private:
+	bool IsProjectile;
 	float Timer;
 	float Damage;
 	FTimerHandle HitboxTimerHandle;

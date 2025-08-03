@@ -53,8 +53,9 @@ namespace PlayerConstants
     constexpr float BatterComboThreeDamage = 24.0f;
     constexpr float BatterComboFinisherDamage = 50.0f;
 
-    constexpr float BatterMaxCombo = 4;
-    constexpr float BatterMaxAirCombo = 2;
+    constexpr int BatterMaxCombo = 4;
+    constexpr int BatterMaxAirCombo = 2;
+    constexpr float BatterSpecialLifetime = 5.5f;
     //walk
     constexpr float BatterGroundFriction = 3.5f;
     constexpr float BatterMinSpeed = 200.0f;

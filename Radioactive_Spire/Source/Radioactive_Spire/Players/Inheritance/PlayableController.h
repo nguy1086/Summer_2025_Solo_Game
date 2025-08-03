@@ -52,6 +52,8 @@ public:
 	bool IsSpecialPressed();
 	//bool IsUpPressed();
 
+	class UEnhancedInputLocalPlayerSubsystem* GetInputSubSystem() { return InputSubsystem; }
+
 protected:
 	void OnMove(const struct FInputActionValue& Value);
 	void OnMoveReleased(const struct FInputActionValue& Value);
@@ -64,8 +66,8 @@ protected:
 
 	void OnAttackPressed(const struct FInputActionValue& Value);
 
-	void OnHeavyPressed(const struct FInputActionValue& Value);
-
+	void OnSpecialPressed(const struct FInputActionValue& Value);
+	void OnSpecialReleased(const struct FInputActionValue& Value);
 	//void OnUpPressed(const struct FInputActionValue& Value);
 
 private:
