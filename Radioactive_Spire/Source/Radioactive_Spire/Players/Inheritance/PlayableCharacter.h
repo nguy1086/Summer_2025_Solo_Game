@@ -44,8 +44,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	EPlayerType Type;
 
-	bool SpecialHeld;
-
 protected:
 	void OnJumped_Implementation() override;
 	void NotifyJumpApex() override;
@@ -76,7 +74,6 @@ private:
 
 	void BatterSpecialSpawn();
 	void BatterComboAttackSpawn();
-	float SpecialTimer;
 
 public:
 
@@ -112,11 +109,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
 	class UPaperFlipbook* BatterFinisherFlipbook;//FINISHER
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
-	class UPaperFlipbook* BatterSpecialFlipbook;//SPECIAL STARTUP
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
-	class UPaperFlipbook* BatterSpecialPressFlipbook;//SPECIAL PRESS
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
-	class UPaperFlipbook* BatterSpecialHoldFlipbook;//SPECIAL HOLD
+	class UPaperFlipbook* BatterSpecialFlipbook;//SPECIAL
 
 	//Test Attacks
 	UPROPERTY(EditAnyWhere, Category = "Test attack")

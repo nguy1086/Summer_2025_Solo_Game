@@ -35,6 +35,7 @@ namespace PlayerConstants
 
     //attack
     constexpr float DefaultAttackCooldown = 0.3f;
+    constexpr float DefaultSpecialHeldThreshold = 0.75f;
     //END DEFAULT   ----------------------------------------------------------------------
 
     //BATTER        ----------------------------------------------------------------------

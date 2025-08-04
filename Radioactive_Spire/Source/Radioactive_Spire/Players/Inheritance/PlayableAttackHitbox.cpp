@@ -21,6 +21,7 @@ APlayableAttackHitbox::APlayableAttackHitbox() :
 	FlipbookComponent = CreateDefaultSubobject<UPaperFlipbookComponent>("HitboxFlipbook");
 	FlipbookComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	FlipbookComponent->SetCollisionProfileName("NoCollision");
+	FlipbookComponent->SetSimulatePhysics(true);
 	FlipbookComponent->SetupAttachment(RootComponent);
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
@@ -40,8 +41,8 @@ void APlayableAttackHitbox::OnOverlapBegin(UPrimitiveComponent* OverlapComponent
 
 void APlayableAttackHitbox::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && (OtherActor != this->GetOwner()))
-		ProjectileMovementComponent->StopMovementImmediately();
+	//if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && (OtherActor != this->GetOwner()))
+	//	ProjectileMovementComponent->StopMovementImmediately();
 
 }
 
@@ -88,7 +89,6 @@ void APlayableAttackHitbox::Projectile(FString name, float damage)
 			Timer = PlayerConstants::BatterSpecialLifetime;
 		}
 
-
 		FlipbookComponent->SetFlipbook(flipbook);
 
 		InitializeHitbox();
@@ -107,16 +107,34 @@ void APlayableAttackHitbox::InitializeHitbox()
 {
 	SphereComponent->SetSphereRadius(0.0f);
 	BoxComponent->SetBoxExtent(FVector(0.0f, 0.0f, 0.0f));
+	ProjectileMovementComponent->SetActive(false);
 	if (FlipbookComponent->GetFlipbook() == BatterSpecialFlipbook)
 	{
+		DestroyBox();
+		SphereComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		SphereComponent->SetSimulatePhysics(true);
+		ProjectileMovementComponent->SetActive(true,true);
 		SphereComponent->SetSphereRadius(10.0f);
 
+		RootComponent = SphereComponent;
+
 		ProjectileMovementComponent->UpdatedComponent = SphereComponent;
-		ProjectileMovementComponent->InitialSpeed = 2000.f;
-		ProjectileMovementComponent->MaxSpeed = 2000.f;
+		ProjectileMovementComponent->InitialSpeed = 1000.f;
+		ProjectileMovementComponent->MaxSpeed = 1000.f;
 		ProjectileMovementComponent->bRotationFollowsVelocity = true;
 	}
+}
 
+void APlayableAttackHitbox::DestroyBox()
+{
+	BoxComponent->DestroyComponent();
+	BoxComponent = nullptr;
+}
+
+void APlayableAttackHitbox::DestroySphere()
+{
+	SphereComponent->DestroyComponent();
+	SphereComponent = nullptr;
 }
 
 // Called every frame

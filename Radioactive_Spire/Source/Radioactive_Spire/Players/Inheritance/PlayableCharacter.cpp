@@ -24,9 +24,7 @@ APlayableCharacter::APlayableCharacter() :
     PlayerState(nullptr),
     Camera(nullptr),
 	PlayableController(nullptr),
-	DamagedTimer(0.0f),
-	SpecialHeld(false),
-	SpecialTimer(0.0f)
+	DamagedTimer(0.0f)
 {
     PrimaryActorTick.bCanEverTick = true;
 
@@ -100,10 +98,8 @@ void APlayableCharacter::Tick(float DeltaTime)
 				Death();
 		}
 	}
-	if (SpecialHeld)
-	{
-		SpecialTimer += DeltaTime;
-	}
+
+
 }
 
 void APlayableCharacter::Duck()
@@ -173,21 +169,18 @@ void APlayableCharacter::Special()
 {
 	if (Type == EPlayerType::Batter)
 	{
-		if (PlayerState->State != EState::Special)
+		if (AttackHitboxTemplate)
 		{
-			if (AttackHitboxTemplate)
-			{
-				//DisableControls();
-				StopDucking();
-				ApplyStateChange(EState::Special);
+			DisableControls();
+			StopDucking();
+			ApplyStateChange(EState::Special);
 
-				float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
-				float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
+			float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
+			float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
 
-				//GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterSpecialSpawn, (1.0f / FramesPerSecond), false);
-				//GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, (1.0f / FramesPerSecond), false);
-				//GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
-			}
+			GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterSpecialSpawn, (4.0f / FramesPerSecond), false);
+			GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, (4.0f / FramesPerSecond), false);
+			GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
 		}
 	}
 }
@@ -424,14 +417,19 @@ UPaperFlipbook* APlayableCharacter::GetBatterFlipbook()
 	else if (PlayerState->State == EState::Ducking)
 		flipbook = BatterDuckFlipbook;
 	else if (PlayerState->State == EState::Attacking)
+	{
 		if ((ComboNumber == 0 || ComboNumber == 2) && PlayableController->IsAttackPressed())
 			flipbook = BatterAttackOneFlipbook;
 		else if ((ComboNumber == 1 || ComboNumber == 3) && PlayableController->IsAttackPressed())
 			flipbook = BatterAttackTwoFlipbook;
-		else if(ComboNumber >= PlayerConstants::BatterMaxCombo && PlayableController->IsAttackPressed())
+		else if (ComboNumber >= PlayerConstants::BatterMaxCombo && PlayableController->IsAttackPressed())
 			flipbook = BatterFinisherFlipbook;
+	}
 	else if (PlayerState->State == EState::Special)
 		flipbook = BatterSpecialFlipbook;
+
+
+
 
 	return flipbook;
 }
@@ -522,7 +520,6 @@ void APlayableCharacter::ResetPlayerState()
 			ApplyStateChange(EState::Walking);
 
 		ComboNumber = 0;
-		SpecialTimer = 0;
 		GetWorldTimerManager().ClearTimer(AttackTimerHandle);
 		GetWorldTimerManager().ClearTimer(InputTimerHandle);
 		GetWorldTimerManager().ClearTimer(StateTimerHandle);
@@ -532,21 +529,11 @@ void APlayableCharacter::ResetPlayerState()
 void APlayableCharacter::BatterSpecialSpawn()
 {
 	FVector location = GetActorLocation();
-	FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
-	if (PlayerState->Direction == EDirection::Left)
-	{
-		location.X -= 64.0f;
-		rotation = FRotator(0.0f, 180.0f, 0.0f);
-		location.Z += 32.0f;
-	}
-	else if (PlayerState->Direction == EDirection::Right)
-	{
-		location.X += 64.0f;
-		location.Z += 32.0f;
-	}
+	FRotator rotation = FRotator(90.0f, 0.0f, 0.0f);
+	location.Z += 96.0f;
 
 	APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
-	hitbox->Spawn(TEXT("Batter_Special"), PlayerConstants::BatterSpecialAttackDamage);
+	hitbox->Projectile(TEXT("Batter_Special"), PlayerConstants::BatterSpecialAttackDamage);
 }
 
 void APlayableCharacter::BatterComboAttackSpawn()

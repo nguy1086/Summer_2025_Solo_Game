@@ -56,6 +56,8 @@ protected:
 	void InitializeHitbox();
 
 private:
+	void DestroyBox();
+	void DestroySphere();
 	bool IsProjectile;
 	float Timer;
 	float Damage;
