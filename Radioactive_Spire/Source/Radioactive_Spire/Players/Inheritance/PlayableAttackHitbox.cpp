@@ -18,15 +18,16 @@ APlayableAttackHitbox::APlayableAttackHitbox() :
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
+	RootComponent = BoxComponent;
+
 	FlipbookComponent = CreateDefaultSubobject<UPaperFlipbookComponent>("HitboxFlipbook");
 	FlipbookComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	FlipbookComponent->SetCollisionProfileName("NoCollision");
-	FlipbookComponent->SetSimulatePhysics(true);
 	FlipbookComponent->SetupAttachment(RootComponent);
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
-	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
-	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
+
 }
 
 // Called when the game starts or when spawned
@@ -105,36 +106,25 @@ void APlayableAttackHitbox::OnFinishPlaying()
 
 void APlayableAttackHitbox::InitializeHitbox()
 {
-	SphereComponent->SetSphereRadius(0.0f);
 	BoxComponent->SetBoxExtent(FVector(0.0f, 0.0f, 0.0f));
 	ProjectileMovementComponent->SetActive(false);
 	if (FlipbookComponent->GetFlipbook() == BatterSpecialFlipbook)
 	{
-		DestroyBox();
-		SphereComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		SphereComponent->SetSimulatePhysics(true);
+		BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		BoxComponent->SetCollisionProfileName("PlayerHitbox");
+		BoxComponent->SetSimulatePhysics(true);
 		ProjectileMovementComponent->SetActive(true,true);
-		SphereComponent->SetSphereRadius(10.0f);
+		BoxComponent->SetBoxExtent(FVector(5.0f, 1.0f, 5.0f));
 
-		RootComponent = SphereComponent;
 
-		ProjectileMovementComponent->UpdatedComponent = SphereComponent;
-		ProjectileMovementComponent->InitialSpeed = 1000.f;
-		ProjectileMovementComponent->MaxSpeed = 1000.f;
+		RootComponent = BoxComponent;
+
+		ProjectileMovementComponent->UpdatedComponent = BoxComponent;
+		ProjectileMovementComponent->Velocity.Z = 10000.f;
+		ProjectileMovementComponent->InitialSpeed = 250.f;
+		ProjectileMovementComponent->MaxSpeed = 250.f;
 		ProjectileMovementComponent->bRotationFollowsVelocity = true;
 	}
-}
-
-void APlayableAttackHitbox::DestroyBox()
-{
-	BoxComponent->DestroyComponent();
-	BoxComponent = nullptr;
-}
-
-void APlayableAttackHitbox::DestroySphere()
-{
-	SphereComponent->DestroyComponent();
-	SphereComponent = nullptr;
 }
 
 // Called every frame
@@ -145,8 +135,8 @@ void APlayableAttackHitbox::Tick(float DeltaTime)
 	if (FlipbookComponent->GetFlipbook() == BatterSpecialFlipbook)
 	{
 		Timer -= DeltaTime;
-		if (Timer < 0.0f)
-			Destroy();
+		//if (Timer < 0.0f)
+			//Destroy();
 	}
 }
 

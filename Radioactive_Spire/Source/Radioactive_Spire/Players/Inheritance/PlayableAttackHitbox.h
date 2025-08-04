@@ -19,8 +19,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UBoxComponent* BoxComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	class USphereComponent* SphereComponent;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UPaperFlipbookComponent* FlipbookComponent;
 	UPROPERTY(EditAnywhere)
 	class UProjectileMovementComponent* ProjectileMovementComponent;
@@ -56,8 +54,6 @@ protected:
 	void InitializeHitbox();
 
 private:
-	void DestroyBox();
-	void DestroySphere();
 	bool IsProjectile;
 	float Timer;
 	float Damage;

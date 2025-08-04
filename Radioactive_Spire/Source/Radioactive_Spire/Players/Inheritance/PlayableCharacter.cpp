@@ -440,7 +440,7 @@ void APlayableCharacter::InitializeType()
 	{
 		Health = PlayerConstants::DefaultHealth;
 		//collision
-		GetCapsuleComponent()->SetCollisionProfileName("Entity");
+		GetCapsuleComponent()->SetCollisionProfileName("Player");
 		GetCapsuleComponent()->SetCapsuleRadius(PlayerConstants::DefaultCapsuleRadius);
 		GetCapsuleComponent()->SetCapsuleHalfHeight(PlayerConstants::DefaultCapsuleHalfHeight);
 
@@ -468,7 +468,7 @@ void APlayableCharacter::InitializeType()
 	{
 		Health = PlayerConstants::BatterHealth;
 		//collision
-		GetCapsuleComponent()->SetCollisionProfileName("Entity");
+		GetCapsuleComponent()->SetCollisionProfileName("Player");
 		GetCapsuleComponent()->SetCapsuleRadius(PlayerConstants::BatterCapsuleRadius);
 		GetCapsuleComponent()->SetCapsuleHalfHeight(PlayerConstants::BatterCapsuleHalfHeight);
 
@@ -529,7 +529,7 @@ void APlayableCharacter::ResetPlayerState()
 void APlayableCharacter::BatterSpecialSpawn()
 {
 	FVector location = GetActorLocation();
-	FRotator rotation = FRotator(90.0f, 0.0f, 0.0f);
+	FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
 	location.Z += 96.0f;
 
 	APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
