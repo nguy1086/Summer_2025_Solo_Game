@@ -24,7 +24,7 @@ APlayerCamera::APlayerCamera() :
 	Camera->SetOrthoWidth(GameConstants::ResolutionWidth);
 	Camera->SetAspectRatio(GameConstants::ResolutionAspectRatio);
 	Camera->SetConstraintAspectRatio(true);
-	Camera->SetRelativeLocation(FVector(0.0f, GameConstants::CameraDepthY, -50.0f));
+	Camera->SetRelativeLocation(FVector(0.0f, GameConstants::CameraDepthY, -180.0f));
 	Camera->SetRelativeRotation(FQuat(FRotator(0.0f, GameConstants::CameraRotationYaw, 0.0f)));
 	Camera->SetupAttachment(RootComponent);
 

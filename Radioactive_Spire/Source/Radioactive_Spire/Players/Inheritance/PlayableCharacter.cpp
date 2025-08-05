@@ -21,10 +21,11 @@
 #include "EnhancedInputSubsystems.h"
 
 APlayableCharacter::APlayableCharacter() :
-    PlayerState(nullptr),
-    Camera(nullptr),
+	PlayerState(nullptr),
+	Camera(nullptr),
 	PlayableController(nullptr),
-	DamagedTimer(0.0f)
+	DamagedTimer(0.0f),
+	DuckSpecial(false)
 {
     PrimaryActorTick.bCanEverTick = true;
 
@@ -171,6 +172,8 @@ void APlayableCharacter::Special()
 	{
 		if (AttackHitboxTemplate)
 		{
+			if (PlayableController->IsDuckPressed())
+				DuckSpecial = true;
 			DisableControls();
 			StopDucking();
 			ApplyStateChange(EState::Special);
@@ -178,8 +181,8 @@ void APlayableCharacter::Special()
 			float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
 			float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
 
-			GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterSpecialSpawn, (4.0f / FramesPerSecond), false);
-			GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, (4.0f / FramesPerSecond), false);
+			GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterSpecialSpawn, ((4.0f - (DuckSpecial ? 1.0f : 0.0f)) / FramesPerSecond), false);
+			GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, ((4.0f - (DuckSpecial ? 1.0f : 0.0f)) / FramesPerSecond), false);
 			GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
 		}
 	}
@@ -426,7 +429,13 @@ UPaperFlipbook* APlayableCharacter::GetBatterFlipbook()
 			flipbook = BatterFinisherFlipbook;
 	}
 	else if (PlayerState->State == EState::Special)
-		flipbook = BatterSpecialFlipbook;
+	{
+		if (DuckSpecial)
+			flipbook = BatterSpecialDuckFlipbook;
+		else
+			flipbook = BatterSpecialFlipbook;
+	}
+
 
 
 
@@ -520,6 +529,7 @@ void APlayableCharacter::ResetPlayerState()
 			ApplyStateChange(EState::Walking);
 
 		ComboNumber = 0;
+		DuckSpecial = false;
 		GetWorldTimerManager().ClearTimer(AttackTimerHandle);
 		GetWorldTimerManager().ClearTimer(InputTimerHandle);
 		GetWorldTimerManager().ClearTimer(StateTimerHandle);
@@ -530,10 +540,29 @@ void APlayableCharacter::BatterSpecialSpawn()
 {
 	FVector location = GetActorLocation();
 	FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
-	location.Z += 96.0f;
+	if (DuckSpecial)
+	{
+		location.Z += 96.0f;
 
-	APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
-	hitbox->Projectile(TEXT("Batter_Special"), PlayerConstants::BatterSpecialAttackDamage);
+		APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
+		hitbox->Projectile(TEXT("Batter_Special_Duck"), PlayerConstants::BatterSpecialAttackDamage);
+	}
+	else
+	{
+		if (PlayerState->Direction == EDirection::Left)
+		{
+			location.X -= 64.0f;
+			rotation = FRotator(0.0f, 180.0f, 0.0f);
+			location.Z += 48.0f;
+		}
+		else if (PlayerState->Direction == EDirection::Right)
+		{
+			location.X += 64.0f;
+			location.Z += 48.0f;
+		}
+		APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
+		hitbox->Projectile(TEXT("Batter_Special"), PlayerConstants::BatterSpecialAttackDamage);
+	}
 }
 
 void APlayableCharacter::BatterComboAttackSpawn()
@@ -544,13 +573,13 @@ void APlayableCharacter::BatterComboAttackSpawn()
 		FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
 		if (PlayerState->Direction == EDirection::Left)
 		{
-			location.X -= 96.0f;
+			location.X -= 64.0f;
 			rotation = FRotator(0.0f, 180.0f, 0.0f);
 			LaunchCharacter(FVector(-300.0f, 0.0f, 64.0f), false, false);
 		}
 		else if (PlayerState->Direction == EDirection::Right)
 		{
-			location.X += 96.0f;
+			location.X += 64.0f;
 			LaunchCharacter(FVector(300.0f, 0.0f, 64.0f), false, false);
 		}
 

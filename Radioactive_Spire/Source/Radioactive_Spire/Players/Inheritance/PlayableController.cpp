@@ -161,6 +161,19 @@ void APlayableController::OnMove(const FInputActionValue& Value)
 				PlayablePlayerState->Direction = EDirection::Right;
 			}
 		}
+		else if (PlayablePlayerState->State == EState::Attacking)//able to turn when attacking
+		{
+			if (Direction < 0.0f)
+			{
+				SetControlRotation(FRotator(0.0, 180.0f, 0.0f));
+				PlayablePlayerState->Direction = EDirection::Left;
+			}
+			else if (Direction > 0.0f)
+			{
+				SetControlRotation(FRotator(0.0f, 0.0f, 0.0f));
+				PlayablePlayerState->Direction = EDirection::Right;
+			}
+		}
 	}
 }
 

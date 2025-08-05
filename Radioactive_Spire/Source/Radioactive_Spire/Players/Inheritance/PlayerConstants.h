@@ -57,6 +57,7 @@ namespace PlayerConstants
     constexpr int BatterMaxCombo = 4;
     constexpr int BatterMaxAirCombo = 2;
     constexpr float BatterSpecialLifetime = 5.5f;
+    constexpr int BatterSpecialMaxBounce = 2;
     //walk
     constexpr float BatterGroundFriction = 3.5f;
     constexpr float BatterMinSpeed = 200.0f;
@@ -65,9 +66,9 @@ namespace PlayerConstants
     constexpr float BatterMaxStepHeight = 10.0f;
 
     //jump
-    constexpr float BatterGravityScale = 3.75f;
-    constexpr float BatterAirControl = 1.0f;
-    constexpr float BatterJumpZVelocity = 800.0f;
+    constexpr float BatterGravityScale = 1.75f;
+    constexpr float BatterAirControl = 0.75f;
+    constexpr float BatterJumpZVelocity = 450.0f;
     constexpr float BatterJumpMaxHoldTimeWalking = 0.15f;
     constexpr float BatterJumpMaxHoldTimeRunning = 0.19f;
     constexpr float BatterJumpIncreasePerSegment = 0.0005f;

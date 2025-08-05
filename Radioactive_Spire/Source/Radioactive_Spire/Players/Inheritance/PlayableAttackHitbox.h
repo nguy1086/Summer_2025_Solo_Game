@@ -57,5 +57,7 @@ private:
 	bool IsProjectile;
 	float Timer;
 	float Damage;
+	int Ricochet;
+	FString Name;
 	FTimerHandle HitboxTimerHandle;
 };

@@ -13,12 +13,15 @@
 // Sets default values
 APlayableAttackHitbox::APlayableAttackHitbox() :
 	Timer(0.0f),
-	IsProjectile(false)
+	IsProjectile(false),
+	Ricochet(0)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
+	BoxComponent->BodyInstance.bLockYRotation = true;
+	BoxComponent->BodyInstance.bLockZRotation = true;
 	RootComponent = BoxComponent;
 
 	FlipbookComponent = CreateDefaultSubobject<UPaperFlipbookComponent>("HitboxFlipbook");
@@ -27,7 +30,9 @@ APlayableAttackHitbox::APlayableAttackHitbox() :
 	FlipbookComponent->SetupAttachment(RootComponent);
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
+	ProjectileMovementComponent->bSimulationEnabled = true;
 
+	RootComponent->SetHiddenInGame(false);
 }
 
 // Called when the game starts or when spawned
@@ -42,8 +47,39 @@ void APlayableAttackHitbox::OnOverlapBegin(UPrimitiveComponent* OverlapComponent
 
 void APlayableAttackHitbox::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	//if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && (OtherActor != this->GetOwner()))
-	//	ProjectileMovementComponent->StopMovementImmediately();
+	if (IsProjectile)
+	{
+		//if (Name == TEXT("Batter_Special_Duck") || Name == TEXT("Batter_Special"))
+		//{
+		//	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && (OtherActor != this->GetOwner()))
+		//	{
+		//		ProjectileMovementComponent->StopMovementImmediately();
+		//		if (OtherActor->ActorHasTag("Enemy"))
+		//		{
+		//			Damage *= (ProjectileMovementComponent->Velocity.Size() * 0.5f);//velocity.size() gets the current speed
+		//			Destroy();
+		//		}
+		//		else
+		//		{
+		//			Ricochet++;
+		//			Damage = Damage / 2.0f;
+	
+		//			if (Ricochet >= PlayerConstants::BatterSpecialMaxBounce)
+		//			{
+		//				Destroy();
+		//			}
+		//		}
+		//	}
+		//}
+
+
+	}
+	else
+	{
+
+	}
+
+
 
 }
 
@@ -83,11 +119,13 @@ void APlayableAttackHitbox::Projectile(FString name, float damage)
 		UPaperFlipbook* flipbook = nullptr;
 
 		Damage = damage;
+		Name = name;
+		IsProjectile = true;
 
-		if (name == TEXT("Batter_Special"))
+		if (name == TEXT("Batter_Special_Duck") || name == TEXT("Batter_Special"))
 		{
 			flipbook = BatterSpecialFlipbook;
-			Timer = PlayerConstants::BatterSpecialLifetime;
+			Timer = PlayerConstants::BatterSpecialLifetime;//initiallifespan no work
 		}
 
 		FlipbookComponent->SetFlipbook(flipbook);
@@ -108,22 +146,43 @@ void APlayableAttackHitbox::InitializeHitbox()
 {
 	BoxComponent->SetBoxExtent(FVector(0.0f, 0.0f, 0.0f));
 	ProjectileMovementComponent->SetActive(false);
-	if (FlipbookComponent->GetFlipbook() == BatterSpecialFlipbook)
+	if (Name == TEXT("Batter_Special_Duck"))
 	{
 		BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		BoxComponent->SetCollisionProfileName("PlayerHitbox");
-		BoxComponent->SetSimulatePhysics(true);
+		BoxComponent->SetCollisionProfileName("PlayerProjectileWorldHitbox");
+		//BoxComponent->SetSimulatePhysics(false);
 		ProjectileMovementComponent->SetActive(true,true);
 		BoxComponent->SetBoxExtent(FVector(5.0f, 1.0f, 5.0f));
-
 
 		RootComponent = BoxComponent;
 
 		ProjectileMovementComponent->UpdatedComponent = BoxComponent;
-		ProjectileMovementComponent->Velocity.Z = 10000.f;
-		ProjectileMovementComponent->InitialSpeed = 250.f;
-		ProjectileMovementComponent->MaxSpeed = 250.f;
+		ProjectileMovementComponent->Velocity.Z = 1000.0f;
+		ProjectileMovementComponent->InitialSpeed = 750.0f;
+		ProjectileMovementComponent->MaxSpeed = 750.0f;
 		ProjectileMovementComponent->bRotationFollowsVelocity = true;
+		ProjectileMovementComponent->bShouldBounce = true;
+		ProjectileMovementComponent->Bounciness = 0.5f;
+		ProjectileMovementComponent->ProjectileGravityScale = 1.0f;
+	}
+	else if (Name == TEXT("Batter_Special"))
+	{
+		BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		BoxComponent->SetCollisionProfileName("PlayerProjectileWorldHitbox");
+		//BoxComponent->SetSimulatePhysics(false);
+		ProjectileMovementComponent->SetActive(true, true);
+		BoxComponent->SetBoxExtent(FVector(5.0f, 1.0f, 5.0f));
+
+		RootComponent = BoxComponent;
+
+		ProjectileMovementComponent->UpdatedComponent = BoxComponent;
+		ProjectileMovementComponent->Velocity.X = 1000.0f * (GetActorRotation() == FRotator(0.0f,180.0f,0.0f) ? -1.0f : 1.0f);//NOT THE BEST AT CHECKING WILL PROBABLY CHANGED THIS LATER
+		ProjectileMovementComponent->InitialSpeed = 1250.0f * (GetActorRotation() == FRotator(0.0f, 180.0f, 0.0f) ? -1.0f : 1.0f);
+		ProjectileMovementComponent->MaxSpeed = 1250.0f;
+		ProjectileMovementComponent->bRotationFollowsVelocity = true;
+		ProjectileMovementComponent->bShouldBounce = true;
+		ProjectileMovementComponent->Bounciness = 0.5f;
+		ProjectileMovementComponent->ProjectileGravityScale = 1.0f;
 	}
 }
 
@@ -132,11 +191,11 @@ void APlayableAttackHitbox::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (FlipbookComponent->GetFlipbook() == BatterSpecialFlipbook)
+	if (IsProjectile)
 	{
 		Timer -= DeltaTime;
-		//if (Timer < 0.0f)
-			//Destroy();
+		if (Timer < 0.0f)
+			Destroy();
 	}
 }
 

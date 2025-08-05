@@ -75,6 +75,9 @@ private:
 	void BatterSpecialSpawn();
 	void BatterComboAttackSpawn();
 
+	//batter
+	bool DuckSpecial;
+
 public:
 
 	//Test
@@ -110,6 +113,8 @@ public:
 	class UPaperFlipbook* BatterFinisherFlipbook;//FINISHER
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
 	class UPaperFlipbook* BatterSpecialFlipbook;//SPECIAL
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterSpecialDuckFlipbook;//SPECIAL DUCK
 
 	//Test Attacks
 	UPROPERTY(EditAnyWhere, Category = "Test attack")
