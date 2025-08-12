@@ -37,6 +37,8 @@ public:
 
 	void HandleDamage(float damage);
 	bool IsInvincible();
+	void NoGravity();
+	void SetGravity();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float Health = PlayerConstants::DefaultHealth;
@@ -62,6 +64,7 @@ private:
 	FTimerHandle AttackTimerHandle;
 	FTimerHandle InputTimerHandle;
 	FTimerHandle StateTimerHandle;
+	FTimerHandle GravityTimerHandle;
 
 	class UPaperFlipbook* GetTestFlipbook();
 	class UPaperFlipbook* GetBatterFlipbook();
@@ -111,6 +114,10 @@ public:
 	class UPaperFlipbook* BatterAttackTwoFlipbook;//ATK2
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
 	class UPaperFlipbook* BatterFinisherFlipbook;//FINISHER
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterAIRAttackOneFlipbook;//AIRATK1
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterAIRAttackTwoFlipbook;//AIRATK2
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
 	class UPaperFlipbook* BatterSpecialFlipbook;//SPECIAL
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
