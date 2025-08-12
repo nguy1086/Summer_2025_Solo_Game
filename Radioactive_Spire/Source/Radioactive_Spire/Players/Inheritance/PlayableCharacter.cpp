@@ -153,6 +153,7 @@ void APlayableCharacter::Attack()
 				StopDucking();
 				ApplyStateChange(EState::Attacking);
 
+				PlayerState->IsOnGround = true;
 
 				float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
 				float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
@@ -361,8 +362,8 @@ void APlayableCharacter::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
 
-	if ((PlayerState->State == EState::Attacking && !PlayerState->IsOnGround) || PlayerState->State == EState::Falling)//safe check when doing air attacks
-		EnableControls();
+	//if ((PlayerState->State == EState::Attacking && !PlayerState->IsOnGround) || PlayerState->State == EState::Falling)//safe check when doing air attacks
+	//	EnableControls();
 
 	if (PlayerState)
 	{
@@ -632,16 +633,14 @@ void APlayableCharacter::BatterComboAttackSpawn()
 		{
 			FVector location = GetActorLocation();
 			FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
-			if (PlayerState->Direction == EDirection::Left)
-			{
+			if (PlayerState->Direction == EDirection::Left){
 				location.X -= 64.0f;
 				rotation = FRotator(0.0f, 180.0f, 0.0f);
-				LaunchCharacter(FVector(-300.0f, 0.0f, 64.0f), false, false);
+				LaunchCharacter(FVector(-300.0f, 0.0f, -5.0f), false, false);
 			}
-			else if (PlayerState->Direction == EDirection::Right)
-			{
+			else if (PlayerState->Direction == EDirection::Right){
 				location.X += 64.0f;
-				LaunchCharacter(FVector(300.0f, 0.0f, 64.0f), false, false);
+				LaunchCharacter(FVector(300.0f, 0.0f, -5.0f), false, false);
 			}
 
 			APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
@@ -653,16 +652,14 @@ void APlayableCharacter::BatterComboAttackSpawn()
 		{
 			FVector location = GetActorLocation();
 			FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
-			if (PlayerState->Direction == EDirection::Left)
-			{
+			if (PlayerState->Direction == EDirection::Left){
 				location.X -= 96.0f;
 				rotation = FRotator(0.0f, 180.0f, 0.0f);
-				LaunchCharacter(FVector(-300.0f, 0.0f, 64.0f), false, false);
+				LaunchCharacter(FVector(-300.0f, 0.0f, -5.0f), false, false);
 			}
-			else if (PlayerState->Direction == EDirection::Right)
-			{
+			else if (PlayerState->Direction == EDirection::Right){
 				location.X += 96.0f;
-				LaunchCharacter(FVector(300.0f, 0.0f, 64.0f), false, false);
+				LaunchCharacter(FVector(300.0f, 0.0f, -5.0f), false, false);
 			}
 
 			APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
@@ -678,12 +675,12 @@ void APlayableCharacter::BatterComboAttackSpawn()
 			{
 				location.X -= 96.0f;
 				rotation = FRotator(0.0f, 180.0f, 0.0f);
-				LaunchCharacter(FVector(-300.0f, 0.0f, 64.0f), false, false);
+				LaunchCharacter(FVector(-300.0f, 0.0f, 0.0f), false, false);
 			}
 			else if (PlayerState->Direction == EDirection::Right)
 			{
 				location.X += 96.0f;
-				LaunchCharacter(FVector(300.0f, 0.0f, 64.0f), false, false);
+				LaunchCharacter(FVector(300.0f, 0.0f, 0.0f), false, false);
 			}
 
 			APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
