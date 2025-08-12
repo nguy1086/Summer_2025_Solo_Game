@@ -183,9 +183,7 @@ void APlayableCharacter::Attack()
 					GetWorldTimerManager().SetTimer(GravityTimerHandle, this, &APlayableCharacter::SetGravity, ((TotalDuration - 0.5f) / FramesPerSecond), false);
 				}
 				else
-				{
 					GetWorldTimerManager().SetTimer(GravityTimerHandle, this, &APlayableCharacter::SetGravity, ((TotalDuration - 4.0f) / FramesPerSecond), false);
-				}
 
 
 				GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterComboAttackSpawn, ((TotalDuration - Delay) / FramesPerSecond), false);
@@ -211,8 +209,8 @@ void APlayableCharacter::Special()
 			float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
 			float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
 
-			GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterSpecialSpawn, ((4.0f - (DuckSpecial ? 1.0f : 0.0f)) / FramesPerSecond), false);
-			GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, ((4.0f - (DuckSpecial ? 1.0f : 0.0f)) / FramesPerSecond), false);
+			GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterSpecialSpawn, ((TotalDuration - (DuckSpecial ? 2.0f : 3.0f)) / FramesPerSecond), false);
+			GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, ((TotalDuration - (DuckSpecial ? 2.0f : 1.0f)) / FramesPerSecond), false);
 			GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
 		}
 	}
@@ -323,15 +321,22 @@ bool APlayableCharacter::IsInvincible()
 void APlayableCharacter::NoGravity()
 {
 	GetCharacterMovement()->GravityScale = 0.0f;
-	GetCharacterMovement()->Velocity = FVector(GetCharacterMovement()->Velocity.X/2.0, 0, GetCharacterMovement()->Velocity.Z / 50.0);
+	GetCharacterMovement()->JumpZVelocity = 0.0f;
+	GetCharacterMovement()->Velocity = FVector(GetCharacterMovement()->Velocity.X/2.0, 0, GetCharacterMovement()->Velocity.Z / 10.0);
 }
 
 void APlayableCharacter::SetGravity()
 {
 	if (Type == EPlayerType::Test)
+	{
 		GetCharacterMovement()->GravityScale = PlayerConstants::DefaultGravityScale;
+		GetCharacterMovement()->JumpZVelocity = PlayerConstants::DefaultJumpZVelocity;
+	}
 	else if (Type == EPlayerType::Batter)
+	{
 		GetCharacterMovement()->GravityScale = PlayerConstants::BatterGravityScale;
+		GetCharacterMovement()->JumpZVelocity = PlayerConstants::BatterJumpZVelocity;
+	}
 }
 
 void APlayableCharacter::OnJumped_Implementation()
@@ -717,7 +722,7 @@ void APlayableCharacter::BatterComboAttackSpawn()
 			APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
 			hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 			hitbox->Spawn(TEXT("Test_Basic"), PlayerConstants::BatterAirComboTwoDamage);
-			ComboNumber++;//dont want players to infinitely keep air attacking to the sky
+			ComboNumber++;//dont want players to infinitely keep air attacking to the sky (air stalling), will reset combo if hits an enemy
 		}
 	}
 }
