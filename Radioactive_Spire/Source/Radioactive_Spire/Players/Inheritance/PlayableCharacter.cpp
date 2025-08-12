@@ -176,14 +176,20 @@ void APlayableCharacter::Attack()
 				float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
 
 				float Delay = ComboNumber == 0 ? 4.0f : 5.0f;
-				if (ComboNumber == 0)
-					NoGravity();
 
 				if (ComboNumber == 0)
-					GetWorldTimerManager().SetTimer(GravityTimerHandle, this, &APlayableCharacter::SetGravity, ((TotalDuration - 1.0f) / FramesPerSecond), false);
+				{
+					NoGravity();
+					GetWorldTimerManager().SetTimer(GravityTimerHandle, this, &APlayableCharacter::SetGravity, ((TotalDuration - 0.5f) / FramesPerSecond), false);
+				}
+				else
+				{
+					GetWorldTimerManager().SetTimer(GravityTimerHandle, this, &APlayableCharacter::SetGravity, ((TotalDuration - 4.0f) / FramesPerSecond), false);
+				}
+
 
 				GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterComboAttackSpawn, ((TotalDuration - Delay) / FramesPerSecond), false);
-				GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, ((TotalDuration - Delay + (ComboNumber == 0 ? 0.0f : 5.0f)) / FramesPerSecond), false);
+				GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, ((TotalDuration - Delay + (ComboNumber == 0 ? 0.0f : 4.5f)) / FramesPerSecond), false);
 				GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
 			}
 		}
@@ -316,7 +322,8 @@ bool APlayableCharacter::IsInvincible()
 
 void APlayableCharacter::NoGravity()
 {
-	GetCharacterMovement()->GravityScale = 0.5f;
+	GetCharacterMovement()->GravityScale = 0.0f;
+	GetCharacterMovement()->Velocity = FVector(GetCharacterMovement()->Velocity.X/2.0, 0, GetCharacterMovement()->Velocity.Z / 50.0);
 }
 
 void APlayableCharacter::SetGravity()
@@ -349,7 +356,7 @@ void APlayableCharacter::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
 
-	if (PlayerState->State == EState::Attacking && !PlayerState->IsOnGround)
+	if ((PlayerState->State == EState::Attacking && !PlayerState->IsOnGround) || PlayerState->State == EState::Falling)//safe check when doing air attacks
 		EnableControls();
 
 	if (PlayerState)
@@ -702,15 +709,15 @@ void APlayableCharacter::BatterComboAttackSpawn()
 		else if (ComboNumber >= PlayerConstants::BatterMaxAirCombo)
 		{
 			FVector location = GetActorLocation();
-			FRotator rotation = FRotator(0.0f, 90.0f, 0.0f);
+			FRotator rotation = FRotator(90.0f, 00.0f, 0.0f);
 
-			location.Z += 128.0f;
-			LaunchCharacter(FVector(0.0f, 0.0f, 300.0f), false, false);
+			location.Z += 96.0f;
+			LaunchCharacter(FVector(0.0f, 0.0f, 250.0f), false, false);
 
 			APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
 			hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 			hitbox->Spawn(TEXT("Test_Basic"), PlayerConstants::BatterAirComboTwoDamage);
-			ComboNumber = 0;
+			ComboNumber++;//dont want players to infinitely keep air attacking to the sky
 		}
 	}
 }
