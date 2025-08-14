@@ -397,13 +397,9 @@ void APlayableCharacter::UpdateFlipbook()
 	UPaperFlipbook* newFlipbook = nullptr;
 
 	if (Type == EPlayerType::Test)
-	{
 		newFlipbook = GetTestFlipbook();
-	}
 	else if (Type == EPlayerType::Batter)
-	{
 		newFlipbook = GetBatterFlipbook();
-	}
 
 	// safety check that the new flipbook is not null and different than the current flipbook
 	if (currentFlipbook != newFlipbook && newFlipbook)
@@ -636,11 +632,11 @@ void APlayableCharacter::BatterComboAttackSpawn()
 			if (PlayerState->Direction == EDirection::Left){
 				location.X -= 64.0f;
 				rotation = FRotator(0.0f, 180.0f, 0.0f);
-				LaunchCharacter(FVector(-300.0f, 0.0f, -5.0f), false, false);
+				GetCharacterMovement()->AddImpulse(FVector(-600.0f, 0.0f, 0.0f), true);
 			}
 			else if (PlayerState->Direction == EDirection::Right){
 				location.X += 64.0f;
-				LaunchCharacter(FVector(300.0f, 0.0f, -5.0f), false, false);
+				GetCharacterMovement()->AddImpulse(FVector(600.0f, 0.0f, 0.0f), true);
 			}
 
 			APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
@@ -655,11 +651,11 @@ void APlayableCharacter::BatterComboAttackSpawn()
 			if (PlayerState->Direction == EDirection::Left){
 				location.X -= 96.0f;
 				rotation = FRotator(0.0f, 180.0f, 0.0f);
-				LaunchCharacter(FVector(-300.0f, 0.0f, -5.0f), false, false);
+				GetCharacterMovement()->AddImpulse(FVector(-600.0f, 0.0f, 0.0f), true);
 			}
 			else if (PlayerState->Direction == EDirection::Right){
 				location.X += 96.0f;
-				LaunchCharacter(FVector(300.0f, 0.0f, -5.0f), false, false);
+				GetCharacterMovement()->AddImpulse(FVector(600.0f, 0.0f, 0.0f), true);
 			}
 
 			APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
@@ -675,12 +671,12 @@ void APlayableCharacter::BatterComboAttackSpawn()
 			{
 				location.X -= 96.0f;
 				rotation = FRotator(0.0f, 180.0f, 0.0f);
-				LaunchCharacter(FVector(-300.0f, 0.0f, 0.0f), false, false);
+				GetCharacterMovement()->AddImpulse(FVector(-600.0f, 0.0f, 0.0f), true);
 			}
 			else if (PlayerState->Direction == EDirection::Right)
 			{
 				location.X += 96.0f;
-				LaunchCharacter(FVector(300.0f, 0.0f, 0.0f), false, false);
+				GetCharacterMovement()->AddImpulse(FVector(600.0f, 0.0f, 0.0f), true);
 			}
 
 			APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
