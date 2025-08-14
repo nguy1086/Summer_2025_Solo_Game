@@ -35,6 +35,9 @@ public:
 	void ApplyStateChange(EState newState);
 	void ApplyBounce();
 
+	UFUNCTION()
+	void ApplyImpulse(FVector impulse);
+
 	void HandleDamage(float damage);
 	bool IsInvincible();
 	void NoGravity();
@@ -61,10 +64,12 @@ private:
 	class APlayableController* PlayableController;
 	float DamagedTimer;
 	int ComboNumber;
+
 	FTimerHandle AttackTimerHandle;
 	FTimerHandle InputTimerHandle;
 	FTimerHandle StateTimerHandle;
 	FTimerHandle GravityTimerHandle;
+	FTimerHandle ImpulseTimerHandle;
 
 	class UPaperFlipbook* GetTestFlipbook();
 	class UPaperFlipbook* GetBatterFlipbook();
@@ -121,9 +126,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
 	class UPaperFlipbook* BatterSpecialFlipbook;//SPECIAL
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterAIRSpecialFlipbook;//AIRSPECIAL
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
 	class UPaperFlipbook* BatterSpecialDuckFlipbook;//SPECIAL DUCK
 
-	//Test Attacks
-	UPROPERTY(EditAnyWhere, Category = "Test attack")
+	//Attacks
+	UPROPERTY(EditAnyWhere, Category = "Hitbox attack")
 	TSubclassOf<class APlayableAttackHitbox> AttackHitboxTemplate;
 };

@@ -201,18 +201,45 @@ void APlayableCharacter::Special()
 	{
 		if (AttackHitboxTemplate)
 		{
-			if (PlayableController->IsDuckPressed())
-				DuckSpecial = true;
-			DisableControls();
-			StopDucking();
-			ApplyStateChange(EState::Special);
+			if (PlayerState->IsOnGround)
+			{
+				if (PlayableController->IsDuckPressed())
+					DuckSpecial = true;
+				DisableControls();
+				StopDucking();
+				ApplyStateChange(EState::Special);
 
-			float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
-			float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
+				float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
+				float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
 
-			GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterSpecialSpawn, ((TotalDuration - (DuckSpecial ? 2.0f : 3.0f)) / FramesPerSecond), false);
-			GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, ((TotalDuration - (DuckSpecial ? 2.0f : 1.0f)) / FramesPerSecond), false);
-			GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
+				GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterSpecialSpawn, ((TotalDuration - (DuckSpecial ? 2.0f : 3.0f)) / FramesPerSecond), false);
+				GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, ((TotalDuration - (DuckSpecial ? 2.0f : 1.0f)) / FramesPerSecond), false);
+				GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
+			}
+			else if (!PlayerState->IsOnGround)
+			{
+				DisableControls();
+				StopDucking();
+				ApplyStateChange(EState::Special);
+
+				float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
+				float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
+
+				//if (PlayerState->Direction == EDirection::Left)
+				//{
+				//	FVector vector = FVector(-1200.0f, 0.0f, 0.0f);
+				//	FTimerDelegate Delegate;
+				//	Delegate.BindUFunction(this, &APlayableCharacter::ApplyImpulse, vector);
+				//	GetWorldTimerManager().SetTimer(ImpulseTimerHandle, Delegate, ((TotalDuration - 6.0f) / FramesPerSecond), false);
+				//}
+				//else if (PlayerState->Direction == EDirection::Right)
+
+				NoGravity();
+				GetWorldTimerManager().SetTimer(GravityTimerHandle, this, &APlayableCharacter::SetGravity, ((TotalDuration - 0.5f) / FramesPerSecond), false);
+				GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterSpecialSpawn, ((TotalDuration - 4.0f) / FramesPerSecond), false);
+				GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, ((TotalDuration - 0.5f) / FramesPerSecond), false);
+				GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
+			}
 		}
 	}
 }
@@ -290,6 +317,11 @@ void APlayableCharacter::ApplyBounce()
 {
 	LaunchCharacter(FVector(0.0f, 0.0f, 600.0f), false, true);
 	GetPlayerState<APlayableCharacterState>()->IsOnGround = false;
+}
+
+void APlayableCharacter::ApplyImpulse(FVector impulse)
+{
+	GetCharacterMovement()->AddImpulse(impulse, true);
 }
 
 void APlayableCharacter::HandleDamage(float damage)
@@ -479,10 +511,15 @@ UPaperFlipbook* APlayableCharacter::GetBatterFlipbook()
 	}
 	else if (PlayerState->State == EState::Special)
 	{
-		if (DuckSpecial)
-			flipbook = BatterSpecialDuckFlipbook;
-		else
-			flipbook = BatterSpecialFlipbook;
+		if (PlayerState->IsOnGround)
+		{
+			if (DuckSpecial)
+				flipbook = BatterSpecialDuckFlipbook;
+			else
+				flipbook = BatterSpecialFlipbook;
+		}
+		else if (!PlayerState->IsOnGround)
+			flipbook = BatterAIRSpecialFlipbook;
 	}
 	else if (PlayerState->State == EState::Idle)
 		flipbook = BatterIdleFlipbook;
@@ -585,6 +622,8 @@ void APlayableCharacter::ResetPlayerState()
 
 		ComboNumber = 0;
 		DuckSpecial = false;
+
+		GetWorldTimerManager().ClearTimer(ImpulseTimerHandle);
 		GetWorldTimerManager().ClearTimer(AttackTimerHandle);
 		GetWorldTimerManager().ClearTimer(InputTimerHandle);
 		GetWorldTimerManager().ClearTimer(StateTimerHandle);
@@ -594,30 +633,51 @@ void APlayableCharacter::ResetPlayerState()
 
 void APlayableCharacter::BatterSpecialSpawn()
 {
-	FVector location = GetActorLocation();
-	FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
-	if (DuckSpecial)
+	if (PlayerState->IsOnGround)
 	{
-		location.Z += 96.0f;
-
-		APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
-		hitbox->Projectile(TEXT("Batter_Special_Duck"), PlayerConstants::BatterSpecialAttackDamage);
-	}
-	else
-	{
-		if (PlayerState->Direction == EDirection::Left)
+		FVector location = GetActorLocation();
+		FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
+		if (DuckSpecial)
 		{
+			location.Z += 96.0f;
+
+			APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
+			hitbox->Projectile(TEXT("Batter_Special_Duck"), PlayerConstants::BatterSpecialAttackDamage);
+		}
+		else
+		{
+			if (PlayerState->Direction == EDirection::Left)
+			{
+				location.X -= 64.0f;
+				rotation = FRotator(0.0f, 180.0f, 0.0f);
+				location.Z += 48.0f;
+			}
+			else if (PlayerState->Direction == EDirection::Right)
+			{
+				location.X += 64.0f;
+				location.Z += 48.0f;
+			}
+			APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
+			hitbox->Projectile(TEXT("Batter_Special"), PlayerConstants::BatterSpecialAttackDamage);
+		}
+	}
+	else if (!PlayerState->IsOnGround)
+	{
+		FVector location = GetActorLocation();
+		FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
+		if (PlayerState->Direction == EDirection::Left) {
 			location.X -= 64.0f;
 			rotation = FRotator(0.0f, 180.0f, 0.0f);
-			location.Z += 48.0f;
+			GetCharacterMovement()->AddImpulse(FVector(-700.0f, 0.0f, 0.0f), true);
 		}
-		else if (PlayerState->Direction == EDirection::Right)
-		{
+		else if (PlayerState->Direction == EDirection::Right) {
 			location.X += 64.0f;
-			location.Z += 48.0f;
+			GetCharacterMovement()->AddImpulse(FVector(700.0f, 0.0f, 0.0f), true);
 		}
+
 		APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
-		hitbox->Projectile(TEXT("Batter_Special"), PlayerConstants::BatterSpecialAttackDamage);
+		hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+		hitbox->Spawn(TEXT("Test_Basic"), PlayerConstants::BatterComboOneDamage);
 	}
 }
 
