@@ -225,14 +225,18 @@ void APlayableCharacter::Special()
 				float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
 				float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
 
-				//if (PlayerState->Direction == EDirection::Left)
-				//{
-				//	FVector vector = FVector(-1200.0f, 0.0f, 0.0f);
-				//	FTimerDelegate Delegate;
-				//	Delegate.BindUFunction(this, &APlayableCharacter::ApplyImpulse, vector);
-				//	GetWorldTimerManager().SetTimer(ImpulseTimerHandle, Delegate, ((TotalDuration - 6.0f) / FramesPerSecond), false);
-				//}
-				//else if (PlayerState->Direction == EDirection::Right)
+				if (PlayerState->Direction == EDirection::Left){
+					FVector vector = FVector(-1500.0f, 0.0f, 0.0f);
+					FTimerDelegate Delegate;
+					Delegate.BindUObject(this, &APlayableCharacter::ApplyImpulse, vector);
+					GetWorldTimerManager().SetTimer(ImpulseTimerHandle, Delegate, ((TotalDuration - 6.0f) / FramesPerSecond), false);
+				}
+				else if (PlayerState->Direction == EDirection::Right){
+					FVector vector = FVector(1500.0f, 0.0f, 0.0f);
+					FTimerDelegate Delegate;
+					Delegate.BindUObject(this, &APlayableCharacter::ApplyImpulse, vector);
+					GetWorldTimerManager().SetTimer(ImpulseTimerHandle, Delegate, ((TotalDuration - 6.0f) / FramesPerSecond), false);
+				}
 
 				NoGravity();
 				GetWorldTimerManager().SetTimer(GravityTimerHandle, this, &APlayableCharacter::SetGravity, ((TotalDuration - 0.5f) / FramesPerSecond), false);
@@ -646,14 +650,12 @@ void APlayableCharacter::BatterSpecialSpawn()
 		}
 		else
 		{
-			if (PlayerState->Direction == EDirection::Left)
-			{
+			if (PlayerState->Direction == EDirection::Left){
 				location.X -= 64.0f;
 				rotation = FRotator(0.0f, 180.0f, 0.0f);
 				location.Z += 48.0f;
 			}
-			else if (PlayerState->Direction == EDirection::Right)
-			{
+			else if (PlayerState->Direction == EDirection::Right){
 				location.X += 64.0f;
 				location.Z += 48.0f;
 			}
@@ -668,12 +670,11 @@ void APlayableCharacter::BatterSpecialSpawn()
 		if (PlayerState->Direction == EDirection::Left) {
 			location.X -= 64.0f;
 			rotation = FRotator(0.0f, 180.0f, 0.0f);
-			GetCharacterMovement()->AddImpulse(FVector(-700.0f, 0.0f, 0.0f), true);
 		}
-		else if (PlayerState->Direction == EDirection::Right) {
+		else if (PlayerState->Direction == EDirection::Right)
 			location.X += 64.0f;
-			GetCharacterMovement()->AddImpulse(FVector(700.0f, 0.0f, 0.0f), true);
-		}
+
+		GetCharacterMovement()->Velocity = FVector::ZeroVector;
 
 		APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
 		hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
@@ -727,14 +728,12 @@ void APlayableCharacter::BatterComboAttackSpawn()
 		{
 			FVector location = GetActorLocation();
 			FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
-			if (PlayerState->Direction == EDirection::Left)
-			{
+			if (PlayerState->Direction == EDirection::Left){
 				location.X -= 96.0f;
 				rotation = FRotator(0.0f, 180.0f, 0.0f);
 				GetCharacterMovement()->AddImpulse(FVector(-600.0f, 0.0f, 0.0f), true);
 			}
-			else if (PlayerState->Direction == EDirection::Right)
-			{
+			else if (PlayerState->Direction == EDirection::Right){
 				location.X += 96.0f;
 				GetCharacterMovement()->AddImpulse(FVector(600.0f, 0.0f, 0.0f), true);
 			}
@@ -751,8 +750,7 @@ void APlayableCharacter::BatterComboAttackSpawn()
 		{
 			FVector location = GetActorLocation();
 			FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
-			if (PlayerState->Direction == EDirection::Left)
-			{
+			if (PlayerState->Direction == EDirection::Left){
 				location.X -= 96.0f;
 				rotation = FRotator(0.0f, 180.0f, 0.0f);
 			}
@@ -770,7 +768,7 @@ void APlayableCharacter::BatterComboAttackSpawn()
 			FRotator rotation = FRotator(90.0f, 00.0f, 0.0f);
 
 			location.Z += 96.0f;
-			LaunchCharacter(FVector(0.0f, 0.0f, 250.0f), false, false);
+			LaunchCharacter(FVector(0.0f, 0.0f, 350.0f), false, false);
 
 			APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
 			hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
