@@ -129,6 +129,10 @@ public:
 	class UPaperFlipbook* BatterAIRSpecialFlipbook;//AIRSPECIAL
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
 	class UPaperFlipbook* BatterSpecialDuckFlipbook;//SPECIAL DUCK
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterGroundPoundFlipbook;//GROUND POUND
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterRollFlipbook;//ROLL
 
 	//Attacks
 	UPROPERTY(EditAnyWhere, Category = "Hitbox attack")
