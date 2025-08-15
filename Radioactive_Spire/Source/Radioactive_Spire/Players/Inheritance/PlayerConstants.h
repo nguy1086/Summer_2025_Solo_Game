@@ -49,6 +49,10 @@ namespace PlayerConstants
     constexpr float BatterSpecialAttackDamage = 10.0f;
     constexpr float BatterSpecialMaxAttackDamage = 125.0f;
 
+    constexpr float BatterAirSpecialAttackDamage = 60.0f;
+
+    constexpr float BatterGroundPoundDamage = 70.0f;
+
     constexpr float BatterComboOneDamage = 16.0f;
     constexpr float BatterComboTwoDamage = 20.0f;
     constexpr float BatterComboThreeDamage = 24.0f;

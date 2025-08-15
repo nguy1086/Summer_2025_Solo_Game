@@ -678,7 +678,7 @@ void APlayableCharacter::BatterSpecialSpawn()
 
 		APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
 		hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-		hitbox->Spawn(TEXT("Test_Basic"), PlayerConstants::BatterComboOneDamage);
+		hitbox->Spawn(TEXT("Test_Basic"), PlayerConstants::BatterAirSpecialAttackDamage);
 	}
 }
 
