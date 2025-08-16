@@ -92,7 +92,7 @@ void APlayableCharacter::Tick(float DeltaTime)
 					if (DamagedTimer <= 0.0f)
 					{
 						DamagedTimer = PlayerConstants::DefaultInvincibleVisibilityDuration;
-						GetSprite()->ToggleVisibility();
+						//GetSprite()->ToggleVisibility(); //THIS IS WHAT CAUSES INVINCIBILITY TO FLASH
 					}
 				}
 			}
@@ -249,12 +249,12 @@ void APlayableCharacter::Special()
 
 				if (PlayerState->Direction == EDirection::Left){
 					FTimerDelegate Delegate;
-					Delegate.BindUObject(this, &APlayableCharacter::ApplyImpulse, FVector(-1500.0f, 0.0f, 0.0f));
+					Delegate.BindUObject(this, &APlayableCharacter::ApplyImpulse, FVector(-900.0f, 0.0f, 0.0f));
 					GetWorldTimerManager().SetTimer(ImpulseTimerHandle, Delegate, ((TotalDuration - 6.0f) / FramesPerSecond), false);
 				}
 				else if (PlayerState->Direction == EDirection::Right){
 					FTimerDelegate Delegate;
-					Delegate.BindUObject(this, &APlayableCharacter::ApplyImpulse, FVector(1500.0f, 0.0f, 0.0f));
+					Delegate.BindUObject(this, &APlayableCharacter::ApplyImpulse, FVector(900.0f, 0.0f, 0.0f));
 					GetWorldTimerManager().SetTimer(ImpulseTimerHandle, Delegate, ((TotalDuration - 6.0f) / FramesPerSecond), false);
 				}
 
@@ -282,9 +282,9 @@ void APlayableCharacter::Roll()
 			float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
 
 			if (PlayerState->Direction == EDirection::Left)
-				ApplyImpulse(FVector(-1200.0f, 0.0f, 0.0f));
+				ApplyImpulse(FVector(-1500.0f, 0.0f, 0.0f));
 			else if (PlayerState->Direction == EDirection::Right)
-				ApplyImpulse(FVector(1200.0f, 0.0f, 0.0f));
+				ApplyImpulse(FVector(1500.0f, 0.0f, 0.0f));
 
 			GetCapsuleComponent()->SetCollisionProfileName("Invincible");
 			PlayerState->InvincibilityTimer = ((TotalDuration - 0.25f) / FramesPerSecond);
