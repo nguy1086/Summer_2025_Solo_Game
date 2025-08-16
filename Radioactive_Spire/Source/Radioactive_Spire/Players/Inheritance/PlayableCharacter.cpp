@@ -60,6 +60,16 @@ void APlayableCharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
+	//if (GEngine)
+	//{
+	//	GEngine->AddOnScreenDebugMessage(
+	//		-1,            // Unique key for the message (-1 for no key, allowing duplicates)
+	//		5.0f,          // Duration to display the message in seconds
+	//		FColor::Green,   // Color of the text
+	//		FString::SanitizeFloat(GetSprite()->GetFlipbookFramerate()) // The message to display
+	//	);
+	//}
+
 	UpdateFlipbook();
 
 	if (PlayerState != nullptr)
@@ -106,7 +116,7 @@ void APlayableCharacter::Tick(float DeltaTime)
 
 void APlayableCharacter::Duck()
 {
-	if (PlayerState->IsOnGround)
+	if (PlayerState->IsOnGround && !GroundPound)//may need to remove !groundpound, that removes duck right after ground pound
 		ApplyStateChange(EState::Ducking);
 }
 
@@ -180,17 +190,11 @@ void APlayableCharacter::Attack()
 
 					NoGravity();
 					GetWorldTimerManager().SetTimer(GravityTimerHandle, this, &APlayableCharacter::SetGravity, ((TotalDuration - 4.0f) / FramesPerSecond), false);
-
 					FTimerDelegate Delegate;
 					Delegate.BindUObject(this, &APlayableCharacter::ApplyImpulse, FVector(0.0f, 0.0f, -500.0f));
 					GetWorldTimerManager().SetTimer(ImpulseTimerHandle, Delegate, ((TotalDuration - 4.0f) / FramesPerSecond), false);
 
-					GetWorldTimerManager().SetTimer(PauseTimerTimerHandle, this, &APlayableCharacter::PauseTimerHandle, ((TotalDuration - 4.0f) / FramesPerSecond), false);
-					GetSprite()->SetPlayRate(0.0f);
-
-					GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterGroundPoundSpawn, ((TotalDuration - 3.0f) / FramesPerSecond), false);
-					GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, (TotalDuration - 0.5f / FramesPerSecond), false);
-					GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration - 0.5f / FramesPerSecond), false);
+					GetWorldTimerManager().SetTimer(PauseSpriteTimerHandle, this, &APlayableCharacter::PauseSprite, ((TotalDuration - 4.0f) / FramesPerSecond), false);
 				}
 				else
 				{
@@ -425,16 +429,26 @@ void APlayableCharacter::Landed(const FHitResult& Hit)
 	//if ((PlayerState->State == EState::Attacking && !PlayerState->IsOnGround) || PlayerState->State == EState::Falling)//safe check when doing air attacks
 	//	EnableControls();
 
-	if (GroundPound)
-	{
-		GetSprite()->SetPlayRate(1.0f);
-		UnPauseTimerHandle();
-	}
-	else if (PlayerState)
+	if (PlayerState)
 	{
 		PlayerState->IsOnGround = true;
 
-		if (PlayableController && 
+
+		if (GroundPound)
+		{
+			if (Type == EPlayerType::Batter)
+			{
+				UnPauseSprite();
+				float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
+				float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
+
+				BatterGroundPoundSpawn();
+				EnableControls();
+				GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, (3.0f / FramesPerSecond), false);
+				GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (3.0f / FramesPerSecond), false);
+			}
+		}
+		else if (PlayableController && 
 			PlayerState->State != EState::Special &&
 			PlayerState->State != EState::Attacking)//make sures the launchcharacter() doesnt reset the frames when attack/special
 		{
@@ -672,22 +686,14 @@ void APlayableCharacter::ResetPlayerState()
 	}
 }
 
-void APlayableCharacter::PauseTimerHandle()
+void APlayableCharacter::PauseSprite()
 {
-	GetWorldTimerManager().PauseTimer(ImpulseTimerHandle);
-	GetWorldTimerManager().PauseTimer(AttackTimerHandle);
-	GetWorldTimerManager().PauseTimer(InputTimerHandle);
-	GetWorldTimerManager().PauseTimer(StateTimerHandle);
-	GetWorldTimerManager().PauseTimer(GravityTimerHandle);
+	GetSprite()->SetPlayRate(0.0f);
 }
 
-void APlayableCharacter::UnPauseTimerHandle()
+void APlayableCharacter::UnPauseSprite()
 {
-	GetWorldTimerManager().UnPauseTimer(ImpulseTimerHandle);
-	GetWorldTimerManager().UnPauseTimer(AttackTimerHandle);
-	GetWorldTimerManager().UnPauseTimer(InputTimerHandle);
-	GetWorldTimerManager().UnPauseTimer(StateTimerHandle);
-	GetWorldTimerManager().UnPauseTimer(GravityTimerHandle);
+	GetSprite()->SetPlayRate(1.0f);
 }
 
 void APlayableCharacter::BatterSpecialSpawn()
@@ -836,7 +842,9 @@ void APlayableCharacter::BatterComboAttackSpawn()
 void APlayableCharacter::BatterGroundPoundSpawn()
 {
 	FVector location = GetActorLocation();
+	location.Y += 1.0f;
+	location.Z -= PlayerConstants::BatterCapsuleHalfHeight;
 	FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
 	APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
-	hitbox->Projectile(TEXT("Test_Basic"), PlayerConstants::BatterGroundPoundDamage);
+	hitbox->Spawn(TEXT("Test_Basic"), PlayerConstants::BatterGroundPoundDamage);
 }
