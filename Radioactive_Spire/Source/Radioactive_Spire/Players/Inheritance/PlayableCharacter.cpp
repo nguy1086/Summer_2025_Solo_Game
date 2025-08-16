@@ -25,7 +25,8 @@ APlayableCharacter::APlayableCharacter() :
 	Camera(nullptr),
 	PlayableController(nullptr),
 	DamagedTimer(0.0f),
-	DuckSpecial(false)
+	DuckSpecial(false),
+	GroundPound(false)
 {
     PrimaryActorTick.bCanEverTick = true;
 
@@ -168,28 +169,53 @@ void APlayableCharacter::Attack()
 			}																						//total frames / fps to get the total frame duration
 			else if (!PlayerState->IsOnGround)
 			{
-				DisableControls();
-				StopDucking();
-				ApplyStateChange(EState::Attacking);
-
-
-				float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
-				float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
-
-				float Delay = ComboNumber == 0 ? 4.0f : 5.0f;
-
-				if (ComboNumber == 0)
+				if (PlayableController->IsDuckPressed())
 				{
+					DisableControls();
+					GroundPound = true;
+					ApplyStateChange(EState::Attacking);
+
+					float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
+					float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
+
 					NoGravity();
-					GetWorldTimerManager().SetTimer(GravityTimerHandle, this, &APlayableCharacter::SetGravity, ((TotalDuration - 0.5f) / FramesPerSecond), false);
-				}
-				else
 					GetWorldTimerManager().SetTimer(GravityTimerHandle, this, &APlayableCharacter::SetGravity, ((TotalDuration - 4.0f) / FramesPerSecond), false);
 
+					FTimerDelegate Delegate;
+					Delegate.BindUObject(this, &APlayableCharacter::ApplyImpulse, FVector(0.0f, 0.0f, -500.0f));
+					GetWorldTimerManager().SetTimer(ImpulseTimerHandle, Delegate, ((TotalDuration - 4.0f) / FramesPerSecond), false);
 
-				GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterComboAttackSpawn, ((TotalDuration - Delay) / FramesPerSecond), false);
-				GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, ((TotalDuration - Delay + (ComboNumber == 0 ? 0.0f : 4.5f)) / FramesPerSecond), false);
-				GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
+					GetWorldTimerManager().SetTimer(PauseTimerTimerHandle, this, &APlayableCharacter::PauseTimerHandle, ((TotalDuration - 4.0f) / FramesPerSecond), false);
+					GetSprite()->SetPlayRate(0.0f);
+
+					GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterGroundPoundSpawn, ((TotalDuration - 3.0f) / FramesPerSecond), false);
+					GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, (TotalDuration - 0.5f / FramesPerSecond), false);
+					GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration - 0.5f / FramesPerSecond), false);
+				}
+				else
+				{
+					DisableControls();
+					StopDucking();
+					ApplyStateChange(EState::Attacking);
+
+
+					float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
+					float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
+
+					float Delay = ComboNumber == 0 ? 4.0f : 5.0f;
+
+					if (ComboNumber == 0)
+					{
+						NoGravity();
+						GetWorldTimerManager().SetTimer(GravityTimerHandle, this, &APlayableCharacter::SetGravity, ((TotalDuration - 0.5f) / FramesPerSecond), false);
+					}
+					else
+						GetWorldTimerManager().SetTimer(GravityTimerHandle, this, &APlayableCharacter::SetGravity, ((TotalDuration - 4.0f) / FramesPerSecond), false);
+
+					GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterComboAttackSpawn, ((TotalDuration - Delay) / FramesPerSecond), false);
+					GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, ((TotalDuration - Delay + (ComboNumber == 0 ? 0.0f : 4.5f)) / FramesPerSecond), false);
+					GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
+				}
 			}
 		}
 	}
@@ -226,15 +252,13 @@ void APlayableCharacter::Special()
 				float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
 
 				if (PlayerState->Direction == EDirection::Left){
-					FVector vector = FVector(-1500.0f, 0.0f, 0.0f);
 					FTimerDelegate Delegate;
-					Delegate.BindUObject(this, &APlayableCharacter::ApplyImpulse, vector);
+					Delegate.BindUObject(this, &APlayableCharacter::ApplyImpulse, FVector(-1500.0f, 0.0f, 0.0f));
 					GetWorldTimerManager().SetTimer(ImpulseTimerHandle, Delegate, ((TotalDuration - 6.0f) / FramesPerSecond), false);
 				}
 				else if (PlayerState->Direction == EDirection::Right){
-					FVector vector = FVector(1500.0f, 0.0f, 0.0f);
 					FTimerDelegate Delegate;
-					Delegate.BindUObject(this, &APlayableCharacter::ApplyImpulse, vector);
+					Delegate.BindUObject(this, &APlayableCharacter::ApplyImpulse, FVector(1500.0f, 0.0f, 0.0f));
 					GetWorldTimerManager().SetTimer(ImpulseTimerHandle, Delegate, ((TotalDuration - 6.0f) / FramesPerSecond), false);
 				}
 
@@ -390,7 +414,7 @@ void APlayableCharacter::NotifyJumpApex()
 {
 	Super::NotifyJumpApex();
 
-	if (PlayerState && !PlayerState->IsOnGround)
+	if (PlayerState && !PlayerState->IsOnGround && !GroundPound)
 		ApplyStateChange(EState::Falling);
 }
 
@@ -401,7 +425,12 @@ void APlayableCharacter::Landed(const FHitResult& Hit)
 	//if ((PlayerState->State == EState::Attacking && !PlayerState->IsOnGround) || PlayerState->State == EState::Falling)//safe check when doing air attacks
 	//	EnableControls();
 
-	if (PlayerState)
+	if (GroundPound)
+	{
+		GetSprite()->SetPlayRate(1.0f);
+		UnPauseTimerHandle();
+	}
+	else if (PlayerState)
 	{
 		PlayerState->IsOnGround = true;
 
@@ -507,10 +536,15 @@ UPaperFlipbook* APlayableCharacter::GetBatterFlipbook()
 		}
 		else if (!PlayerState->IsOnGround)
 		{
-			if ((ComboNumber < PlayerConstants::BatterMaxAirCombo) && PlayableController->IsAttackPressed())
-				flipbook = BatterAIRAttackOneFlipbook;
-			else if ((ComboNumber >= PlayerConstants::BatterMaxAirCombo) && PlayableController->IsAttackPressed())
-				flipbook = BatterAIRAttackTwoFlipbook;
+			if (GroundPound)
+				flipbook = BatterGroundPoundFlipbook;
+			else
+			{
+				if ((ComboNumber < PlayerConstants::BatterMaxAirCombo) && PlayableController->IsAttackPressed())
+					flipbook = BatterAIRAttackOneFlipbook;
+				else if ((ComboNumber >= PlayerConstants::BatterMaxAirCombo) && PlayableController->IsAttackPressed())
+					flipbook = BatterAIRAttackTwoFlipbook;
+			}
 		}
 	}
 	else if (PlayerState->State == EState::Special)
@@ -617,22 +651,43 @@ void APlayableCharacter::ResetPlayerState()
 {
 	if (PlayableController)
 	{
-		if (PlayableController->GetMoveValue() == 0.0f)
-			ApplyStateChange(EState::Idle);
-		else if (!PlayerState->IsOnGround)
+		if (!PlayerState->IsOnGround)
 			ApplyStateChange(EState::Falling);
+		else if (PlayableController->GetMoveValue() == 0.0f)
+			ApplyStateChange(EState::Idle);
 		else
 			ApplyStateChange(EState::Walking);
 
 		ComboNumber = 0;
 		DuckSpecial = false;
+		GroundPound = false;
 
 		GetWorldTimerManager().ClearTimer(ImpulseTimerHandle);
 		GetWorldTimerManager().ClearTimer(AttackTimerHandle);
 		GetWorldTimerManager().ClearTimer(InputTimerHandle);
 		GetWorldTimerManager().ClearTimer(StateTimerHandle);
 		GetWorldTimerManager().ClearTimer(GravityTimerHandle);
+
+		EnableControls();//incase if getting hurt causes enable controls to not get hit
 	}
+}
+
+void APlayableCharacter::PauseTimerHandle()
+{
+	GetWorldTimerManager().PauseTimer(ImpulseTimerHandle);
+	GetWorldTimerManager().PauseTimer(AttackTimerHandle);
+	GetWorldTimerManager().PauseTimer(InputTimerHandle);
+	GetWorldTimerManager().PauseTimer(StateTimerHandle);
+	GetWorldTimerManager().PauseTimer(GravityTimerHandle);
+}
+
+void APlayableCharacter::UnPauseTimerHandle()
+{
+	GetWorldTimerManager().UnPauseTimer(ImpulseTimerHandle);
+	GetWorldTimerManager().UnPauseTimer(AttackTimerHandle);
+	GetWorldTimerManager().UnPauseTimer(InputTimerHandle);
+	GetWorldTimerManager().UnPauseTimer(StateTimerHandle);
+	GetWorldTimerManager().UnPauseTimer(GravityTimerHandle);
 }
 
 void APlayableCharacter::BatterSpecialSpawn()
@@ -776,4 +831,12 @@ void APlayableCharacter::BatterComboAttackSpawn()
 			ComboNumber++;//dont want players to infinitely keep air attacking to the sky (air stalling), will reset combo if hits an enemy
 		}
 	}
+}
+
+void APlayableCharacter::BatterGroundPoundSpawn()
+{
+	FVector location = GetActorLocation();
+	FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
+	APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
+	hitbox->Projectile(TEXT("Test_Basic"), PlayerConstants::BatterGroundPoundDamage);
 }

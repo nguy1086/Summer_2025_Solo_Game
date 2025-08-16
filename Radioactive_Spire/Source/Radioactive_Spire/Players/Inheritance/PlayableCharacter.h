@@ -64,12 +64,14 @@ private:
 	class APlayableController* PlayableController;
 	float DamagedTimer;
 	int ComboNumber;
+	bool GroundPound;
 
 	FTimerHandle AttackTimerHandle;
 	FTimerHandle InputTimerHandle;
 	FTimerHandle StateTimerHandle;
 	FTimerHandle GravityTimerHandle;
 	FTimerHandle ImpulseTimerHandle;
+	FTimerHandle PauseTimerTimerHandle;//DO NOT INCLUDE IN PauseTimerHandle()
 
 	class UPaperFlipbook* GetTestFlipbook();
 	class UPaperFlipbook* GetBatterFlipbook();
@@ -79,9 +81,12 @@ private:
 	void EnableControls();
 	void DisableControls();
 	void ResetPlayerState();
+	void PauseTimerHandle();
+	void UnPauseTimerHandle();
 
 	void BatterSpecialSpawn();
 	void BatterComboAttackSpawn();
+	void BatterGroundPoundSpawn();
 
 	//batter
 	bool DuckSpecial;
