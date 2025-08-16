@@ -70,6 +70,8 @@ void APlayableController::SetupInputComponent()
 
 		EnhancedInputComponent->BindAction(SpecialInputAction, ETriggerEvent::Started, this, &APlayableController::OnSpecialPressed);
 
+		EnhancedInputComponent->BindAction(RollInputAction, ETriggerEvent::Started, this, &APlayableController::OnRollPressed);
+
 		//EnhancedInputComponent->BindAction(UpInputAction, ETriggerEvent::Started, this, &APlayableController::OnUpPressed);
 	}
 }
@@ -142,7 +144,8 @@ void APlayableController::OnMove(const FInputActionValue& Value)
 	{
 		if (PlayablePlayerState->State != EState::Ducking && 
 			PlayablePlayerState->State != EState::Special && 
-			PlayablePlayerState->State != EState::Attacking)
+			PlayablePlayerState->State != EState::Attacking &&
+			PlayablePlayerState->State != EState::Roll)
 		{
 			if (PlayablePlayerState->IsOnGround)
 				PlayablePlayer->ApplyStateChange(EState::Walking);
@@ -182,7 +185,8 @@ void APlayableController::OnMoveReleased(const FInputActionValue& Value)
 		if (PlayablePlayerState->IsOnGround && 
 			PlayablePlayerState->State != EState::Ducking && 
 			PlayablePlayerState->State != EState::Special &&
-			PlayablePlayerState->State != EState::Attacking)
+			PlayablePlayerState->State != EState::Attacking &&
+			PlayablePlayerState->State != EState::Roll)
 			PlayablePlayer->ApplyStateChange(EState::Idle);
 }
 
@@ -220,6 +224,12 @@ void APlayableController::OnSpecialPressed(const FInputActionValue& Value)
 {
 	if (PlayablePlayer != nullptr)
 		PlayablePlayer->Special();
+}
+
+void APlayableController::OnRollPressed(const FInputActionValue& Value)
+{
+	if (PlayablePlayer != nullptr)
+		PlayablePlayer->Roll();
 }
 
 //void APlayableController::OnUpPressed(const FInputActionValue& Value)

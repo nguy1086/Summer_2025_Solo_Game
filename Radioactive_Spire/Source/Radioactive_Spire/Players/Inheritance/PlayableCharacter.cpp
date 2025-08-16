@@ -26,7 +26,8 @@ APlayableCharacter::APlayableCharacter() :
 	PlayableController(nullptr),
 	DamagedTimer(0.0f),
 	DuckSpecial(false),
-	GroundPound(false)
+	GroundPound(false),
+	CanDash(0.0f)
 {
     PrimaryActorTick.bCanEverTick = true;
 
@@ -59,16 +60,6 @@ void APlayableCharacter::BeginPlay()
 void APlayableCharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-
-	//if (GEngine)
-	//{
-	//	GEngine->AddOnScreenDebugMessage(
-	//		-1,            // Unique key for the message (-1 for no key, allowing duplicates)
-	//		5.0f,          // Duration to display the message in seconds
-	//		FColor::Green,   // Color of the text
-	//		FString::SanitizeFloat(GetSprite()->GetFlipbookFramerate()) // The message to display
-	//	);
-	//}
 
 	UpdateFlipbook();
 
@@ -111,7 +102,8 @@ void APlayableCharacter::Tick(float DeltaTime)
 		}
 	}
 
-
+	if (CanDash > 0.0f)
+		CanDash -= DeltaTime;
 }
 
 void APlayableCharacter::Duck()
@@ -276,6 +268,35 @@ void APlayableCharacter::Special()
 	}
 }
 
+void APlayableCharacter::Roll()
+{
+	if (PlayerState->IsOnGround && CanDash <= 0.0f)
+	{
+		if (Type == EPlayerType::Batter)
+		{
+			DisableControls();
+			StopDucking();
+			ApplyStateChange(EState::Roll);
+
+			float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
+			float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
+
+			if (PlayerState->Direction == EDirection::Left)
+				ApplyImpulse(FVector(-1200.0f, 0.0f, 0.0f));
+			else if (PlayerState->Direction == EDirection::Right)
+				ApplyImpulse(FVector(1200.0f, 0.0f, 0.0f));
+
+			GetCapsuleComponent()->SetCollisionProfileName("Invincible");
+			PlayerState->InvincibilityTimer = ((TotalDuration - 0.25f) / FramesPerSecond);
+
+			GetWorldTimerManager().SetTimer(ImpulseTimerHandle, this, &APlayableCharacter::ZeroVelocity, ((TotalDuration - 1.0f) / FramesPerSecond), false);
+			GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, ((TotalDuration - 0.5f) / FramesPerSecond), false);
+			GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
+			CanDash = PlayerConstants::BatterRollCooldown;
+		}
+	}
+}
+
 void APlayableCharacter::ApplyStateChange(EState newState)
 {
 	if (!PlayerState)
@@ -345,12 +366,6 @@ void APlayableCharacter::ApplyStateChange(EState newState)
 	UpdateFlipbook();
 }
 
-void APlayableCharacter::ApplyBounce()
-{
-	LaunchCharacter(FVector(0.0f, 0.0f, 600.0f), false, true);
-	GetPlayerState<APlayableCharacterState>()->IsOnGround = false;
-}
-
 void APlayableCharacter::ApplyImpulse(FVector impulse)
 {
 	GetCharacterMovement()->AddImpulse(impulse, true);
@@ -402,6 +417,11 @@ void APlayableCharacter::SetGravity()
 		GetCharacterMovement()->GravityScale = PlayerConstants::BatterGravityScale;
 		GetCharacterMovement()->JumpZVelocity = PlayerConstants::BatterJumpZVelocity;
 	}
+}
+
+void APlayableCharacter::ZeroVelocity()
+{
+	GetCharacterMovement()->Velocity = FVector::ZeroVector;
 }
 
 void APlayableCharacter::OnJumped_Implementation()
@@ -573,6 +593,8 @@ UPaperFlipbook* APlayableCharacter::GetBatterFlipbook()
 		else if (!PlayerState->IsOnGround)
 			flipbook = BatterAIRSpecialFlipbook;
 	}
+	else if (PlayerState->State == EState::Roll)
+		flipbook = BatterRollFlipbook;
 	else if (PlayerState->State == EState::Idle)
 		flipbook = BatterIdleFlipbook;
 	else if (PlayerState->State == EState::Walking)
@@ -681,6 +703,7 @@ void APlayableCharacter::ResetPlayerState()
 		GetWorldTimerManager().ClearTimer(InputTimerHandle);
 		GetWorldTimerManager().ClearTimer(StateTimerHandle);
 		GetWorldTimerManager().ClearTimer(GravityTimerHandle);
+		GetWorldTimerManager().ClearTimer(PauseSpriteTimerHandle);
 
 		EnableControls();//incase if getting hurt causes enable controls to not get hit
 	}

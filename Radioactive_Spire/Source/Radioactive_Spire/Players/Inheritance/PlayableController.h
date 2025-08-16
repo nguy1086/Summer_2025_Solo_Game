@@ -42,6 +42,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* SpecialInputAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* RollInputAction;
+
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced input")
 	//class UInputAction* UpInputAction;
 
@@ -67,6 +70,8 @@ protected:
 	void OnAttackPressed(const struct FInputActionValue& Value);
 
 	void OnSpecialPressed(const struct FInputActionValue& Value);
+
+	void OnRollPressed(const struct FInputActionValue& Value);
 
 private:
 	class APlayableCharacter* PlayablePlayer;

@@ -32,8 +32,9 @@ public:
 	void Attack();
 	void Special();
 
+	void Roll();
+
 	void ApplyStateChange(EState newState);
-	void ApplyBounce();
 
 	UFUNCTION()
 	void ApplyImpulse(FVector impulse);
@@ -42,6 +43,7 @@ public:
 	bool IsInvincible();
 	void NoGravity();
 	void SetGravity();
+	void ZeroVelocity();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float Health = PlayerConstants::DefaultHealth;
@@ -65,13 +67,14 @@ private:
 	float DamagedTimer;
 	int ComboNumber;
 	bool GroundPound;
+	float CanDash;
 
 	FTimerHandle AttackTimerHandle;
 	FTimerHandle InputTimerHandle;
 	FTimerHandle StateTimerHandle;
 	FTimerHandle GravityTimerHandle;
 	FTimerHandle ImpulseTimerHandle;
-	FTimerHandle PauseSpriteTimerHandle;//DO NOT INCLUDE IN PauseTimerHandle()
+	FTimerHandle PauseSpriteTimerHandle;
 
 	class UPaperFlipbook* GetTestFlipbook();
 	class UPaperFlipbook* GetBatterFlipbook();
