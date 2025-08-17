@@ -53,6 +53,7 @@ public:
 	bool IsDuckPressed();
 	bool IsAttackPressed();
 	bool IsSpecialPressed();
+	bool IsRollPressed();
 	//bool IsUpPressed();
 
 	class UEnhancedInputLocalPlayerSubsystem* GetInputSubSystem() { return InputSubsystem; }

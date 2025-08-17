@@ -126,6 +126,16 @@ bool APlayableController::IsSpecialPressed()
 	return false;
 }
 
+bool APlayableController::IsRollPressed()
+{
+	if (InputSubsystem != nullptr)
+	{
+		FInputActionValue InputActionValue = InputSubsystem->GetPlayerInput()->GetActionValue(RollInputAction);
+		return InputActionValue.Get<bool>();
+	}
+	return false;
+}
+
 //bool APlayableController::IsUpPressed()
 //{
 //	if (InputSubsystem != nullptr)
@@ -206,30 +216,45 @@ void APlayableController::OnDuckPressed(const FInputActionValue& Value)
 {
 	if (PlayablePlayer != nullptr)
 		PlayablePlayer->Duck();
+
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Start Ducking!"));
 }
 
 void APlayableController::OnDuckReleased(const FInputActionValue& Value)
 {
 	if (PlayablePlayer != nullptr)
 		PlayablePlayer->StopDucking();
+
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Stop Ducking!"));
 }
 
 void APlayableController::OnAttackPressed(const FInputActionValue& Value)
 {
 	if (PlayablePlayer != nullptr)
 		PlayablePlayer->Attack();
+
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Attack!"));
 }
 
 void APlayableController::OnSpecialPressed(const FInputActionValue& Value)
 {
 	if (PlayablePlayer != nullptr)
 		PlayablePlayer->Special();
+
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Special!"));
 }
 
 void APlayableController::OnRollPressed(const FInputActionValue& Value)
 {
 	if (PlayablePlayer != nullptr)
 		PlayablePlayer->Roll();
+
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Roll!"));
 }
 
 //void APlayableController::OnUpPressed(const FInputActionValue& Value)

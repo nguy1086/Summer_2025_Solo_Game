@@ -108,19 +108,22 @@ void APlayableCharacter::Tick(float DeltaTime)
 
 void APlayableCharacter::Duck()
 {
-	if (PlayerState->IsOnGround && !GroundPound)//may need to remove !groundpound, that removes duck right after ground pound
+	if (PlayerState->IsOnGround && !GroundPound && //may need to remove !groundpound, that removes duck right after ground pound
+		PlayerState->State != EState::Attacking && 
+		PlayerState->State != EState::Roll &&
+		PlayerState->State != EState::Special)//makes sure duck doesnt make attack/special/roll not play flipbook properly
 		ApplyStateChange(EState::Ducking);
 }
 
 void APlayableCharacter::StopDucking()
 {
-	if (PlayerState->IsOnGround)
+	if (PlayerState->IsOnGround && PlayerState->State == EState::Ducking)
 	{
 		if (PlayableController)
 		{
 			if (PlayableController->IsSpecialPressed() || PlayerState->State == EState::Special)//make sures crouch doesnt interfere with special attack animation
 				ApplyStateChange(EState::Special);
-			else if (PlayableController->GetMoveValue() == 0.0f && (PlayerState->State != EState::Attacking || PlayerState->State != EState::Roll))
+			else if (PlayableController->GetMoveValue() == 0.0f)
 				ApplyStateChange(EState::Idle);
 			else
 				ApplyStateChange(EState::Walking);
@@ -222,7 +225,7 @@ void APlayableCharacter::Special()
 		{
 			if (PlayerState->IsOnGround)
 			{
-				if (PlayableController->IsDuckPressed())
+				if (PlayerState->State == EState::Ducking)
 					DuckSpecial = true;
 				DisableControls();
 				ApplyStateChange(EState::Special);
@@ -269,6 +272,8 @@ void APlayableCharacter::Roll()
 	{
 		if (Type == EPlayerType::Batter)
 		{
+			CanDash = PlayerConstants::BatterRollCooldown;
+
 			DisableControls();
 			ApplyStateChange(EState::Roll);
 
@@ -286,7 +291,6 @@ void APlayableCharacter::Roll()
 			GetWorldTimerManager().SetTimer(ImpulseTimerHandle, this, &APlayableCharacter::ZeroVelocity, ((TotalDuration - 1.0f) / FramesPerSecond), false);
 			GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, ((TotalDuration - 0.5f) / FramesPerSecond), false);
 			GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
-			CanDash = PlayerConstants::BatterRollCooldown;
 		}
 	}
 }
