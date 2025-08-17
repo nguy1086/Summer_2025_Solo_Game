@@ -26,8 +26,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Test flipbooks")
 	class UPaperFlipbook* TestBasicFlipbook;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Neutral flipbooks")
+	class UPaperFlipbook* FrameOneFlipbook;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Neutral flipbooks")
+	class UPaperFlipbook* FrameTwoFlipbook;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
 	class UPaperFlipbook* BatterSpecialFlipbook;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterFinisherFlipbook;
 
 	virtual void Tick(float DeltaTime) override;
 
@@ -52,6 +59,7 @@ protected:
 	void OnFinishPlaying();
 
 	void InitializeHitbox();
+	void InitializeMeleeFlipbook();
 
 private:
 	bool IsProjectile;

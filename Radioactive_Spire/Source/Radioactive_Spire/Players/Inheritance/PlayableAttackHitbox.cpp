@@ -87,16 +87,10 @@ void APlayableAttackHitbox::Spawn(FString name, float damage)
 {
 	if (!name.IsEmpty() && FlipbookComponent)
 	{
-		UPaperFlipbook* flipbook = nullptr;
-
 		Damage = damage;
+		Name = name;
 
-		if (name == TEXT("Test_Basic"))
-			flipbook = TestBasicFlipbook;
-
-
-		FlipbookComponent->SetFlipbook(flipbook);
-		FlipbookComponent->SetLooping(false);
+		InitializeMeleeFlipbook();
 
 		//FlipbookComponent->OnFinishedPlaying.AddDynamic(this, &APlayableAttackHitbox::OnFinishPlaying());
 		GetWorldTimerManager().SetTimer(
@@ -144,6 +138,7 @@ void APlayableAttackHitbox::OnFinishPlaying()
 
 void APlayableAttackHitbox::InitializeHitbox()
 {
+	BoxComponent->SetCollisionProfileName("PlayerHitbox");
 	BoxComponent->SetBoxExtent(FVector(0.0f, 0.0f, 0.0f));
 	ProjectileMovementComponent->SetActive(false);
 	if (Name == TEXT("Batter_Special_Duck"))
@@ -154,7 +149,7 @@ void APlayableAttackHitbox::InitializeHitbox()
 		ProjectileMovementComponent->SetActive(true,true);
 		BoxComponent->SetBoxExtent(FVector(5.0f, 1.0f, 5.0f));
 
-		RootComponent = BoxComponent;
+
 
 		ProjectileMovementComponent->UpdatedComponent = BoxComponent;
 		ProjectileMovementComponent->Velocity.Z = 1000.0f;
@@ -173,7 +168,7 @@ void APlayableAttackHitbox::InitializeHitbox()
 		ProjectileMovementComponent->SetActive(true, true);
 		BoxComponent->SetBoxExtent(FVector(5.0f, 1.0f, 5.0f));
 
-		RootComponent = BoxComponent;
+
 
 		ProjectileMovementComponent->UpdatedComponent = BoxComponent;
 		ProjectileMovementComponent->Velocity.X = 1000.0f * (GetActorRotation() == FRotator(0.0f,180.0f,0.0f) ? -1.0f : 1.0f);//NOT THE BEST AT CHECKING WILL PROBABLY CHANGED THIS LATER
@@ -184,6 +179,56 @@ void APlayableAttackHitbox::InitializeHitbox()
 		ProjectileMovementComponent->Bounciness = 0.5f;
 		ProjectileMovementComponent->ProjectileGravityScale = 1.0f;
 	}
+	else if (Name == TEXT("Batter_ComboOne"))
+	{
+		BoxComponent->SetBoxExtent(FVector(48.0f, 1.0f, 32.0f));
+	}
+	else if (Name == TEXT("Batter_ComboTwo"))
+	{
+		BoxComponent->SetBoxExtent(FVector(64.0f, 1.0f, 48.0f));
+	}
+	else if (Name == TEXT("Batter_Finisher"))
+	{
+		BoxComponent->SetBoxExtent(FVector(48.0f, 1.0f, 64.0f));
+		FVector loc = FlipbookComponent->GetRelativeLocation();
+		loc.X += 24.0f;
+		FlipbookComponent->SetRelativeLocation(loc);
+		FlipbookComponent->SetRelativeScale3D(FVector(1.5f, 1.5f, 1.5f));
+	}
+	else if (Name == TEXT("Batter_AirComboOne"))
+	{
+		BoxComponent->SetBoxExtent(FVector(48.0f, 1.0f, 32.0f));
+	}
+	else if (Name == TEXT("Batter_AirComboTwo"))
+	{
+		BoxComponent->SetBoxExtent(FVector(48.0f, 1.0f, 64.0f));
+	}
+	else if (Name == TEXT("Batter_AirSpecial"))
+	{
+		BoxComponent->SetBoxExtent(FVector(54.0f, 1.0f, 32.0f));
+	}
+	else if (Name == TEXT("Batter_GroundPound"))
+	{
+		BoxComponent->SetBoxExtent(FVector(72.0f, 1.0f, 48.0f));
+	}
+}
+
+void APlayableAttackHitbox::InitializeMeleeFlipbook()
+{
+	UPaperFlipbook* flipbook = nullptr;
+
+
+	if (Name == TEXT("Test_Basic"))
+		flipbook = TestBasicFlipbook;
+	//BATTER
+	else if (Name == TEXT("Batter_ComboOne") || Name == TEXT("Batter_ComboTwo") || Name == TEXT("Batter_AirComboOne") || Name == TEXT("Batter_AirComboTwo"))
+		flipbook = FrameTwoFlipbook;
+	else if (Name == TEXT("Batter_Finisher") || Name == TEXT("Batter_AirSpecial"))
+		flipbook = BatterFinisherFlipbook;
+
+
+	FlipbookComponent->SetFlipbook(flipbook);
+	FlipbookComponent->SetLooping(false);
 }
 
 // Called every frame

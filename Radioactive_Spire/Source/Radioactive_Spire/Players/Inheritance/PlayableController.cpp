@@ -63,7 +63,7 @@ void APlayableController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(JumpInputAction, ETriggerEvent::Started, this, &APlayableController::OnJumpPressed);
 		EnhancedInputComponent->BindAction(JumpInputAction, ETriggerEvent::Completed, this, &APlayableController::OnJumpReleased);
 
-		EnhancedInputComponent->BindAction(DuckInputAction, ETriggerEvent::Started, this, &APlayableController::OnDuckPressed);
+		EnhancedInputComponent->BindAction(DuckInputAction, ETriggerEvent::Triggered, this, &APlayableController::OnDuckPressed);
 		EnhancedInputComponent->BindAction(DuckInputAction, ETriggerEvent::Completed, this, &APlayableController::OnDuckReleased);
 
 		EnhancedInputComponent->BindAction(AttackInputAction, ETriggerEvent::Started, this, &APlayableController::OnAttackPressed);
