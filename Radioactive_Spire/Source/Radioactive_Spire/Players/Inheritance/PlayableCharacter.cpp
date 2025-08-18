@@ -719,6 +719,32 @@ void APlayableCharacter::UnPauseSprite()
 	GetSprite()->SetPlayRate(1.0f);
 }
 
+FVector APlayableCharacter::HandleMeleeHitBoxLocation(float OffsetX, float Impulse)//LAZY
+{
+	FVector location = GetActorLocation();
+	if (PlayerState->Direction == EDirection::Left)
+	{
+		location.X -= OffsetX;
+		GetCharacterMovement()->AddImpulse(FVector(-Impulse, 0.0f, 0.0f), true);
+	}
+	else if (PlayerState->Direction == EDirection::Right) 
+	{
+		location.X += OffsetX;
+		GetCharacterMovement()->AddImpulse(FVector(Impulse, 0.0f, 0.0f), true);
+	}
+	return location;
+}
+
+FRotator APlayableCharacter::HandleMeleeHitBoxRotation()//LAZY
+{
+	FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
+	if (PlayerState->Direction == EDirection::Left) 
+	{
+		rotation = FRotator(0.0f, 180.0f, 0.0f);
+	}
+	return rotation;
+}
+
 void APlayableCharacter::BatterSpecialSpawn()
 {
 	if (PlayerState->IsOnGround)
@@ -749,14 +775,8 @@ void APlayableCharacter::BatterSpecialSpawn()
 	}
 	else if (!PlayerState->IsOnGround)
 	{
-		FVector location = GetActorLocation();
-		FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
-		if (PlayerState->Direction == EDirection::Left) {
-			location.X -= 64.0f;
-			rotation = FRotator(0.0f, 180.0f, 0.0f);
-		}
-		else if (PlayerState->Direction == EDirection::Right)
-			location.X += 64.0f;
+		FVector location = HandleMeleeHitBoxLocation(64.0f, 0.0f);
+		FRotator rotation = HandleMeleeHitBoxRotation();
 
 		GetCharacterMovement()->Velocity = FVector::ZeroVector;
 
@@ -772,17 +792,8 @@ void APlayableCharacter::BatterComboAttackSpawn()
 	{
 		if (ComboNumber == 0 || ComboNumber == 2)
 		{
-			FVector location = GetActorLocation();
-			FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
-			if (PlayerState->Direction == EDirection::Left){
-				location.X -= 32.0f;
-				rotation = FRotator(0.0f, 180.0f, 0.0f);
-				GetCharacterMovement()->AddImpulse(FVector(-600.0f, 0.0f, 0.0f), true);
-			}
-			else if (PlayerState->Direction == EDirection::Right){
-				location.X += 32.0f;
-				GetCharacterMovement()->AddImpulse(FVector(600.0f, 0.0f, 0.0f), true);
-			}
+			FVector location = HandleMeleeHitBoxLocation(32.0f, 600.0f);
+			FRotator rotation = HandleMeleeHitBoxRotation();
 
 			APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
 			hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
@@ -791,17 +802,8 @@ void APlayableCharacter::BatterComboAttackSpawn()
 		}
 		else if (ComboNumber == 1 || ComboNumber == 3)
 		{
-			FVector location = GetActorLocation();
-			FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
-			if (PlayerState->Direction == EDirection::Left){
-				location.X -= 16.0f;
-				rotation = FRotator(0.0f, 180.0f, 0.0f);
-				GetCharacterMovement()->AddImpulse(FVector(-600.0f, 0.0f, 0.0f), true);
-			}
-			else if (PlayerState->Direction == EDirection::Right){
-				location.X += 16.0f;
-				GetCharacterMovement()->AddImpulse(FVector(600.0f, 0.0f, 0.0f), true);
-			}
+			FVector location = HandleMeleeHitBoxLocation(16.0f, 600.0f);
+			FRotator rotation = HandleMeleeHitBoxRotation();
 
 			APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
 			hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
@@ -810,17 +812,8 @@ void APlayableCharacter::BatterComboAttackSpawn()
 		}
 		else
 		{
-			FVector location = GetActorLocation();
-			FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
-			if (PlayerState->Direction == EDirection::Left){
-				location.X -= 32.0f;
-				rotation = FRotator(0.0f, 180.0f, 0.0f);
-				GetCharacterMovement()->AddImpulse(FVector(-600.0f, 0.0f, 0.0f), true);
-			}
-			else if (PlayerState->Direction == EDirection::Right){
-				location.X += 32.0f;
-				GetCharacterMovement()->AddImpulse(FVector(600.0f, 0.0f, 0.0f), true);
-			}
+			FVector location = HandleMeleeHitBoxLocation(32.0f, 600.0f);
+			FRotator rotation = HandleMeleeHitBoxRotation();
 
 			APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
 			hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
@@ -832,14 +825,8 @@ void APlayableCharacter::BatterComboAttackSpawn()
 	{
 		if (ComboNumber < PlayerConstants::BatterMaxAirCombo)
 		{
-			FVector location = GetActorLocation();
-			FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
-			if (PlayerState->Direction == EDirection::Left){
-				location.X -= 54.0f;
-				rotation = FRotator(0.0f, 180.0f, 0.0f);
-			}
-			else if (PlayerState->Direction == EDirection::Right)
-				location.X += 54.0f;
+			FVector location = HandleMeleeHitBoxLocation(54.0f, 600.0f);
+			FRotator rotation = HandleMeleeHitBoxRotation();
 
 			APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
 			hitbox->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
@@ -866,8 +853,8 @@ void APlayableCharacter::BatterGroundPoundSpawn()
 {
 	FVector location = GetActorLocation();
 	location.Y += 1.0f;
-	location.Z -= PlayerConstants::BatterCapsuleHalfHeight;
+	location.Z -= 24.0f;
 	FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
 	APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
-	hitbox->Spawn(TEXT("Test_Basic"), PlayerConstants::BatterGroundPoundDamage);
+	hitbox->Spawn(TEXT("Batter_GroundPound"), PlayerConstants::BatterGroundPoundDamage);
 }

@@ -209,7 +209,10 @@ void APlayableAttackHitbox::InitializeHitbox()
 	}
 	else if (Name == TEXT("Batter_GroundPound"))
 	{
-		BoxComponent->SetBoxExtent(FVector(72.0f, 1.0f, 48.0f));
+		FVector loc = FlipbookComponent->GetRelativeLocation();
+		loc.Z += 52.0f;
+		FlipbookComponent->SetRelativeLocation(loc);
+		BoxComponent->SetBoxExtent(FVector(96.0f, 1.0f, 48.0f));
 	}
 }
 
@@ -225,7 +228,8 @@ void APlayableAttackHitbox::InitializeMeleeFlipbook()
 		flipbook = FrameTwoFlipbook;
 	else if (Name == TEXT("Batter_Finisher") || Name == TEXT("Batter_AirSpecial"))
 		flipbook = BatterFinisherFlipbook;
-
+	else if (Name == TEXT("Batter_GroundPound"))
+		flipbook = BatterGroundPoundFlipbook;
 
 	FlipbookComponent->SetFlipbook(flipbook);
 	FlipbookComponent->SetLooping(false);

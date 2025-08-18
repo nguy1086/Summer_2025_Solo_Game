@@ -35,6 +35,8 @@ public:
 	class UPaperFlipbook* BatterSpecialFlipbook;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
 	class UPaperFlipbook* BatterFinisherFlipbook;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterGroundPoundFlipbook;
 
 	virtual void Tick(float DeltaTime) override;
 

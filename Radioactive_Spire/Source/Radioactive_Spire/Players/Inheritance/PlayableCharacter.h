@@ -86,6 +86,8 @@ private:
 	void ResetPlayerState();
 	void PauseSprite();
 	void UnPauseSprite();
+	FVector HandleMeleeHitBoxLocation(float OffsetX, float Impulse);
+	FRotator HandleMeleeHitBoxRotation();
 
 	void BatterSpecialSpawn();
 	void BatterComboAttackSpawn();
