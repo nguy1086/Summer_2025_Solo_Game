@@ -175,6 +175,7 @@ void APlayableCharacter::Attack()
 			{
 				if (PlayableController->IsDuckPressed())
 				{
+					ResetPlayerState();
 					DisableControls();
 					GroundPound = true;
 					ApplyStateChange(EState::Attacking);
@@ -183,7 +184,7 @@ void APlayableCharacter::Attack()
 					float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
 
 					NoGravity();
-					GetWorldTimerManager().SetTimer(GravityTimerHandle, this, &APlayableCharacter::SetGravity, ((TotalDuration - 4.0f) / FramesPerSecond), false);
+					GetWorldTimerManager().SetTimer(GravityTimerHandle, this, &APlayableCharacter::SetGravity, ((TotalDuration - 3.5f) / FramesPerSecond), false);
 					FTimerDelegate Delegate;
 					Delegate.BindUObject(this, &APlayableCharacter::ApplyImpulse, FVector(0.0f, 0.0f, -500.0f));
 					GetWorldTimerManager().SetTimer(ImpulseTimerHandle, Delegate, ((TotalDuration - 4.0f) / FramesPerSecond), false);
@@ -706,6 +707,7 @@ void APlayableCharacter::ResetPlayerState()
 		GetWorldTimerManager().ClearTimer(PauseSpriteTimerHandle);
 
 		EnableControls();//incase if getting hurt causes enable controls to not get hit
+		SetGravity();//incase gravity didnt reset
 	}
 }
 
@@ -825,7 +827,7 @@ void APlayableCharacter::BatterComboAttackSpawn()
 	{
 		if (ComboNumber < PlayerConstants::BatterMaxAirCombo)
 		{
-			FVector location = HandleMeleeHitBoxLocation(54.0f, 600.0f);
+			FVector location = HandleMeleeHitBoxLocation(54.0f, 0.0f);
 			FRotator rotation = HandleMeleeHitBoxRotation();
 
 			APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
