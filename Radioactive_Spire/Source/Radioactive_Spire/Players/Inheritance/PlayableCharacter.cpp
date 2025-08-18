@@ -164,8 +164,8 @@ void APlayableCharacter::Attack()
 				float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
 				//float DesiredFrame = (TotalDuration - 3.0f) / FramesPerSecond;//get total frame subtract to the frame you want to spawn in,
 				//i want to spawn at frame 4, so 7 (total) - 3 = 4 divide by the fps, or literally just setting it to the exact frame instead of subtracting lol
-				float Delay = ComboNumber == 1 || ComboNumber == 3 ? 4.0f : 5.0f;
-				Delay = ComboNumber >= PlayerConstants::BatterMaxCombo ? 5.0f : Delay;
+				float Delay = ComboNumber == 1 || ComboNumber == 3 ? 5.0f : 5.0f;//WAS 4 WHEN IF TRUE, KEEPING IT AT 4 LAGS??????
+				Delay = ComboNumber >= PlayerConstants::BatterMaxCombo ? 4.0f : Delay;//WAS 5 SINCE THAT HITS IT TOO EARLY?????
 
 				GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayableCharacter::BatterComboAttackSpawn, ((TotalDuration - Delay) / FramesPerSecond), false);
 				GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, ((TotalDuration - Delay + (ComboNumber >= PlayerConstants::BatterMaxCombo ? 4.0f : 0.0f)) / FramesPerSecond), false);
