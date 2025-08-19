@@ -9,7 +9,7 @@
 #include "InputAction.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-
+#include "../../Game/PlayableWidget.h"
 
 
 APlayableController::APlayableController() :
@@ -34,6 +34,12 @@ void APlayableController::BeginPlay()
 	InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 	if (InputSubsystem != nullptr)
 		InputSubsystem->AddMappingContext(InputMappingContext, 0);
+
+	if (GameInfoBP != nullptr && IsLocalController())
+	{
+		GameInfoWidget = CreateWidget<UPlayableWidget>(this, GameInfoBP);
+		GameInfoWidget->AddToViewport();
+	}
 }
 
 void APlayableController::OnPossess(APawn* aPawn)

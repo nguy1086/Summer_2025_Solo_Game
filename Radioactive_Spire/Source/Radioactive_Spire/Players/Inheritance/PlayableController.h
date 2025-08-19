@@ -9,6 +9,7 @@
 /**
  * 
  */
+class UPlayableWidget;
 UCLASS()
 class RADIOACTIVE_SPIRE_API APlayableController : public APlayerController
 {
@@ -57,6 +58,12 @@ public:
 	//bool IsUpPressed();
 
 	class UEnhancedInputLocalPlayerSubsystem* GetInputSubSystem() { return InputSubsystem; }
+
+	UPROPERTY()
+	UPlayableWidget* GameInfoWidget;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UPlayableWidget> GameInfoBP;
 
 protected:
 	void OnMove(const struct FInputActionValue& Value);

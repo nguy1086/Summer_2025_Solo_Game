@@ -613,6 +613,7 @@ void APlayableCharacter::InitializeType()
 	if (Type == EPlayerType::Test)
 	{
 		Health = PlayerConstants::DefaultHealth;
+		MaxHealth = PlayerConstants::DefaultHealth;
 		//collision
 		GetCapsuleComponent()->SetCollisionProfileName("Player");
 		GetCapsuleComponent()->SetCapsuleRadius(PlayerConstants::DefaultCapsuleRadius);
@@ -641,6 +642,7 @@ void APlayableCharacter::InitializeType()
 	else if (Type == EPlayerType::Batter)
 	{
 		Health = PlayerConstants::BatterHealth;
+		MaxHealth = PlayerConstants::BatterHealth;
 		//collision
 		GetCapsuleComponent()->SetCollisionProfileName("Player");
 		GetCapsuleComponent()->SetCapsuleRadius(PlayerConstants::BatterCapsuleRadius);

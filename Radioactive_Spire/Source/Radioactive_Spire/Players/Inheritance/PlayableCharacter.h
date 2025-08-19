@@ -49,6 +49,9 @@ public:
 	float Health = PlayerConstants::DefaultHealth;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float MaxHealth = PlayerConstants::DefaultHealth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	EPlayerType Type;
 
 protected:
