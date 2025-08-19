@@ -53,8 +53,10 @@ void APlayerCamera::Tick(float DeltaTime)
 		FVector playerLocation = Player->GetActorLocation();
 		FVector cameraLocation = Camera->GetComponentLocation();
 
-		// set the X value
+		// set the X value  FInterpTO MOVES THE X CAMERA
 		cameraLocation.X = FMath::FInterpTo(cameraLocation.X, playerLocation.X, DeltaTime, 8.0f) + ShakeOffset.X;
+
+		cameraLocation.Y = FMath::FInterpTo(cameraLocation.Y, playerLocation.Y, DeltaTime, 8.0f) + GameConstants::CameraDepthY;
 
 		// set the Z value
 		cameraLocation.Z = InitialLocation.Z + GameConstants::CameraZOffset + ShakeOffset.Z;
@@ -75,7 +77,7 @@ void APlayerCamera::OnShake()
 	ShakeCount++;
 
 	ShakeOffset.X = FMath::RandRange(-2.0f, 2.0f);
-	ShakeOffset.Z = FMath::RandRange(-5.0f, 5.0f);
+	ShakeOffset.Z = FMath::RandRange(-3.0f, 3.0f);
 
 	if (ShakeCount >= GameConstants::MaxCameraShakes)
 	{

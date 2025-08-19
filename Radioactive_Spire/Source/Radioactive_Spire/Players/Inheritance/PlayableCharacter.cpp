@@ -153,7 +153,7 @@ void APlayableCharacter::Attack()
 	{
 		if (AttackHitboxTemplate)
 		{
-			if (PlayerState->IsOnGround)
+			if (PlayerState->IsOnGround)//ground combo
 			{
 				DisableControls();
 				ApplyStateChange(EState::Attacking);
@@ -173,7 +173,7 @@ void APlayableCharacter::Attack()
 			}																						//total frames / fps to get the total frame duration
 			else if (!PlayerState->IsOnGround)
 			{
-				if (PlayableController->IsDuckPressed())
+				if (PlayableController->IsDuckPressed())//groundpound
 				{
 					ResetPlayerState();
 					DisableControls();
@@ -191,7 +191,7 @@ void APlayableCharacter::Attack()
 
 					GetWorldTimerManager().SetTimer(PauseSpriteTimerHandle, this, &APlayableCharacter::PauseSprite, ((TotalDuration - 4.0f) / FramesPerSecond), false);
 				}
-				else
+				else//air combo
 				{
 					DisableControls();
 					ApplyStateChange(EState::Attacking);
@@ -224,7 +224,7 @@ void APlayableCharacter::Special()
 	{
 		if (AttackHitboxTemplate)
 		{
-			if (PlayerState->IsOnGround)
+			if (PlayerState->IsOnGround)//ground special
 			{
 				if (PlayerState->State == EState::Ducking)
 					DuckSpecial = true;
@@ -238,7 +238,7 @@ void APlayableCharacter::Special()
 				GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, ((TotalDuration - (DuckSpecial ? 2.0f : 1.0f)) / FramesPerSecond), false);
 				GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
 			}
-			else if (!PlayerState->IsOnGround)
+			else if (!PlayerState->IsOnGround)//air special
 			{
 				DisableControls();
 				ApplyStateChange(EState::Special);
@@ -462,7 +462,6 @@ void APlayableCharacter::Landed(const FHitResult& Hit)
 				float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
 
 				BatterGroundPoundSpawn();
-				EnableControls();
 				GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, (3.0f / FramesPerSecond), false);
 				GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (3.0f / FramesPerSecond), false);
 			}
