@@ -33,6 +33,8 @@ APlayableAttackHitbox::APlayableAttackHitbox() :
 	ProjectileMovementComponent->bSimulationEnabled = true;
 
 	RootComponent->SetHiddenInGame(false);
+
+	Tags.Add("PlayerHitbox");
 }
 
 // Called when the game starts or when spawned

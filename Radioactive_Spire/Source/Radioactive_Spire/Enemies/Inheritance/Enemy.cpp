@@ -5,22 +5,24 @@
 #include "PaperFlipbook.h"
 #include "PaperFlipbookComponent.h"
 #include "Components/CapsuleComponent.h"
-//#include "Perception/PawnSensingComponent.h"
-//#include "AIController.h"
+#include "../../AIModule/Classes/Perception/PawnSensingComponent.h"
+#include "../../AIModule/Classes/AIController.h"
+#include "Kismet/GameplayStatics.h"
 
 AEnemy::AEnemy() :
 	BoxComponent(nullptr),
-	FlipbookComponent(nullptr)
+	FlipbookComponent(nullptr),
+	Direction(EEnemyDirection::Right)
 {
 	//GetCapsuleComponent() = CreateDefaultSubobject<UCapsuleComponent>("EnemyBoxComponent");
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	GetCapsuleComponent()->SetCollisionProfileName("OverlapAll");
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetCapsuleComponent()->SetCollisionProfileName("Entity");
 	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
 	GetCapsuleComponent()->BodyInstance.bLockXRotation = true;
 	GetCapsuleComponent()->BodyInstance.bLockYRotation = true;
 	GetCapsuleComponent()->BodyInstance.bLockZRotation = true;
 	GetCapsuleComponent()->BodyInstance.bLockYTranslation = true;
-	//GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AEnemy::OnHit);
+
 	RootComponent = GetCapsuleComponent();
 
 	FlipbookComponent = CreateDefaultSubobject<UPaperFlipbookComponent>("EnemyFlipbook");
@@ -28,14 +30,14 @@ AEnemy::AEnemy() :
 	FlipbookComponent->SetCollisionProfileName("NoCollision");
 	FlipbookComponent->SetupAttachment(RootComponent);
 
-	//if (PawnSensingComponent)
-	//	PawnSensingComponent->OnSeePawn.AddDynamic(this, &AEnemy::OnSeePawn);
+	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComponent"));
+	PawnSensingComponent->SetPeripheralVisionAngle(180.0f); //vision degrees
+	PawnSensingComponent->SightRadius = 5000.0f; //range
+	PawnSensingComponent->SetSensingInterval(0.5f);
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	Tags.Add("Enemy");
 }
 
-void AEnemy::OnSeePawn(APawn* OtherPawn)
-{
-}
+

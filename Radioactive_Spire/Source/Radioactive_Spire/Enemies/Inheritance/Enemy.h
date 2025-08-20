@@ -6,6 +6,13 @@
 #include "PaperCharacter.h"
 #include "Enemy.generated.h"
 
+
+UENUM(BlueprintType)
+enum class EEnemyDirection : uint8
+{
+	Right	UMETA(DisplayName = "Right"),
+	Left	UMETA(DisplayName = "Left")
+};
 /**
  * 
  */
@@ -29,10 +36,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float Health = 100.0f;
 
-protected:
-	//UFUNCTION()
-	//void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
-	UFUNCTION()
-	void OnSeePawn(APawn* OtherPawn);
+private:
+	EEnemyDirection Direction;
 };
