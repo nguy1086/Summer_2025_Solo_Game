@@ -6,7 +6,8 @@
 #include "../../AIModule/Classes/Perception/PawnSensingComponent.h"
 #include "../../AIModule/Classes/AIController.h"
 
-ASlime::ASlime()
+ASlime::ASlime() :
+    State(ESlimeState::Idle)
 {
     PrimaryActorTick.bCanEverTick = true;
 
@@ -24,6 +25,15 @@ void ASlime::BeginPlay()
 
 void ASlime::OnSeePawn(APawn* OtherPawn)
 {
+}
+
+void ASlime::ApplyStateChange(ESlimeState newState)
+{
+    if (State == newState)
+        return;
+
+    ESlimeState old = State;
+    State = newState;
 }
 
 void ASlime::Tick(float DeltaTime)

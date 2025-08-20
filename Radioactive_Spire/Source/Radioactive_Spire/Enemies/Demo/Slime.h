@@ -44,6 +44,7 @@ protected:
 	void OnSeePawn(APawn* OtherPawn);
 
 private:
+	void ApplyStateChange(ESlimeState newState);
 	float AttackTimer;
-
+	ESlimeState State;
 };
