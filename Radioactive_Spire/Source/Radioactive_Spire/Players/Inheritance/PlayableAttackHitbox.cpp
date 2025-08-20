@@ -149,8 +149,6 @@ void APlayableAttackHitbox::InitializeHitbox()
 		ProjectileMovementComponent->SetActive(true,true);
 		BoxComponent->SetBoxExtent(FVector(5.0f, 1.0f, 5.0f));
 
-
-
 		ProjectileMovementComponent->UpdatedComponent = BoxComponent;
 		ProjectileMovementComponent->Velocity.Z = 1000.0f;
 		ProjectileMovementComponent->InitialSpeed = 750.0f;
@@ -159,6 +157,8 @@ void APlayableAttackHitbox::InitializeHitbox()
 		ProjectileMovementComponent->bShouldBounce = true;
 		ProjectileMovementComponent->Bounciness = 0.5f;
 		ProjectileMovementComponent->ProjectileGravityScale = 1.0f;
+
+		Tags.Add("Baseball");
 	}
 	else if (Name == TEXT("Batter_Special"))
 	{
@@ -168,8 +168,6 @@ void APlayableAttackHitbox::InitializeHitbox()
 		ProjectileMovementComponent->SetActive(true, true);
 		BoxComponent->SetBoxExtent(FVector(5.0f, 1.0f, 5.0f));
 
-
-
 		ProjectileMovementComponent->UpdatedComponent = BoxComponent;
 		ProjectileMovementComponent->Velocity.X = 1000.0f * (GetActorRotation() == FRotator(0.0f,180.0f,0.0f) ? -1.0f : 1.0f);//NOT THE BEST AT CHECKING WILL PROBABLY CHANGED THIS LATER
 		ProjectileMovementComponent->InitialSpeed = 1250.0f * (GetActorRotation() == FRotator(0.0f, 180.0f, 0.0f) ? -1.0f : 1.0f);
@@ -178,14 +176,19 @@ void APlayableAttackHitbox::InitializeHitbox()
 		ProjectileMovementComponent->bShouldBounce = true;
 		ProjectileMovementComponent->Bounciness = 0.5f;
 		ProjectileMovementComponent->ProjectileGravityScale = 1.0f;
+
+		Tags.Add("Baseball");
 	}
 	else if (Name == TEXT("Batter_ComboOne"))
 	{
 		BoxComponent->SetBoxExtent(FVector(48.0f, 1.0f, 32.0f));
+
+		Tags.Add("Batter_proj");
 	}
 	else if (Name == TEXT("Batter_ComboTwo"))
 	{
 		BoxComponent->SetBoxExtent(FVector(64.0f, 1.0f, 48.0f));
+		Tags.Add("Batter_proj");
 	}
 	else if (Name == TEXT("Batter_Finisher"))
 	{
@@ -194,18 +197,25 @@ void APlayableAttackHitbox::InitializeHitbox()
 		loc.X += 24.0f;
 		FlipbookComponent->SetRelativeLocation(loc);
 		FlipbookComponent->SetRelativeScale3D(FVector(1.5f, 1.5f, 1.5f));
+		Tags.Add("Batter_proj");
 	}
 	else if (Name == TEXT("Batter_AirComboOne"))
 	{
 		BoxComponent->SetBoxExtent(FVector(48.0f, 1.0f, 32.0f));
+		Tags.Add("Batter_proj");
+		Tags.Add("Air");
 	}
 	else if (Name == TEXT("Batter_AirComboTwo"))
 	{
 		BoxComponent->SetBoxExtent(FVector(48.0f, 1.0f, 64.0f));
+		Tags.Add("Batter_proj");
+		Tags.Add("Air");
 	}
 	else if (Name == TEXT("Batter_AirSpecial"))
 	{
 		BoxComponent->SetBoxExtent(FVector(54.0f, 1.0f, 32.0f));
+		Tags.Add("Batter_proj");
+		Tags.Add("Air");
 	}
 	else if (Name == TEXT("Batter_GroundPound"))
 	{

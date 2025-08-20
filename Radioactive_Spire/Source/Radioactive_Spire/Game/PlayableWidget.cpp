@@ -9,6 +9,7 @@
 #include "RadioactiveSpire_GameModeBase.h"
 #include "RadioactiveSpire_GameStateBase.h"
 #include "../Players/Inheritance/PlayableCharacter.h"
+#include "../Players/Inheritance/PlayableCharacterState.h"
 
 bool UPlayableWidget::Initialize()
 {
@@ -71,7 +72,14 @@ void UPlayableWidget::UpdateHealth()
 
         UProgressBar* Bar = Cast<UProgressBar>(GetWidgetFromName("HealthBar"));
         if (Bar != nullptr)
+        {
             Bar->SetPercent((Player->Health / Player->MaxHealth));
+            if (Player->Type == EPlayerType::Batter)
+                Bar->SetFillColorAndOpacity(FLinearColor(0.37f, 0.0f, 0.63f, 1.0f));
+        }
+
+
+            
     }
 }
 
