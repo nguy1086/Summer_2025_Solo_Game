@@ -25,8 +25,8 @@ APlayableCharacter::APlayableCharacter() :
 	Camera(nullptr),
 	PlayableController(nullptr),
 	DamagedTimer(0.0f),
-	DuckSpecial(false),
 	GroundPound(false),
+	DuckSpecial(false),
 	CanDash(0.0f)
 {
     PrimaryActorTick.bCanEverTick = true;

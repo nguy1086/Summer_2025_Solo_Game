@@ -16,9 +16,10 @@
 
 // Sets default values
 APlayableAttackHitbox::APlayableAttackHitbox() :
-	Timer(0.0f),
 	IsProjectile(false),
-	Ricochet(0)
+	Timer(0.0f),
+	Ricochet(0),
+	Knockback(0.0f, 0.0f, 75.0f)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -56,11 +57,23 @@ void APlayableAttackHitbox::OnOverlapBegin(UPrimitiveComponent* OverlapComponent
 	if (enemy)
 	{
 		if (GEngine)
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Hit!"));
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Hit! Damage: " + FString::FromInt(Damage)) );
 
 		enemy->OnDamaged(Damage);
-		if (IsProjectile)
+
+		if (ActorHasTag("Baseball"))
 			Destroy();
+		else if (ActorHasTag("GroundPound"))
+		{
+			FVector loc = enemy->GetActorLocation();
+			if (loc.X < GetActorLocation().X)
+				Knockback.X *= -1.0f;
+		}
+
+		if (!enemy->ActorHasTag("Unknockable"))
+			enemy->LaunchCharacter(Knockback, false, true);
+
+
 	}
 	else
 	{
@@ -101,7 +114,8 @@ void APlayableAttackHitbox::OnOverlapBegin(UPrimitiveComponent* OverlapComponent
 					float z = FMath::FRandRange(-2.0f, 2.0f);
 					baseball->ProjectileMovementComponent->MaxSpeed = 3000.0f;
 					baseball->ProjectileMovementComponent->Velocity = FVector(3000.0f * CheckDirectionOfHitbox(), 0.0f, z);
-					baseball->Damage *= 3.5f;
+					baseball->Damage *= 5.5f;
+					baseball->Knockback.Z *= 3.0f;
 				}
 			}
 		}
@@ -213,12 +227,15 @@ void APlayableAttackHitbox::InitializeHitbox()
 	else if (Name == TEXT("Batter_ComboOne"))
 	{
 		BoxComponent->SetBoxExtent(FVector(48.0f, 1.0f, 32.0f));
+		Knockback = FVector(100.0f * CheckDirectionOfHitbox(), 0.0f, 150.0f);
 
 		Tags.Add("Batter_proj");
 	}
 	else if (Name == TEXT("Batter_ComboTwo"))
 	{
 		BoxComponent->SetBoxExtent(FVector(64.0f, 1.0f, 48.0f));
+		Knockback = FVector(100.0f * CheckDirectionOfHitbox(), 0.0f, 150.0f);
+
 		Tags.Add("Batter_proj");
 	}
 	else if (Name == TEXT("Batter_Finisher"))
@@ -228,23 +245,31 @@ void APlayableAttackHitbox::InitializeHitbox()
 		loc.X += 24.0f;
 		FlipbookComponent->SetRelativeLocation(loc);
 		FlipbookComponent->SetRelativeScale3D(FVector(1.5f, 1.5f, 1.5f));
+		Knockback = FVector(200.0f * CheckDirectionOfHitbox(), 0.0f, 150.0f);
+
 		Tags.Add("Batter_proj");
 	}
 	else if (Name == TEXT("Batter_AirComboOne"))
 	{
 		BoxComponent->SetBoxExtent(FVector(48.0f, 1.0f, 32.0f));
+		Knockback = FVector(0.0f * CheckDirectionOfHitbox(), 0.0f, 150.0f);
+
 		Tags.Add("Batter_proj");
 		Tags.Add("Air");
 	}
 	else if (Name == TEXT("Batter_AirComboTwo"))
 	{
 		BoxComponent->SetBoxExtent(FVector(48.0f, 1.0f, 64.0f));
+		Knockback = FVector(50.0f * CheckDirectionOfHitbox(), 0.0f, 150.0f);
+
 		Tags.Add("Batter_proj");
 		Tags.Add("Air");
 	}
 	else if (Name == TEXT("Batter_AirSpecial"))
 	{
 		BoxComponent->SetBoxExtent(FVector(54.0f, 1.0f, 32.0f));
+		Knockback = FVector(100.0f * CheckDirectionOfHitbox(), 0.0f, 150.0f);
+
 		Tags.Add("Batter_proj");
 		Tags.Add("Air");
 	}
@@ -254,6 +279,9 @@ void APlayableAttackHitbox::InitializeHitbox()
 		loc.Z += 52.0f;
 		FlipbookComponent->SetRelativeLocation(loc);
 		BoxComponent->SetBoxExtent(FVector(96.0f, 1.0f, 48.0f));
+		Knockback = FVector(300.0f, 0.0f, 750.0f);
+
+		Tags.Add("GroundPound");
 	}
 }
 

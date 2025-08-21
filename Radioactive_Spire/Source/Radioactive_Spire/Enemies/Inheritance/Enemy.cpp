@@ -12,7 +12,8 @@
 AEnemy::AEnemy() :
 	BoxComponent(nullptr),
 	FlipbookComponent(nullptr),
-	Direction(EEnemyDirection::Right)
+	Direction(EEnemyDirection::Right),
+	InvincibleTimer(0.0f)
 {
 	//GetCapsuleComponent() = CreateDefaultSubobject<UCapsuleComponent>("EnemyBoxComponent");
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -30,12 +31,27 @@ AEnemy::AEnemy() :
 	FlipbookComponent->SetCollisionProfileName("NoCollision");
 	FlipbookComponent->SetupAttachment(RootComponent);
 
-	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComponent"));
-	PawnSensingComponent->SetPeripheralVisionAngle(180.0f); //vision degrees
-	PawnSensingComponent->SightRadius = 5000.0f; //range
-	PawnSensingComponent->SetSensingInterval(0.5f);
+	//PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComponent"));
+	//PawnSensingComponent->SetPeripheralVisionAngle(180.0f); //vision degrees
+	//PawnSensingComponent->SightRadius = 5000.0f; //range
+	//PawnSensingComponent->SetSensingInterval(0.5f);
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	Tags.Add("Enemy");
+}
+
+void AEnemy::CheckDirection()
+{
+	if (GetVelocity().X < 0.0f)
+	{
+		Direction = EEnemyDirection::Left;
+		SetActorRotation(FRotator(0.0, 180.0f, 0.0f));
+
+	}
+	else if (GetVelocity().X > 0.0f)
+	{
+		Direction = EEnemyDirection::Right;
+		SetActorRotation(FRotator(0.0, 0.0f, 0.0f));
+	}
 }

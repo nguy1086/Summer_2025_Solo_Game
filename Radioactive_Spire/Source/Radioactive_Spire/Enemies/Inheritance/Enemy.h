@@ -30,14 +30,16 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UPaperFlipbookComponent* FlipbookComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pawn Sensing", meta = (AllowPrivateAccess = "true"))
-	class UPawnSensingComponent* PawnSensingComponent;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pawn Sensing", meta = (AllowPrivateAccess = "true"))
+	//class UPawnSensingComponent* PawnSensingComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float Health = 100.0f;
 
 	virtual void OnDamaged(float damage) {};
+	virtual void UpdateFlipbook() {};
 
-private:
+	void CheckDirection();
 	EEnemyDirection Direction;
+	float InvincibleTimer;
 };

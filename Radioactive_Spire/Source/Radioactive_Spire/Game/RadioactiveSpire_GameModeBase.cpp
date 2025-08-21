@@ -16,6 +16,10 @@
 
 #include "PaperFlipbook.h"
 #include "PaperFlipbookComponent.h"
+
+#include "NavMesh/NavMeshBoundsVolume.h"
+#include "Components/BrushComponent.h"
+
 ARadioactiveSpire_GameModeBase::ARadioactiveSpire_GameModeBase() :
     Camera(nullptr)
 {
@@ -30,11 +34,19 @@ void ARadioactiveSpire_GameModeBase::BeginPlay()
 	SpawnParams.Owner = this;
 	Camera = GetWorld()->SpawnActor<APlayerCamera>(APlayerCamera::StaticClass(), FVector(), FRotator(), SpawnParams);
 	ApplyViewMode(EViewModeIndex::VMI_Unlit, false, *GetWorld()->GetGameViewport()->GetEngineShowFlags());
+
+	//ANavMeshBoundsVolume * NavMeshVolume = GetWorld()->SpawnActor<ANavMeshBoundsVolume>(Camera->GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
+	//NavMeshVolume->GetBrushComponent()->Brush;
+	//NavMeshVolume->SetActorScale3D(FVector(500.0f, 500.0f, 500.0f));
+	//NavMeshVolume->SetActorHiddenInGame(false);
+
 }
 
 void ARadioactiveSpire_GameModeBase::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+
+	//UNavigationSystemV1::OnNavigationBoundsUpdated()
 }
 
 void ARadioactiveSpire_GameModeBase::PlayerDied()

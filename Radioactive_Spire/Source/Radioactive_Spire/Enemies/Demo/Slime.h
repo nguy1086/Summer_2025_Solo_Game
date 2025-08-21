@@ -37,14 +37,13 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 protected:
-
 	virtual void OnDamaged(float damage) override;
-
-	UFUNCTION()
-	void OnSeePawn(APawn* OtherPawn);
+	void Landed(const FHitResult& Hit) override;
 
 private:
 	void ApplyStateChange(ESlimeState newState);
 	float AttackTimer;
 	ESlimeState State;
+
+	virtual void UpdateFlipbook() override;
 };

@@ -68,4 +68,5 @@ private:
 	int Ricochet;
 	FString Name;
 	FTimerHandle HitboxTimerHandle;
+	FVector Knockback;
 };
