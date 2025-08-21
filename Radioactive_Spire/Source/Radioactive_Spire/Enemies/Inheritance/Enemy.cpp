@@ -39,5 +39,3 @@ AEnemy::AEnemy() :
 
 	Tags.Add("Enemy");
 }
-
-

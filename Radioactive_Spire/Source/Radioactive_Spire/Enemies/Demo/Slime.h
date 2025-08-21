@@ -37,8 +37,8 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 protected:
-	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	virtual void OnDamaged(float damage) override;
 
 	UFUNCTION()
 	void OnSeePawn(APawn* OtherPawn);

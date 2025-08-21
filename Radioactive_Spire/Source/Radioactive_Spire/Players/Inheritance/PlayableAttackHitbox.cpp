@@ -10,6 +10,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
+#include "../../Enemies/Inheritance/Enemy.h"
+#include "PlayableCharacter.h"
+#include "PlayableCharacterState.h"
+
 // Sets default values
 APlayableAttackHitbox::APlayableAttackHitbox() :
 	Timer(0.0f),
@@ -22,6 +26,8 @@ APlayableAttackHitbox::APlayableAttackHitbox() :
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
 	BoxComponent->BodyInstance.bLockYRotation = true;
 	BoxComponent->BodyInstance.bLockZRotation = true;
+	//BoxComponent->OnComponentHit.AddDynamic(this, &APlayableAttackHitbox::OnHit);
+	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &APlayableAttackHitbox::OnOverlapBegin);
 	RootComponent = BoxComponent;
 
 	FlipbookComponent = CreateDefaultSubobject<UPaperFlipbookComponent>("HitboxFlipbook");
@@ -45,45 +51,68 @@ void APlayableAttackHitbox::BeginPlay()
 
 void APlayableAttackHitbox::OnOverlapBegin(UPrimitiveComponent* OverlapComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-}
-
-void APlayableAttackHitbox::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
-{
-	if (IsProjectile)
+	//OnHit(OverlapComponent, OtherActor, OtherComp, FVector::ZeroVector, SweepResult);
+	AEnemy* enemy = Cast<AEnemy>(OtherActor);
+	if (enemy)
 	{
-		//if (Name == TEXT("Batter_Special_Duck") || Name == TEXT("Batter_Special"))
-		//{
-		//	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && (OtherActor != this->GetOwner()))
-		//	{
-		//		ProjectileMovementComponent->StopMovementImmediately();
-		//		if (OtherActor->ActorHasTag("Enemy"))
-		//		{
-		//			Damage *= (ProjectileMovementComponent->Velocity.Size() * 0.5f);//velocity.size() gets the current speed
-		//			Destroy();
-		//		}
-		//		else
-		//		{
-		//			Ricochet++;
-		//			Damage = Damage / 2.0f;
-	
-		//			if (Ricochet >= PlayerConstants::BatterSpecialMaxBounce)
-		//			{
-		//				Destroy();
-		//			}
-		//		}
-		//	}
-		//}
+		if (GEngine)
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Hit!"));
 
-
+		enemy->OnDamaged(Damage);
+		if (IsProjectile)
+			Destroy();
 	}
 	else
 	{
+		if (IsProjectile)
+		{
+			//if (Name == TEXT("Batter_Special_Duck") || Name == TEXT("Batter_Special"))
+			//{
+			//	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && (OtherActor != this->GetOwner()))
+			//	{
+			//		ProjectileMovementComponent->StopMovementImmediately();
+			//		if (OtherActor->ActorHasTag("Enemy"))
+			//		{
+			//			Damage *= (ProjectileMovementComponent->Velocity.Size() * 0.5f);//velocity.size() gets the current speed
+			//			Destroy();
+			//		}
+			//		else
+			//		{
+			//			Ricochet++;
+			//			Damage = Damage / 2.0f;
 
+			//			if (Ricochet >= PlayerConstants::BatterSpecialMaxBounce)
+			//			{
+			//				Destroy();
+			//			}
+			//		}
+			//	}
+			//}
+
+
+		}
+		else
+		{
+			if (ActorHasTag("Batter_proj"))
+			{
+				if (OtherActor->ActorHasTag("Baseball"))
+				{
+					APlayableAttackHitbox* baseball = Cast<APlayableAttackHitbox>(OtherActor);
+					float z = FMath::FRandRange(-2.0f, 2.0f);
+					baseball->ProjectileMovementComponent->MaxSpeed = 3000.0f;
+					baseball->ProjectileMovementComponent->Velocity = FVector(3000.0f * CheckDirectionOfHitbox(), 0.0f, z);
+					baseball->Damage *= 3.5f;
+				}
+			}
+		}
 	}
 
-
-
 }
+
+//void APlayableAttackHitbox::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+//{
+//
+//}
 
 void APlayableAttackHitbox::Spawn(FString name, float damage)
 {
@@ -245,6 +274,18 @@ void APlayableAttackHitbox::InitializeMeleeFlipbook()
 
 	FlipbookComponent->SetFlipbook(flipbook);
 	FlipbookComponent->SetLooping(false);
+}
+
+float APlayableAttackHitbox::CheckDirectionOfHitbox()
+{
+	APlayableCharacter* player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
+	APlayableCharacterState* PlayerState = player->GetPlayerState<APlayableCharacterState>();
+	if (PlayerState->Direction == EDirection::Left)
+		return -1.0f;
+	else if (PlayerState->Direction == EDirection::Right)
+		return 1.0f;
+	
+	return 0.0f;
 }
 
 // Called every frame

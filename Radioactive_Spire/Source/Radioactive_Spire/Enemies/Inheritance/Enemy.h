@@ -36,6 +36,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float Health = 100.0f;
 
+	virtual void OnDamaged(float damage) {};
+
 private:
 	EEnemyDirection Direction;
 };
