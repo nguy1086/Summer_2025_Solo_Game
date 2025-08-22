@@ -22,13 +22,11 @@ ASlime::ASlime() :
     GetCapsuleComponent()->SetCapsuleSize(32.0f, 32.0f);
     GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ASlime::OnOverlapBegin);
     FlipbookComponent->SetWorldScale3D(FVector(2.0f, 2.0f, 2.0f));
-    //GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ASlime::OnHit);
 
-    //GetCharacterMovement()->GroundFriction = PlayerConstants::BatterGroundFriction;
     GetCharacterMovement()->MaxWalkSpeed = 20.0f;
-    //GetCharacterMovement()->MaxAcceleration = PlayerConstants::BatterMaxAcceleration;
-    //GetCharacterMovement()->MinAnalogWalkSpeed = PlayerConstants::BatterMinSpeed;
     Damage = 10.0f;
+
+    GetCapsuleComponent()->SetHiddenInGame(false);
 }
 
 void ASlime::BeginPlay()
@@ -123,9 +121,10 @@ void ASlime::Tick(float DeltaTime)
     }
     else if (State == ESlimeState::Attack)
     {
-        float RemainingTime = GetWorld()->GetTimerManager().GetTimerRemaining(AttackTimerHandle);
+
     }
-    InvincibleTimer -= DeltaTime;
+    if (InvincibleTimer >= 0.0f)
+        InvincibleTimer -= DeltaTime;
 }
 
 void ASlime::OnDamaged(float damage)

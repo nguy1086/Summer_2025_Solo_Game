@@ -161,7 +161,8 @@ void APlayableController::OnMove(const FInputActionValue& Value)
 		if (PlayablePlayerState->State != EState::Ducking && 
 			PlayablePlayerState->State != EState::Special && 
 			PlayablePlayerState->State != EState::Attacking &&
-			PlayablePlayerState->State != EState::Roll)
+			PlayablePlayerState->State != EState::Roll &&
+			PlayablePlayerState->State != EState::Hurt)
 		{
 			if (PlayablePlayerState->IsOnGround)
 				PlayablePlayer->ApplyStateChange(EState::Walking);
@@ -202,7 +203,8 @@ void APlayableController::OnMoveReleased(const FInputActionValue& Value)
 			PlayablePlayerState->State != EState::Ducking && 
 			PlayablePlayerState->State != EState::Special &&
 			PlayablePlayerState->State != EState::Attacking &&
-			PlayablePlayerState->State != EState::Roll)
+			PlayablePlayerState->State != EState::Roll &&
+			PlayablePlayerState->State != EState::Hurt)
 			PlayablePlayer->ApplyStateChange(EState::Idle);
 }
 

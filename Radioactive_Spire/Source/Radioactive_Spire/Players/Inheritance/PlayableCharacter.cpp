@@ -106,6 +106,9 @@ void APlayableCharacter::Tick(float DeltaTime)
 
 	if (CanDash > 0.0f)
 		CanDash -= DeltaTime;
+
+	//if (GEngine)
+	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("I-frames Timer: " + FString::SanitizeFloat(PlayerState->InvincibilityTimer)));
 }
 
 void APlayableCharacter::Duck()
@@ -470,8 +473,8 @@ void APlayableCharacter::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
 
-	//if ((PlayerState->State == EState::Attacking && !PlayerState->IsOnGround) || PlayerState->State == EState::Falling)//safe check when doing air attacks
-	//	EnableControls();
+	if (PlayerState->State == EState::Hurt)//safe check when doing air attacks
+		ResetPlayerState();
 
 	if (PlayerState)
 	{
@@ -724,6 +727,7 @@ void APlayableCharacter::ResetPlayerState()
 			ApplyStateChange(EState::Walking);
 
 		ComboNumber = 0;
+		PlayerState->InvincibilityTimer = 0.0f;
 		DuckSpecial = false;
 		GroundPound = false;
 
