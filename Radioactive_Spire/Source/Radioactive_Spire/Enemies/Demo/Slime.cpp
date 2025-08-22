@@ -14,8 +14,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 ASlime::ASlime() :
-    State(ESlimeState::Idle),
-    AttackTimer(AttackMax)
+    AttackTimer(AttackMax),
+    State(ESlimeState::Idle)
 {
     PrimaryActorTick.bCanEverTick = true;
 
@@ -64,7 +64,7 @@ void ASlime::OnOverlapBegin(UPrimitiveComponent* OverlapComponent, AActor* Other
     if (player)
     {
         if (ActorHasTag("EnemyHurtbox"))
-            player->Health -= Damage;
+            player->HandleDamage(Damage, this);
     }
 }
 

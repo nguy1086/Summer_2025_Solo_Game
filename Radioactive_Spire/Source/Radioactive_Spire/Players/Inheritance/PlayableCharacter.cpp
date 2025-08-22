@@ -20,6 +20,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
+#include "../../Enemies/Inheritance/Enemy.h"
+
 APlayableCharacter::APlayableCharacter() :
 	PlayerState(nullptr),
 	Camera(nullptr),
@@ -370,25 +372,48 @@ void APlayableCharacter::ApplyImpulse(FVector impulse)
 	GetCharacterMovement()->AddImpulse(impulse, true);
 }
 
-void APlayableCharacter::HandleDamage(float damage)
+void APlayableCharacter::HandleDamage(float damage, AActor* OtherActor)
 {
-	if (PlayerState && !IsInvincible())
+	if (OtherActor && OtherActor->ActorHasTag("EnemyHurtbox"))
 	{
-		Health -= damage;
-		if (Health <= 0)
+		if (PlayerState && !IsInvincible())
 		{
-			DamagedTimer = PlayerConstants::DefaultInvincibleVisibilityDuration;
-			PlayerState->InvincibilityTimer = PlayerConstants::DefaultInvincibleTime;
-			GetCapsuleComponent()->SetCollisionProfileName("Invincible");
-			Death();
+			Health -= damage;
+			if (Health <= 0)
+			{
+				DamagedTimer = PlayerConstants::DefaultInvincibleVisibilityDuration;
+				PlayerState->InvincibilityTimer = PlayerConstants::DefaultInvincibleTime;
+				GetCapsuleComponent()->SetCollisionProfileName("Invincible");
+				Death();
+			}
+			else
+			{
+				DamagedTimer = PlayerConstants::DefaultInvincibleVisibilityDuration;
+				PlayerState->InvincibilityTimer = PlayerConstants::DefaultInvincibleTime;
+				GetCapsuleComponent()->SetCollisionProfileName("Invincible");
+
+				DisableControls();
+				ApplyStateChange(EState::Hurt);
+				AEnemy* enemy = Cast<AEnemy>(OtherActor);
+				if (enemy)
+					EnemyKnockback(enemy);
+
+				float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
+				float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
+				GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, ((TotalDuration * 2.0f) / FramesPerSecond), false);
+			}
 		}
-		else
-		{
-			DamagedTimer = PlayerConstants::DefaultInvincibleVisibilityDuration;
-			PlayerState->InvincibilityTimer = PlayerConstants::DefaultInvincibleTime;
-			GetCapsuleComponent()->SetCollisionProfileName("Invincible");
-			ResetPlayerState();
-		}
+	}
+}
+
+void APlayableCharacter::EnemyKnockback(AEnemy* OtherEnemy)
+{
+	if (OtherEnemy)
+	{
+		if (OtherEnemy->Direction == EEnemyDirection::Left)
+			ApplyImpulse(FVector(-300.0f, 0.0f, 400.0f));
+		else if (OtherEnemy->Direction == EEnemyDirection::Right)
+			ApplyImpulse(FVector(300.0f, 0.0f, 400.0f));
 	}
 }
 
@@ -593,6 +618,8 @@ UPaperFlipbook* APlayableCharacter::GetBatterFlipbook()
 	}
 	else if (PlayerState->State == EState::Roll)
 		flipbook = BatterRollFlipbook;
+	else if (PlayerState->State == EState::Hurt)
+		flipbook = BatterHurtFlipbook;
 	else if (PlayerState->State == EState::Idle)
 		flipbook = BatterIdleFlipbook;
 	else if (PlayerState->State == EState::Walking)

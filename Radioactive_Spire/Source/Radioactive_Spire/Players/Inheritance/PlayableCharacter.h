@@ -39,7 +39,8 @@ public:
 	UFUNCTION()
 	void ApplyImpulse(FVector impulse);
 
-	void HandleDamage(float damage);
+	void HandleDamage(float damage, AActor* OtherActor);
+	void EnemyKnockback(class AEnemy* OtherEnemy);
 	bool IsInvincible();
 	void NoGravity();
 	void SetGravity();
@@ -145,6 +146,8 @@ public:
 	class UPaperFlipbook* BatterGroundPoundFlipbook;//GROUND POUND
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
 	class UPaperFlipbook* BatterRollFlipbook;//ROLL
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterHurtFlipbook;//HURT
 
 	//Attacks
 	UPROPERTY(EditAnyWhere, Category = "Hitbox attack")
