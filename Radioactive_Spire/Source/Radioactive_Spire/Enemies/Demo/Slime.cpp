@@ -8,6 +8,7 @@
 
 #include "PaperFlipbook.h"
 #include "PaperFlipbookComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "../../Players/Inheritance/PlayableCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -42,8 +43,19 @@ void ASlime::ApplyStateChange(ESlimeState newState)
 
     ESlimeState old = State;
     State = newState;
+
     GetSprite()->SetVisibility(true);
     UpdateFlipbook();
+
+    if (State == ESlimeState::Attack)
+    {
+        if (GEngine)
+            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Attacking"));
+        float FramesPerSecond = FlipbookComponent->GetFlipbook()->GetFramesPerSecond();
+        float TotalDuration = FlipbookComponent->GetFlipbookLengthInFrames();
+
+        GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &ASlime::Attack, (TotalDuration - 1.0f) / FramesPerSecond, false);
+    }
 }
 
 void ASlime::OnOverlapBegin(UPrimitiveComponent* OverlapComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -86,7 +98,11 @@ void ASlime::Tick(float DeltaTime)
         if (player && player->IsPlayerControlled())
         {
             float dir = player->GetActorLocation().X - GetActorLocation().X;
-            AddMovementInput(FVector(1.0f, 0.0f, 0.0f), dir);
+            float distance = GetHorizontalDistanceTo(player);
+            if (distance < 100.0f)
+                AddMovementInput(FVector(1.0f, 0.0f, 0.0f), -dir);
+            else
+                AddMovementInput(FVector(1.0f, 0.0f, 0.0f), dir);
 
             if (GEngine)
                 GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Magenta, FString::SanitizeFloat(dir));
@@ -107,10 +123,7 @@ void ASlime::Tick(float DeltaTime)
     }
     else if (State == ESlimeState::Attack)
     {
-        float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
-        float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
-
-        GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &ASlime::Attack, ((TotalDuration - 1.0f) / 8.0f), false);
+        float RemainingTime = GetWorld()->GetTimerManager().GetTimerRemaining(AttackTimerHandle);
     }
     InvincibleTimer -= DeltaTime;
 }
