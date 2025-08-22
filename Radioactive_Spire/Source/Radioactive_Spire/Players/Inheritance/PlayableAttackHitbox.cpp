@@ -227,14 +227,14 @@ void APlayableAttackHitbox::InitializeHitbox()
 	else if (Name == TEXT("Batter_ComboOne"))
 	{
 		BoxComponent->SetBoxExtent(FVector(48.0f, 1.0f, 32.0f));
-		Knockback = FVector(100.0f * CheckDirectionOfHitbox(), 0.0f, 150.0f);
+		Knockback = FVector(200.0f * CheckDirectionOfHitbox(), 0.0f, 150.0f);
 
 		Tags.Add("Batter_proj");
 	}
 	else if (Name == TEXT("Batter_ComboTwo"))
 	{
 		BoxComponent->SetBoxExtent(FVector(64.0f, 1.0f, 48.0f));
-		Knockback = FVector(100.0f * CheckDirectionOfHitbox(), 0.0f, 150.0f);
+		Knockback = FVector(200.0f * CheckDirectionOfHitbox(), 0.0f, 150.0f);
 
 		Tags.Add("Batter_proj");
 	}
@@ -245,14 +245,14 @@ void APlayableAttackHitbox::InitializeHitbox()
 		loc.X += 24.0f;
 		FlipbookComponent->SetRelativeLocation(loc);
 		FlipbookComponent->SetRelativeScale3D(FVector(1.5f, 1.5f, 1.5f));
-		Knockback = FVector(200.0f * CheckDirectionOfHitbox(), 0.0f, 150.0f);
+		Knockback = FVector(400.0f * CheckDirectionOfHitbox(), 0.0f, 150.0f);
 
 		Tags.Add("Batter_proj");
 	}
 	else if (Name == TEXT("Batter_AirComboOne"))
 	{
 		BoxComponent->SetBoxExtent(FVector(48.0f, 1.0f, 32.0f));
-		Knockback = FVector(0.0f * CheckDirectionOfHitbox(), 0.0f, 150.0f);
+		Knockback = FVector(100.0f * CheckDirectionOfHitbox(), 0.0f, 150.0f);
 
 		Tags.Add("Batter_proj");
 		Tags.Add("Air");
