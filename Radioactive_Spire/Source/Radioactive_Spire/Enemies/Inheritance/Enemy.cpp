@@ -13,7 +13,8 @@ AEnemy::AEnemy() :
 	BoxComponent(nullptr),
 	FlipbookComponent(nullptr),
 	Direction(EEnemyDirection::Right),
-	InvincibleTimer(0.0f)
+	InvincibleTimer(0.0f),
+	Damage(0.0f)
 {
 	//GetCapsuleComponent() = CreateDefaultSubobject<UCapsuleComponent>("EnemyBoxComponent");
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);

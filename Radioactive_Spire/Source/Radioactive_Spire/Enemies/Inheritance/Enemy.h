@@ -42,4 +42,5 @@ public:
 	void CheckDirection();
 	EEnemyDirection Direction;
 	float InvincibleTimer;
+	float Damage;
 };

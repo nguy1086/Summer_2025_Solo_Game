@@ -63,7 +63,7 @@ namespace PlayerConstants
 
     constexpr int BatterMaxCombo = 4;
     constexpr int BatterMaxAirCombo = 1;
-    constexpr float BatterSpecialLifetime = 5.5f;
+    constexpr float BatterSpecialLifetime = 2.5f;
     constexpr int BatterSpecialMaxBounce = 2;
 
     //walk

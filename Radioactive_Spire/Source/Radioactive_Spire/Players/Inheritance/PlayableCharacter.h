@@ -60,7 +60,6 @@ protected:
 	void Landed(const FHitResult& Hit) override;
 
 	void UpdateFlipbook();
-
 private:
 	void Death();
 
