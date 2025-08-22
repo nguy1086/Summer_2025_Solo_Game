@@ -47,8 +47,6 @@ void ASlime::ApplyStateChange(ESlimeState newState)
 
     if (State == ESlimeState::Attack)
     {
-        if (GEngine)
-            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Attacking"));
         float FramesPerSecond = FlipbookComponent->GetFlipbook()->GetFramesPerSecond();
         float TotalDuration = FlipbookComponent->GetFlipbookLengthInFrames();
 
@@ -102,9 +100,6 @@ void ASlime::Tick(float DeltaTime)
             else
                 AddMovementInput(FVector(1.0f, 0.0f, 0.0f), dir);
 
-            if (GEngine)
-                GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Magenta, FString::SanitizeFloat(dir));
-
             CheckDirection();
         }
         AttackTimer -= DeltaTime;
@@ -151,9 +146,6 @@ void ASlime::Landed(const FHitResult& Hit)
 
 void ASlime::Attack()
 {
-    if (GEngine)
-        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Attack"));
-
     LaunchCharacter(FVector(200.0f * (Direction == EEnemyDirection::Left ? -1.0f : 1.0f), 0.0f, 300.0f), false, true);
     Tags.Add("EnemyHurtbox");
     FlipbookComponent->SetPlayRate(0.0f);

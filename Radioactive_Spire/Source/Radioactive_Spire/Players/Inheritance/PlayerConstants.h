@@ -83,7 +83,6 @@ namespace PlayerConstants
     constexpr float BatterJumpIncreasePerSegment = 0.0005f;
                     
     constexpr float BatterInvincibleTime = 1.5f;
-    constexpr float BatterInvincibleVisibilityDuration = 0.05f;
 
     //collision
     constexpr float BatterCapsuleRadius = 28.0f;

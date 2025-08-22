@@ -34,7 +34,7 @@ APlayableCharacter::APlayableCharacter() :
     PrimaryActorTick.bCanEverTick = true;
 
 	//InitializeType();
-
+	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
 	//DEBUG
 	GetCapsuleComponent()->SetHiddenInGame(false);
 
@@ -85,7 +85,6 @@ void APlayableCharacter::Tick(float DeltaTime)
 				{
 					PlayerState->InvincibilityTimer = 0.0f;
 					GetCapsuleComponent()->SetCollisionProfileName("Player");
-
 					GetSprite()->SetVisibility(true);
 				}
 				else
@@ -106,9 +105,6 @@ void APlayableCharacter::Tick(float DeltaTime)
 
 	if (CanDash > 0.0f)
 		CanDash -= DeltaTime;
-
-	//if (GEngine)
-	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("I-frames Timer: " + FString::SanitizeFloat(PlayerState->InvincibilityTimer)));
 }
 
 void APlayableCharacter::Duck()
@@ -385,14 +381,14 @@ void APlayableCharacter::HandleDamage(float damage, AActor* OtherActor)
 			if (Health <= 0)
 			{
 				DamagedTimer = PlayerConstants::DefaultInvincibleVisibilityDuration;
-				PlayerState->InvincibilityTimer = PlayerConstants::DefaultInvincibleTime;
+				PlayerState->InvincibilityTimer = GetInvincibilityTimer();
 				GetCapsuleComponent()->SetCollisionProfileName("Invincible");
 				Death();
 			}
 			else
 			{
 				DamagedTimer = PlayerConstants::DefaultInvincibleVisibilityDuration;
-				PlayerState->InvincibilityTimer = PlayerConstants::DefaultInvincibleTime;
+				PlayerState->InvincibilityTimer = GetInvincibilityTimer();
 				GetCapsuleComponent()->SetCollisionProfileName("Invincible");
 
 				DisableControls();
@@ -418,6 +414,16 @@ void APlayableCharacter::EnemyKnockback(AEnemy* OtherEnemy)
 		else if (OtherEnemy->Direction == EEnemyDirection::Right)
 			ApplyImpulse(FVector(300.0f, 0.0f, 400.0f));
 	}
+}
+
+float APlayableCharacter::GetInvincibilityTimer()
+{
+	float time = 0.0f;
+	if (Type == EPlayerType::Test)
+		time = PlayerConstants::DefaultInvincibleTime;
+	else if (Type == EPlayerType::Batter)
+		time = PlayerConstants::BatterInvincibleTime;
+	return time;
 }
 
 bool APlayableCharacter::IsInvincible()
@@ -727,7 +733,6 @@ void APlayableCharacter::ResetPlayerState()
 			ApplyStateChange(EState::Walking);
 
 		ComboNumber = 0;
-		PlayerState->InvincibilityTimer = 0.0f;
 		DuckSpecial = false;
 		GroundPound = false;
 

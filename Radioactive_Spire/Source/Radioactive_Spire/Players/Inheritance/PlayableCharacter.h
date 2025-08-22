@@ -41,6 +41,7 @@ public:
 
 	void HandleDamage(float damage, AActor* OtherActor);
 	void EnemyKnockback(class AEnemy* OtherEnemy);
+	float GetInvincibilityTimer();
 	bool IsInvincible();
 	void NoGravity();
 	void SetGravity();
