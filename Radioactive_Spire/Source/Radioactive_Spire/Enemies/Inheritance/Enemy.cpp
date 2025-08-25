@@ -56,3 +56,17 @@ void AEnemy::CheckDirection()
 		SetActorRotation(FRotator(0.0, 0.0f, 0.0f));
 	}
 }
+
+void AEnemy::ChangeDirection(EEnemyDirection dir)
+{
+	if (dir == EEnemyDirection::Left)
+	{
+		Direction = dir;
+		SetActorRotation(FRotator(0.0, 180.0f, 0.0f));
+	}
+	else if (dir == EEnemyDirection::Right)
+	{
+		Direction = dir;
+		SetActorRotation(FRotator(0.0, 0.0f, 0.0f));
+	}
+}

@@ -40,6 +40,7 @@ public:
 	virtual void UpdateFlipbook() {};
 
 	void CheckDirection();
+	void ChangeDirection(EEnemyDirection dir);
 	EEnemyDirection Direction;
 	float InvincibleTimer;
 	float Damage;

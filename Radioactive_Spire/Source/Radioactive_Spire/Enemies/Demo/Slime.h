@@ -11,7 +11,7 @@ enum class ESlimeState : uint8
 {
 	Attack	UMETA(DisplayName = "Attack"),
 	Hurt	UMETA(DisplayName = "Hurt"),
-	Idle	UMETA(DisplayName = "Idle")
+	Walk	UMETA(DisplayName = "Walk")
 };
 /**
  * 

@@ -15,7 +15,7 @@
 
 ASlime::ASlime() :
     AttackTimer(AttackMax),
-    State(ESlimeState::Idle)
+    State(ESlimeState::Walk)
 {
     PrimaryActorTick.bCanEverTick = true;
 
@@ -67,7 +67,7 @@ void ASlime::OnOverlapBegin(UPrimitiveComponent* OverlapComponent, AActor* Other
 void ASlime::UpdateFlipbook()
 {
     UPaperFlipbook* flipbook = nullptr;
-    if (State == ESlimeState::Idle)
+    if (State == ESlimeState::Walk)
         flipbook = IdleFlipbook;
     else if (State == ESlimeState::Hurt)
         flipbook = HurtFlipbook;
@@ -88,8 +88,13 @@ void ASlime::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    if (State == ESlimeState::Idle)
+    if (State == ESlimeState::Walk)
     {
+
+        // timer
+        // checks distance
+
+
         APlayableCharacter* player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
         if (player && player->IsPlayerControlled())
         {
@@ -97,16 +102,23 @@ void ASlime::Tick(float DeltaTime)
             float distance = GetHorizontalDistanceTo(player);
             if (distance < 100.0f)
                 AddMovementInput(FVector(1.0f, 0.0f, 0.0f), -dir);
+            else if (distance < 105.0f)
+            {
+                if (dir > 0.0f)
+                    Direction = EEnemyDirection::Right;
+                else
+                    Direction = EEnemyDirection::Left;
+            }
             else
                 AddMovementInput(FVector(1.0f, 0.0f, 0.0f), dir);
 
-            CheckDirection();
+            ChangeDirection(Direction);
         }
         AttackTimer -= DeltaTime;
         if (AttackTimer < 0.0f)
         {
             float distance = GetHorizontalDistanceTo(player);
-            if (distance < 100.0f)
+            if (distance < 105.0f)
                 ApplyStateChange(ESlimeState::Attack);
         }
     }
@@ -141,7 +153,7 @@ void ASlime::Landed(const FHitResult& Hit)
 {
     Super::Landed(Hit);
 
-    ApplyStateChange(ESlimeState::Idle);
+    ApplyStateChange(ESlimeState::Walk);
 }
 
 void ASlime::Attack()
