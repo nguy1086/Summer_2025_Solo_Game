@@ -268,6 +268,20 @@ void APlayableCharacter::Special()
 	}
 }
 
+void APlayableCharacter::SuperAttack()
+{
+	if (Stats_Super >= Stats_MaxSuper)
+	{
+		if (Type == EPlayerType::Batter)
+		{
+			if (AttackHitboxTemplate)
+			{
+
+			}
+		}
+	}
+}
+
 void APlayableCharacter::Roll()
 {
 	if (PlayerState->IsOnGround && CanDash <= 0.0f)
@@ -377,8 +391,8 @@ void APlayableCharacter::HandleDamage(float damage, AActor* OtherActor)
 	{
 		if (PlayerState && !IsInvincible())
 		{
-			Health -= damage;
-			if (Health <= 0)
+			Stats_Health -= damage;
+			if (Stats_Health <= 0)
 			{
 				DamagedTimer = PlayerConstants::DefaultInvincibleVisibilityDuration;
 				PlayerState->InvincibilityTimer = GetInvincibilityTimer();
@@ -647,8 +661,8 @@ void APlayableCharacter::InitializeType()
 {
 	if (Type == EPlayerType::Test)
 	{
-		Health = PlayerConstants::DefaultHealth;
-		MaxHealth = PlayerConstants::DefaultHealth;
+		Stats_Health = PlayerConstants::DefaultHealth;
+		Stats_MaxHealth = PlayerConstants::DefaultHealth;
 		//collision
 		GetCapsuleComponent()->SetCollisionProfileName("Player");
 		GetCapsuleComponent()->SetCapsuleRadius(PlayerConstants::DefaultCapsuleRadius);
@@ -676,8 +690,8 @@ void APlayableCharacter::InitializeType()
 	}
 	else if (Type == EPlayerType::Batter)
 	{
-		Health = PlayerConstants::BatterHealth;
-		MaxHealth = PlayerConstants::BatterHealth;
+		Stats_Health = PlayerConstants::BatterHealth;
+		Stats_MaxHealth = PlayerConstants::BatterHealth;
 		//collision
 		GetCapsuleComponent()->SetCollisionProfileName("Player");
 		GetCapsuleComponent()->SetCapsuleRadius(PlayerConstants::BatterCapsuleRadius);

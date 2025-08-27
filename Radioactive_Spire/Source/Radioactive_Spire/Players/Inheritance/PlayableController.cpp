@@ -78,6 +78,10 @@ void APlayableController::SetupInputComponent()
 
 		EnhancedInputComponent->BindAction(RollInputAction, ETriggerEvent::Started, this, &APlayableController::OnRollPressed);
 
+		EnhancedInputComponent->BindAction(SuperInputAction, ETriggerEvent::Started, this, &APlayableController::OnRollPressed);
+
+		EnhancedInputComponent->BindAction(PauseInputAction, ETriggerEvent::Started, this, &APlayableController::OnRollPressed);
+
 		//EnhancedInputComponent->BindAction(UpInputAction, ETriggerEvent::Started, this, &APlayableController::OnUpPressed);
 	}
 }
@@ -263,6 +267,16 @@ void APlayableController::OnRollPressed(const FInputActionValue& Value)
 
 	//if (GEngine)
 	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Roll!"));
+}
+
+void APlayableController::OnSuperPressed(const FInputActionValue& Value)
+{
+	if (PlayablePlayer != nullptr)
+		PlayablePlayer->SuperAttack();
+}
+
+void APlayableController::OnPausePressed(const FInputActionValue& Value)
+{
 }
 
 //void APlayableController::OnUpPressed(const FInputActionValue& Value)

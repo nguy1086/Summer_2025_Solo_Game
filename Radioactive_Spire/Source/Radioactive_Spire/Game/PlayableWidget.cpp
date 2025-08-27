@@ -42,7 +42,7 @@ bool UPlayableWidget::Initialize()
     if (Bar)
     {
         Bar->SetPercent(1.0f);
-        Bar->SetFillColorAndOpacity(FLinearColor::Yellow);
+        Bar->SetFillColorAndOpacity(FLinearColor(0.99f, 0.815f, 0.09f, 1.0f));
     }
 
 
@@ -65,7 +65,7 @@ void UPlayableWidget::UpdateHealth()
     APlayableCharacter* Player = Cast<APlayableCharacter>(playerPawn);
     if (Player)
     {
-        FString Value = FString::Printf(TEXT("%d / %d"), (int)Player->Health, (int)Player->MaxHealth);
+        FString Value = FString::Printf(TEXT("%d / %d"), (int)Player->Stats_Health, (int)Player->Stats_MaxHealth);
         UTextBlock* Widget = Cast<UTextBlock>(GetWidgetFromName("HealthText"));
         if (Widget != nullptr)
             Widget->SetText(FText::FromString(Value));
@@ -73,18 +73,36 @@ void UPlayableWidget::UpdateHealth()
         UProgressBar* Bar = Cast<UProgressBar>(GetWidgetFromName("HealthBar"));
         if (Bar != nullptr)
         {
-            Bar->SetPercent((Player->Health / Player->MaxHealth));
+            Bar->SetPercent((Player->Stats_Health / Player->Stats_MaxHealth));
             if (Player->Type == EPlayerType::Batter)
                 Bar->SetFillColorAndOpacity(FLinearColor(0.37f, 0.0f, 0.63f, 1.0f));
         }
-
-
-            
     }
 }
 
 void UPlayableWidget::UpdateSuper()
 {
+    AController* pController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+    APawn* playerPawn = pController->GetPawn();
+    APlayableCharacter* Player = Cast<APlayableCharacter>(playerPawn);
+    if (Player)
+    {
+        FString Value = FString::Printf(TEXT("%d / %d"), (int)Player->Stats_Super, (int)Player->Stats_MaxSuper);
+        UTextBlock* Widget = Cast<UTextBlock>(GetWidgetFromName("SuperText"));
+        if (Widget != nullptr)
+        {
+            if (Value == TEXT("1"))
+                Widget->SetText(FText::FromString("SUPER"));
+            else
+                Widget->SetText(FText::FromString(Value));
+        }
+
+        UProgressBar* Bar = Cast<UProgressBar>(GetWidgetFromName("SuperBar"));
+        if (Bar != nullptr)
+        {
+            Bar->SetPercent((Player->Stats_Super / Player->Stats_MaxSuper));
+        }
+    }
 }
 
 void UPlayableWidget::DisplayGameOver()

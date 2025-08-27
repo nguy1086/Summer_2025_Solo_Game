@@ -31,6 +31,7 @@ public:
 
 	void Attack();
 	void Special();
+	void SuperAttack();
 
 	void Roll();
 
@@ -48,10 +49,16 @@ public:
 	void ZeroVelocity();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-	float Health = PlayerConstants::DefaultHealth;
+	float Stats_Health = PlayerConstants::DefaultHealth;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-	float MaxHealth = PlayerConstants::DefaultHealth;
+	float Stats_MaxHealth = PlayerConstants::DefaultHealth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float Stats_Super = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float Stats_MaxSuper = PlayerConstants::DefaultMaxSuper;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	EPlayerType Type;
@@ -149,6 +156,9 @@ public:
 	class UPaperFlipbook* BatterRollFlipbook;//ROLL
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
 	class UPaperFlipbook* BatterHurtFlipbook;//HURT
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterSuperFlipbook;//SUPER
 
 	//Attacks
 	UPROPERTY(EditAnyWhere, Category = "Hitbox attack")

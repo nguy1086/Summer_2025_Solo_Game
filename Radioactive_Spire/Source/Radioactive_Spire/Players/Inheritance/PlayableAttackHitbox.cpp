@@ -60,6 +60,7 @@ void APlayableAttackHitbox::OnOverlapBegin(UPrimitiveComponent* OverlapComponent
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Hit! Damage: " + FString::FromInt(Damage)) );
 
 		enemy->OnDamaged(Damage);
+		ChargeSuper();
 
 		if (ActorHasTag("Baseball"))
 			Destroy();
@@ -314,6 +315,15 @@ float APlayableAttackHitbox::CheckDirectionOfHitbox()
 		return 1.0f;
 	
 	return 0.0f;
+}
+
+void APlayableAttackHitbox::ChargeSuper()
+{
+	APlayableCharacter* player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
+	if (player->Type == EPlayerType::Test)
+		player->Stats_Super += Damage * PlayerConstants::DefaultSuperChargeRate;
+	else if (player->Type == EPlayerType::Batter)
+		player->Stats_Super += Damage * PlayerConstants::BatterSuperChargeRate;
 }
 
 // Called every frame

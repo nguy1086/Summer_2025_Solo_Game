@@ -18,6 +18,7 @@ enum class EState : uint8
 	Special		UMETA(DisplayName = "Special"),
 	Roll		UMETA(DisplayName = "Roll"),
 	Hurt		UMETA(DisplayName = "Hurt"),
+	Super		UMETA(DisplayName = "Super"),
 	Dead		UMETA(DisplayName = "Dead"),
 };
 

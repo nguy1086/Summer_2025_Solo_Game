@@ -61,6 +61,8 @@ protected:
 
 	float CheckDirectionOfHitbox();
 
+	void ChargeSuper();
+
 private:
 	bool IsProjectile;
 	float Timer;

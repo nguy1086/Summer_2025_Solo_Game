@@ -9,7 +9,9 @@ namespace PlayerConstants
 
     //stats
     constexpr float DefaultHealth = 100.0f;
+    constexpr float DefaultMaxSuper = 100.0f;
     constexpr float DefaultDamage = 50.0f;
+    constexpr float DefaultSuperChargeRate = 0.1f;
 
     //walk
     constexpr float DefaultGroundFriction = 3.5f;
@@ -45,6 +47,7 @@ namespace PlayerConstants
 
     //stats
     constexpr float BatterHealth = 250.0f;
+    constexpr float BatterSuperChargeRate = 0.075f;
 
     constexpr float BatterSpecialAttackDamage = 10.0f;
     constexpr float BatterSpecialMaxAttackDamage = 125.0f;
