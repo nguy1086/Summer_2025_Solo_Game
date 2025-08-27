@@ -6,6 +6,7 @@
 #include "../../Game/GameConstants.h"
 #include "Camera/CameraComponent.h"
 #include "Components/SphereComponent.h"
+#include "PaperTileMapActor.h"
 
 APlayerCamera::APlayerCamera() :
 	Camera(nullptr),
@@ -54,7 +55,7 @@ void APlayerCamera::Tick(float DeltaTime)
 		FVector cameraLocation = Camera->GetComponentLocation();
 
 		// set the X value  FInterpTO MOVES THE X CAMERA
-		cameraLocation.X = FMath::FInterpTo(cameraLocation.X, playerLocation.X, DeltaTime, 8.0f) + ShakeOffset.X;
+		cameraLocation.X = FMath::FInterpTo(cameraLocation.X, 500.0f/*playerLocation.X*/, DeltaTime, 8.0f) + ShakeOffset.X;
 
 		cameraLocation.Y = FMath::FInterpTo(cameraLocation.Y, playerLocation.Y, DeltaTime, 8.0f) + GameConstants::CameraDepthY;
 
@@ -62,7 +63,10 @@ void APlayerCamera::Tick(float DeltaTime)
 		cameraLocation.Z = InitialLocation.Z + GameConstants::CameraZOffset + ShakeOffset.Z;
 
 		// set the camera location
-		Camera->SetWorldLocation(FVector(cameraLocation.X, Camera->GetComponentLocation().Y, cameraLocation.Z));
+		Camera->SetWorldLocation(cameraLocation);
+
+		if (LevelBackground)
+			LevelBackground->SetActorLocation(FVector(cameraLocation.X - 820.0f, cameraLocation.Y - 1640.0f, cameraLocation.Z + 1840.0f));
 	}
 }
 

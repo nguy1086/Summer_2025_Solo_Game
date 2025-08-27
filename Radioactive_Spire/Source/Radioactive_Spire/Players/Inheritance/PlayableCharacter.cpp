@@ -28,8 +28,8 @@ APlayableCharacter::APlayableCharacter() :
 	PlayableController(nullptr),
 	DamagedTimer(0.0f),
 	GroundPound(false),
-	DuckSpecial(false),
-	CanDash(0.0f)
+	CanDash(0.0f),
+	DuckSpecial(false)
 {
     PrimaryActorTick.bCanEverTick = true;
 

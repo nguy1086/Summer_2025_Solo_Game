@@ -44,4 +44,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Death Templates")
 	TSubclassOf<class ADeadActor> DeadBatterTemplate;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level Templates")
+	TSubclassOf<class APaperTileMapActor> RedDesertLevel;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level Templates")
+	TSubclassOf<class APaperTileMapActor> RedDesertSky;
 };

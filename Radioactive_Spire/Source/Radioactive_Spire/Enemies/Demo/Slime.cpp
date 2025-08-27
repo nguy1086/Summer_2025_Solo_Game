@@ -90,18 +90,15 @@ void ASlime::Tick(float DeltaTime)
 
     if (State == ESlimeState::Walk)
     {
-
-        // timer
-        // checks distance
-
-
         APlayableCharacter* player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
         if (player && player->IsPlayerControlled())
         {
             float dir = player->GetActorLocation().X - GetActorLocation().X;
             float distance = GetHorizontalDistanceTo(player);
-            if (distance < 100.0f)
+            if (distance < 100.0f){
                 AddMovementInput(FVector(1.0f, 0.0f, 0.0f), -dir);
+                CheckDirection();
+            }
             else if (distance < 105.0f)
             {
                 if (dir > 0.0f)
@@ -109,8 +106,10 @@ void ASlime::Tick(float DeltaTime)
                 else
                     Direction = EEnemyDirection::Left;
             }
-            else
+            else {
                 AddMovementInput(FVector(1.0f, 0.0f, 0.0f), dir);
+                CheckDirection();
+            }
 
             ChangeDirection(Direction);
         }

@@ -23,6 +23,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess), Category = "Components")
 	class USphereComponent* SphereComponent;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Background")
+	class APaperTileMapActor* LevelBackground;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
