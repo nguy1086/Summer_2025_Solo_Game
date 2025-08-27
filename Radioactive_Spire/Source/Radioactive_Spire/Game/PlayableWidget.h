@@ -23,7 +23,13 @@ public:
 	void UpdateSuper();
 	void UpdatePause();
 	void DisplayGameOver();
-private:
-	TArray<class UButton*> PauseButtons;
-	int PauseIncrement = 0;;
+
+	UFUNCTION()
+	void OnResume();
+	UFUNCTION()
+	void OnOptions();
+	UFUNCTION()
+	void OnRetry();
+	UFUNCTION()
+	void OnQuit();
 };

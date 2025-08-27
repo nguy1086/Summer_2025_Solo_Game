@@ -11,6 +11,7 @@
 #include "RadioactiveSpire_GameStateBase.h"
 #include "../Players/Inheritance/PlayableCharacter.h"
 #include "../Players/Inheritance/PlayableCharacterState.h"
+#include "../Players/Inheritance/PlayableController.h"
 #include "Input/ReplyBase.h"
 
 bool UPlayableWidget::Initialize()
@@ -57,20 +58,31 @@ bool UPlayableWidget::Initialize()
 
     UButton* Button = Cast<UButton>(GetWidgetFromName("Resume"));
     if (Button)
+    {
         Button->SetVisibility(ESlateVisibility::Hidden);
-    PauseButtons.Add(Button);
+        Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnResume);
+    }
+
     Button = Cast<UButton>(GetWidgetFromName("Retry"));
     if (Button)
+    {
         Button->SetVisibility(ESlateVisibility::Hidden);
-    PauseButtons.Add(Button);
+        Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnRetry);
+    }
     Button = Cast<UButton>(GetWidgetFromName("Options"));
     if (Button)
+    {
         Button->SetVisibility(ESlateVisibility::Hidden);
-    PauseButtons.Add(Button);
+        Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnOptions);
+    }
+
     Button = Cast<UButton>(GetWidgetFromName("Quit"));
     if (Button)
+    {
         Button->SetVisibility(ESlateVisibility::Hidden);
-    PauseButtons.Add(Button);
+        Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnQuit);
+    }
+
 
     return true;
 }
@@ -81,7 +93,7 @@ void UPlayableWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
     UpdateHealth();
     UpdateSuper();
-    //UpdatePause();
+    UpdatePause();
     DisplayGameOver();
 }
 
@@ -184,8 +196,6 @@ void UPlayableWidget::UpdatePause()
         Button = Cast<UButton>(GetWidgetFromName("Quit"));
         if (Button)
             Button->SetVisibility(ESlateVisibility::Visible);
-
-        PauseButtons[PauseIncrement]->IsHovered();
     }
     else if (GameModeBase && !GameModeBase->Game_IsPaused)
     {
@@ -241,4 +251,26 @@ void UPlayableWidget::UpdatePause()
 
 void UPlayableWidget::DisplayGameOver()
 {
+}
+
+void UPlayableWidget::OnResume()
+{
+    ARadioactiveSpire_GameModeBase* gameMode = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
+    gameMode->GamePause();
+}
+
+void UPlayableWidget::OnOptions()
+{
+}
+
+void UPlayableWidget::OnRetry()
+{
+    UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
+}
+
+void UPlayableWidget::OnQuit()
+{
+    APlayableCharacter* player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
+    APlayableController* PlayableController = Cast<APlayableController>(player->GetController());
+    UKismetSystemLibrary::QuitGame(GetWorld(), PlayableController, EQuitPreference::Quit, true);
 }

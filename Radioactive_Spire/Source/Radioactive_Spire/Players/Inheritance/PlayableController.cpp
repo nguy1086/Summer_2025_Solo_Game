@@ -38,6 +38,7 @@ void APlayableController::BeginPlay()
 	{
 		GameInfoWidget = CreateWidget<UPlayableWidget>(this, GameInfoBP);
 		GameInfoWidget->AddToViewport();
+		GameInfoWidget->bIsFocusable = true;
 		GameInfoWidget->SetKeyboardFocus();
 	}
 	GameModeBase = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
@@ -308,10 +309,7 @@ void APlayableController::OnSuperPressed(const FInputActionValue& Value)
 void APlayableController::OnPausePressed(const FInputActionValue& Value)
 {
 	if (GameModeBase != nullptr)
-	{
 		GameModeBase->GamePause();
-		GameInfoWidget->UpdatePause();
-	}
 }
 
 //void APlayableController::OnUpPressed(const FInputActionValue& Value)
