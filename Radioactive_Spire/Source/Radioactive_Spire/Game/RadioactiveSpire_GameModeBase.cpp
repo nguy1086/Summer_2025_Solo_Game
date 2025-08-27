@@ -22,7 +22,7 @@
 #include "PaperTileMapComponent.h"
 #include "PaperTileMapActor.h"
 #include "PaperTileMap.h"
-#include "PaperCharacter.h"
+#include "../Enemies/Inheritance/Enemy.h"
 
 #include "NavMesh/NavMeshBoundsVolume.h"
 #include "Components/BrushComponent.h"
@@ -194,10 +194,10 @@ void ARadioactiveSpire_GameModeBase::BlackenActors()
 	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
 		AActor* actor = *ActorItr;
-		APaperCharacter* character = Cast<APaperCharacter>(actor);
+		AEnemy* enemy = Cast<AEnemy>(actor);
 		APaperTileMapActor* tilemap = Cast< APaperTileMapActor>(actor);
-		if (character && !character->ActorHasTag("Player"))
-			character->GetSprite()->SetSpriteColor(FLinearColor(0.2f, 0.2f, 0.2f, 0.5f));
+		if (enemy)
+			enemy->FlipbookComponent->SetSpriteColor(FLinearColor(0.2f, 0.2f, 0.2f, 0.5f));
 		else if (tilemap)
 			tilemap->SetActorHiddenInGame(true);
 
@@ -209,10 +209,10 @@ void ARadioactiveSpire_GameModeBase::UnblackenActors()
 	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
 		AActor* actor = *ActorItr;
-		APaperCharacter* character = Cast<APaperCharacter>(actor);
+		AEnemy* enemy = Cast<AEnemy>(actor);
 		APaperTileMapActor* tilemap = Cast< APaperTileMapActor>(actor);
-		if (character && !character->ActorHasTag("Player"))
-			character->GetSprite()->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 1.0f));
+		if (enemy)
+			enemy->FlipbookComponent->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 1.0f));
 		else if (tilemap)
 			tilemap->SetActorHiddenInGame(false);
 	}
