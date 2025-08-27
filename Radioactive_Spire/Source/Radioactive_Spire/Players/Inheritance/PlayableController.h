@@ -94,6 +94,7 @@ protected:
 
 private:
 	class APlayableCharacter* PlayablePlayer;
+	class ARadioactiveSpire_GameModeBase* GameModeBase;
 	class APlayableCharacterState* PlayablePlayerState;
 	class UEnhancedInputLocalPlayerSubsystem* InputSubsystem;
 };

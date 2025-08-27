@@ -4,12 +4,11 @@
 #include "PlayableController.h"
 #include "PlayableCharacter.h"
 #include "PlayableCharacterState.h"
-//#include "PlatformerGameModeBase.h"
-//#include "PlatformerGameStateBase.h"
 #include "InputAction.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "../../Game/PlayableWidget.h"
+#include "../../Game/RadioactiveSpire_GameModeBase.h"
 
 
 APlayableController::APlayableController() :
@@ -40,6 +39,7 @@ void APlayableController::BeginPlay()
 		GameInfoWidget = CreateWidget<UPlayableWidget>(this, GameInfoBP);
 		GameInfoWidget->AddToViewport();
 	}
+	GameModeBase = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
 }
 
 void APlayableController::OnPossess(APawn* aPawn)
@@ -279,6 +279,8 @@ void APlayableController::OnSuperPressed(const FInputActionValue& Value)
 
 void APlayableController::OnPausePressed(const FInputActionValue& Value)
 {
+	if (GameModeBase != nullptr)
+		GameModeBase->GamePause();
 }
 
 //void APlayableController::OnUpPressed(const FInputActionValue& Value)

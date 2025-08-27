@@ -32,6 +32,9 @@ public:
 
 	void SuperAttackPause(float timer);
 
+	void GamePause();
+	bool Game_IsPaused;
+
 private:
 	void SpawnDeathAnimation(FVector location);
 

@@ -5,6 +5,7 @@
 #include "Components/TextBlock.h"
 #include "Components/ProgressBar.h"
 #include "Components/Button.h"
+#include "Components/Image.h"
 #include "Kismet/GameplayStatics.h"
 #include "RadioactiveSpire_GameModeBase.h"
 #include "RadioactiveSpire_GameStateBase.h"
@@ -45,6 +46,14 @@ bool UPlayableWidget::Initialize()
         Bar->SetFillColorAndOpacity(FLinearColor(0.99f, 0.815f, 0.09f, 1.0f));
     }
 
+    UImage* Image = Cast<UImage>(GetWidgetFromName("InGameUI"));
+    if (Image)
+        Image->SetVisibility(ESlateVisibility::Visible);
+
+    Image = Cast<UImage>(GetWidgetFromName("PauseScreen"));
+    if (Image)
+        Image->SetVisibility(ESlateVisibility::Hidden);
+
 
     return true;
 }
@@ -55,6 +64,7 @@ void UPlayableWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
     UpdateHealth();
     UpdateSuper();
+    UpdatePause();
     DisplayGameOver();
 }
 
@@ -102,6 +112,79 @@ void UPlayableWidget::UpdateSuper()
         {
             Bar->SetPercent((Player->Stats_Super / Player->Stats_MaxSuper));
         }
+    }
+}
+
+void UPlayableWidget::UpdatePause()
+{
+    ARadioactiveSpire_GameModeBase* GameModeBase = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
+    if (GameModeBase && GameModeBase->Game_IsPaused)
+    {
+        UTextBlock* Widget = Cast<UTextBlock>(GetWidgetFromName("HealthText"));
+        if (Widget)
+            Widget->SetVisibility(ESlateVisibility::Hidden);
+        Widget = Cast<UTextBlock>(GetWidgetFromName("SuperText"));
+        if (Widget)
+            Widget->SetVisibility(ESlateVisibility::Hidden);
+        Widget = Cast<UTextBlock>(GetWidgetFromName("EnemiesLeftText"));
+        if (Widget)
+            Widget->SetVisibility(ESlateVisibility::Hidden);
+        Widget = Cast<UTextBlock>(GetWidgetFromName("EnemiesLeftNumber"));
+        if (Widget)
+            Widget->SetVisibility(ESlateVisibility::Hidden);
+        Widget = Cast<UTextBlock>(GetWidgetFromName("LocationText"));
+        if (Widget)
+            Widget->SetVisibility(ESlateVisibility::Hidden);
+        Widget = Cast<UTextBlock>(GetWidgetFromName("LocationWorld"));
+        if (Widget)
+            Widget->SetVisibility(ESlateVisibility::Hidden);
+        UProgressBar* Bar = Cast<UProgressBar>(GetWidgetFromName("HealthBar"));
+        if (Bar)
+            Bar->SetVisibility(ESlateVisibility::Hidden);
+        Bar = Cast<UProgressBar>(GetWidgetFromName("SuperBar"));
+        if (Bar)
+            Bar->SetVisibility(ESlateVisibility::Hidden);
+        UImage* Image = Cast<UImage>(GetWidgetFromName("InGameUI"));
+        if (Image)
+            Image->SetVisibility(ESlateVisibility::Hidden);
+        //-----------------------------------------------------------------------
+        Image = Cast<UImage>(GetWidgetFromName("PauseScreen"));
+        if (Image)
+            Image->SetVisibility(ESlateVisibility::Visible);
+    }
+    else if (GameModeBase && !GameModeBase->Game_IsPaused)
+    {
+        UTextBlock* Widget = Cast<UTextBlock>(GetWidgetFromName("HealthText"));
+        if (Widget)
+            Widget->SetVisibility(ESlateVisibility::Visible);
+        Widget = Cast<UTextBlock>(GetWidgetFromName("SuperText"));
+        if (Widget)
+            Widget->SetVisibility(ESlateVisibility::Visible);
+        Widget = Cast<UTextBlock>(GetWidgetFromName("EnemiesLeftText"));
+        if (Widget)
+            Widget->SetVisibility(ESlateVisibility::Visible);
+        Widget = Cast<UTextBlock>(GetWidgetFromName("EnemiesLeftNumber"));
+        if (Widget)
+            Widget->SetVisibility(ESlateVisibility::Visible);
+        Widget = Cast<UTextBlock>(GetWidgetFromName("LocationText"));
+        if (Widget)
+            Widget->SetVisibility(ESlateVisibility::Visible);
+        Widget = Cast<UTextBlock>(GetWidgetFromName("LocationWorld"));
+        if (Widget)
+            Widget->SetVisibility(ESlateVisibility::Visible);
+        UProgressBar* Bar = Cast<UProgressBar>(GetWidgetFromName("HealthBar"));
+        if (Bar)
+            Bar->SetVisibility(ESlateVisibility::Visible);
+        Bar = Cast<UProgressBar>(GetWidgetFromName("SuperBar"));
+        if (Bar)
+            Bar->SetVisibility(ESlateVisibility::Visible);
+        UImage* Image = Cast<UImage>(GetWidgetFromName("InGameUI"));
+        if (Image)
+            Image->SetVisibility(ESlateVisibility::Visible);
+        //-----------------------------------------------------------------------
+        Image = Cast<UImage>(GetWidgetFromName("PauseScreen"));
+        if (Image)
+            Image->SetVisibility(ESlateVisibility::Hidden);
     }
 }
 

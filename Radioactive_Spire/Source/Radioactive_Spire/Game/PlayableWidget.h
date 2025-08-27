@@ -21,5 +21,6 @@ class RADIOACTIVE_SPIRE_API UPlayableWidget : public UUserWidget
 public:
 	void UpdateHealth();
 	void UpdateSuper();
+	void UpdatePause();
 	void DisplayGameOver();
 };

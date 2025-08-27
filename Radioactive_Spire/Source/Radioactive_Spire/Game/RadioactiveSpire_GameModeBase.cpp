@@ -29,8 +29,9 @@
 
 
 ARadioactiveSpire_GameModeBase::ARadioactiveSpire_GameModeBase() :
-    Camera(nullptr),
-	SuperPauseTimer(0.0f)
+	Camera(nullptr),
+	SuperPauseTimer(0.0f),
+	Game_IsPaused(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -116,6 +117,28 @@ void ARadioactiveSpire_GameModeBase::SuperAttackPause(float timer)
 	CustomTimeDilation = 1.0f;
 	BlackenActors();
 	SuperPauseTimer = timer;
+}
+
+void ARadioactiveSpire_GameModeBase::GamePause()
+{
+	if (Game_IsPaused)
+	{
+		Game_IsPaused = false;
+		UnpauseActors();
+	}
+	else if (!Game_IsPaused)
+	{
+		Game_IsPaused = true;
+		for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+		{
+			AActor* actor = *ActorItr;
+			actor->CustomTimeDilation = 0.0f;
+
+			if (actor->ActorHasTag("Controller"))
+				actor->CustomTimeDilation = 1.0f;
+		}
+		Camera->CustomTimeDilation = 1.0f;
+	}
 }
 
 void ARadioactiveSpire_GameModeBase::SpawnDeathAnimation(FVector location)
