@@ -11,6 +11,7 @@
 #include "RadioactiveSpire_GameStateBase.h"
 #include "../Players/Inheritance/PlayableCharacter.h"
 #include "../Players/Inheritance/PlayableCharacterState.h"
+#include "Input/ReplyBase.h"
 
 bool UPlayableWidget::Initialize()
 {
@@ -49,11 +50,27 @@ bool UPlayableWidget::Initialize()
     UImage* Image = Cast<UImage>(GetWidgetFromName("InGameUI"));
     if (Image)
         Image->SetVisibility(ESlateVisibility::Visible);
-
+    //--------------------------------------------------------------
     Image = Cast<UImage>(GetWidgetFromName("PauseScreen"));
     if (Image)
         Image->SetVisibility(ESlateVisibility::Hidden);
 
+    UButton* Button = Cast<UButton>(GetWidgetFromName("Resume"));
+    if (Button)
+        Button->SetVisibility(ESlateVisibility::Hidden);
+    PauseButtons.Add(Button);
+    Button = Cast<UButton>(GetWidgetFromName("Retry"));
+    if (Button)
+        Button->SetVisibility(ESlateVisibility::Hidden);
+    PauseButtons.Add(Button);
+    Button = Cast<UButton>(GetWidgetFromName("Options"));
+    if (Button)
+        Button->SetVisibility(ESlateVisibility::Hidden);
+    PauseButtons.Add(Button);
+    Button = Cast<UButton>(GetWidgetFromName("Quit"));
+    if (Button)
+        Button->SetVisibility(ESlateVisibility::Hidden);
+    PauseButtons.Add(Button);
 
     return true;
 }
@@ -64,7 +81,7 @@ void UPlayableWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
     UpdateHealth();
     UpdateSuper();
-    UpdatePause();
+    //UpdatePause();
     DisplayGameOver();
 }
 
@@ -151,6 +168,24 @@ void UPlayableWidget::UpdatePause()
         Image = Cast<UImage>(GetWidgetFromName("PauseScreen"));
         if (Image)
             Image->SetVisibility(ESlateVisibility::Visible);
+
+        UButton* Button = Cast<UButton>(GetWidgetFromName("Resume"));
+        if (Button)
+            Button->SetVisibility(ESlateVisibility::Visible);
+
+        Button = Cast<UButton>(GetWidgetFromName("Retry"));
+        if (Button)
+            Button->SetVisibility(ESlateVisibility::Visible);
+
+        Button = Cast<UButton>(GetWidgetFromName("Options"));
+        if (Button)
+            Button->SetVisibility(ESlateVisibility::Visible);
+
+        Button = Cast<UButton>(GetWidgetFromName("Quit"));
+        if (Button)
+            Button->SetVisibility(ESlateVisibility::Visible);
+
+        PauseButtons[PauseIncrement]->IsHovered();
     }
     else if (GameModeBase && !GameModeBase->Game_IsPaused)
     {
@@ -185,6 +220,22 @@ void UPlayableWidget::UpdatePause()
         Image = Cast<UImage>(GetWidgetFromName("PauseScreen"));
         if (Image)
             Image->SetVisibility(ESlateVisibility::Hidden);
+
+        UButton* Button = Cast<UButton>(GetWidgetFromName("Resume"));
+        if (Button)
+            Button->SetVisibility(ESlateVisibility::Hidden);
+
+        Button = Cast<UButton>(GetWidgetFromName("Retry"));
+        if (Button)
+            Button->SetVisibility(ESlateVisibility::Hidden);
+
+        Button = Cast<UButton>(GetWidgetFromName("Options"));
+        if (Button)
+            Button->SetVisibility(ESlateVisibility::Hidden);
+
+        Button = Cast<UButton>(GetWidgetFromName("Quit"));
+        if (Button)
+            Button->SetVisibility(ESlateVisibility::Hidden);
     }
 }
 

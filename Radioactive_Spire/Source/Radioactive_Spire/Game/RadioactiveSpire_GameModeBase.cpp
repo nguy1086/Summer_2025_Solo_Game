@@ -26,7 +26,7 @@
 
 #include "NavMesh/NavMeshBoundsVolume.h"
 #include "Components/BrushComponent.h"
-
+#include "Kismet/GameplayStatics.h"
 
 ARadioactiveSpire_GameModeBase::ARadioactiveSpire_GameModeBase() :
 	Camera(nullptr),
@@ -125,6 +125,9 @@ void ARadioactiveSpire_GameModeBase::GamePause()
 	{
 		Game_IsPaused = false;
 		UnpauseActors();
+		APlayableCharacter* player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
+		APlayableController* PlayableController = Cast<APlayableController>(player->GetController());
+		PlayableController->SetShowMouseCursor(false);
 	}
 	else if (!Game_IsPaused)
 	{
@@ -138,6 +141,9 @@ void ARadioactiveSpire_GameModeBase::GamePause()
 				actor->CustomTimeDilation = 1.0f;
 		}
 		Camera->CustomTimeDilation = 1.0f;
+		APlayableCharacter* player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
+		APlayableController* PlayableController = Cast<APlayableController>(player->GetController());
+		PlayableController->SetShowMouseCursor(true);
 	}
 }
 
@@ -240,3 +246,20 @@ void ARadioactiveSpire_GameModeBase::UnblackenActors()
 			tilemap->SetActorHiddenInGame(false);
 	}
 }
+
+//APlayableCharacter* player;
+//for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+//{
+//	AActor* actor = *ActorItr;
+//	player = Cast<APlayableCharacter>(actor);
+//	if (player)
+//		break;
+//}
+//if (player)
+//{
+//	APlayableController* PlayableController = Cast<APlayableController>(player->GetController());
+//	SetPause(PlayableController, FCanUnpause::)
+//	Game_IsPaused = UGameplayStatics::IsGamePaused(GetWorld());
+//}
+
+//UGameplayStatics::SetGamePaused(GetWorld(), !Game_IsPaused);

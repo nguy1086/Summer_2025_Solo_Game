@@ -38,6 +38,7 @@ void APlayableController::BeginPlay()
 	{
 		GameInfoWidget = CreateWidget<UPlayableWidget>(this, GameInfoBP);
 		GameInfoWidget->AddToViewport();
+		GameInfoWidget->SetKeyboardFocus();
 	}
 	GameModeBase = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
 }
@@ -160,42 +161,49 @@ void APlayableController::OnMove(const FInputActionValue& Value)
 {
 	float Direction = Value.Get<float>();
 
-	if (PlayablePlayer != nullptr && PlayablePlayerState != nullptr)
+	if (PlayablePlayer != nullptr && PlayablePlayerState != nullptr && GameModeBase != nullptr)
 	{
-		if (PlayablePlayerState->State != EState::Ducking && 
-			PlayablePlayerState->State != EState::Special && 
-			PlayablePlayerState->State != EState::Attacking &&
-			PlayablePlayerState->State != EState::Roll &&
-			PlayablePlayerState->State != EState::Hurt &&
-			PlayablePlayerState->State != EState::Super)
+		if (GameModeBase->Game_IsPaused)
 		{
-			if (PlayablePlayerState->IsOnGround)
-				PlayablePlayer->ApplyStateChange(EState::Walking);
 
-			PlayablePlayer->AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Direction);
-
-			if (Direction < 0.0f)
-			{
-				SetControlRotation(FRotator(0.0, 180.0f, 0.0f));
-				PlayablePlayerState->Direction = EDirection::Left;
-			}
-			else if (Direction > 0.0f)
-			{
-				SetControlRotation(FRotator(0.0f, 0.0f, 0.0f));
-				PlayablePlayerState->Direction = EDirection::Right;
-			}
 		}
-		else if (PlayablePlayerState->State == EState::Attacking)//able to turn when attacking
+		else
 		{
-			if (Direction < 0.0f)
+			if (PlayablePlayerState->State != EState::Ducking &&
+				PlayablePlayerState->State != EState::Special &&
+				PlayablePlayerState->State != EState::Attacking &&
+				PlayablePlayerState->State != EState::Roll &&
+				PlayablePlayerState->State != EState::Hurt &&
+				PlayablePlayerState->State != EState::Super)
 			{
-				SetControlRotation(FRotator(0.0, 180.0f, 0.0f));
-				PlayablePlayerState->Direction = EDirection::Left;
+				if (PlayablePlayerState->IsOnGround)
+					PlayablePlayer->ApplyStateChange(EState::Walking);
+
+				PlayablePlayer->AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Direction);
+
+				if (Direction < 0.0f)
+				{
+					SetControlRotation(FRotator(0.0, 180.0f, 0.0f));
+					PlayablePlayerState->Direction = EDirection::Left;
+				}
+				else if (Direction > 0.0f)
+				{
+					SetControlRotation(FRotator(0.0f, 0.0f, 0.0f));
+					PlayablePlayerState->Direction = EDirection::Right;
+				}
 			}
-			else if (Direction > 0.0f)
+			else if (PlayablePlayerState->State == EState::Attacking)//able to turn when attacking
 			{
-				SetControlRotation(FRotator(0.0f, 0.0f, 0.0f));
-				PlayablePlayerState->Direction = EDirection::Right;
+				if (Direction < 0.0f)
+				{
+					SetControlRotation(FRotator(0.0, 180.0f, 0.0f));
+					PlayablePlayerState->Direction = EDirection::Left;
+				}
+				else if (Direction > 0.0f)
+				{
+					SetControlRotation(FRotator(0.0f, 0.0f, 0.0f));
+					PlayablePlayerState->Direction = EDirection::Right;
+				}
 			}
 		}
 	}
@@ -246,8 +254,13 @@ void APlayableController::OnDuckReleased(const FInputActionValue& Value)
 
 void APlayableController::OnAttackPressed(const FInputActionValue& Value)
 {
-	if (PlayablePlayer != nullptr)
-		PlayablePlayer->Attack();
+	if (PlayablePlayer != nullptr && GameModeBase != nullptr)
+		if (GameModeBase->Game_IsPaused)
+		{
+
+		}
+		else
+			PlayablePlayer->Attack();
 
 	//if (GEngine)
 	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Attack!"));
@@ -255,8 +268,13 @@ void APlayableController::OnAttackPressed(const FInputActionValue& Value)
 
 void APlayableController::OnSpecialPressed(const FInputActionValue& Value)
 {
-	if (PlayablePlayer != nullptr)
-		PlayablePlayer->Special();
+	if (PlayablePlayer != nullptr && GameModeBase != nullptr)
+		if (GameModeBase->Game_IsPaused)
+		{
+
+		}
+		else
+			PlayablePlayer->Special();
 
 	//if (GEngine)
 	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Special!"));
@@ -264,8 +282,13 @@ void APlayableController::OnSpecialPressed(const FInputActionValue& Value)
 
 void APlayableController::OnRollPressed(const FInputActionValue& Value)
 {
-	if (PlayablePlayer != nullptr)
-		PlayablePlayer->Roll();
+	if (PlayablePlayer != nullptr && GameModeBase != nullptr)
+		if (GameModeBase->Game_IsPaused)
+		{
+
+		}
+		else
+			PlayablePlayer->Roll();
 
 	//if (GEngine)
 	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Roll!"));
@@ -273,14 +296,22 @@ void APlayableController::OnRollPressed(const FInputActionValue& Value)
 
 void APlayableController::OnSuperPressed(const FInputActionValue& Value)
 {
-	if (PlayablePlayer != nullptr)
-		PlayablePlayer->SuperAttack();
+	if (PlayablePlayer != nullptr && GameModeBase != nullptr)
+		if (GameModeBase->Game_IsPaused)
+		{
+
+		}
+		else
+			PlayablePlayer->SuperAttack();
 }
 
 void APlayableController::OnPausePressed(const FInputActionValue& Value)
 {
 	if (GameModeBase != nullptr)
+	{
 		GameModeBase->GamePause();
+		GameInfoWidget->UpdatePause();
+	}
 }
 
 //void APlayableController::OnUpPressed(const FInputActionValue& Value)
