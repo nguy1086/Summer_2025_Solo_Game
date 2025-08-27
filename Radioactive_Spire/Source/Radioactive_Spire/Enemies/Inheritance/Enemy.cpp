@@ -32,11 +32,6 @@ AEnemy::AEnemy() :
 	FlipbookComponent->SetCollisionProfileName("NoCollision");
 	FlipbookComponent->SetupAttachment(RootComponent);
 
-	//PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComponent"));
-	//PawnSensingComponent->SetPeripheralVisionAngle(180.0f); //vision degrees
-	//PawnSensingComponent->SightRadius = 5000.0f; //range
-	//PawnSensingComponent->SetSensingInterval(0.5f);
-
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	Tags.Add("Enemy");

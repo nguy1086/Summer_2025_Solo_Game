@@ -276,7 +276,22 @@ void APlayableCharacter::SuperAttack()
 		{
 			if (AttackHitboxTemplate)
 			{
+				DisableControls();
+				ApplyStateChange(EState::Super);
+				NoGravity();
 
+				float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
+				float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
+
+				BatterSuperSpawn();
+
+				GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
+
+				ARadioactiveSpire_GameModeBase* gameMode = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
+				if (gameMode)
+					gameMode->SuperAttackPause(TotalDuration/FramesPerSecond);
+
+				Stats_Super = 0.0f;
 			}
 		}
 	}
@@ -602,8 +617,9 @@ UPaperFlipbook* APlayableCharacter::GetBatterFlipbook()
 		return nullptr;
 
 	UPaperFlipbook* flipbook = nullptr;
-
-	if (PlayerState->State == EState::Attacking)
+	if (PlayerState->State == EState::Super)
+		flipbook = BatterSuperFlipbook;
+	else if (PlayerState->State == EState::Attacking)
 	{
 		if (PlayerState->IsOnGround)
 		{
@@ -910,4 +926,20 @@ void APlayableCharacter::BatterGroundPoundSpawn()
 	FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
 	APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
 	hitbox->Spawn(TEXT("Batter_GroundPound"), PlayerConstants::BatterGroundPoundDamage);
+}
+
+void APlayableCharacter::BatterSuperSpawn()
+{
+	FVector location = GetActorLocation();
+	FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
+	location.Z += 48.0f;
+	if (PlayerState->Direction == EDirection::Left) {
+		location.X -= 76.0f;
+		rotation = FRotator(0.0f, 180.0f, 0.0f);
+	}
+	else if (PlayerState->Direction == EDirection::Right) {
+		location.X += 76.0f;
+	}
+	APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
+	hitbox->Projectile(TEXT("Batter_Super"), PlayerConstants::BatterSuperDamage);
 }

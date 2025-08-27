@@ -49,12 +49,11 @@ namespace PlayerConstants
     constexpr float BatterHealth = 250.0f;
     constexpr float BatterSuperChargeRate = 0.075f;
 
-    constexpr float BatterSpecialAttackDamage = 10.0f;
-    constexpr float BatterSpecialMaxAttackDamage = 125.0f;
-
+    constexpr float BatterSpecialAttackDamage = 20.0f;
     constexpr float BatterAirSpecialAttackDamage = 60.0f;
 
     constexpr float BatterGroundPoundDamage = 70.0f;
+    constexpr float BatterSuperDamage = 80.0f;
 
     constexpr float BatterComboOneDamage = 16.0f;
     constexpr float BatterComboTwoDamage = 20.0f;
@@ -67,7 +66,7 @@ namespace PlayerConstants
     constexpr int BatterMaxCombo = 4;
     constexpr int BatterMaxAirCombo = 1;
     constexpr float BatterSpecialLifetime = 2.5f;
-    constexpr int BatterSpecialMaxBounce = 2;
+    constexpr float BatterSuperLifeTime = 7.5f;
 
     //walk
     constexpr float BatterGroundFriction = 3.5f;

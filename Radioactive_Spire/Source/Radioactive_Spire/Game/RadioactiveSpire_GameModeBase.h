@@ -30,14 +30,21 @@ public:
 	void EnableControls();
 	void DisableControls();
 
+	void SuperAttackPause(float timer);
+
 private:
 	void SpawnDeathAnimation(FVector location);
 
 	void PauseActors();
 	void UnpauseActors();
 
-	UPROPERTY() class APlayerCamera* Camera;
+	void BlackenActors();
+	void UnblackenActors();
 
+	UPROPERTY() class APlayerCamera* Camera;
+	float SuperPauseTimer;
+	FVector SuperPausedVelocity;
+	class APlayableAttackHitbox* SuperAttackPaused;
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Death Templates")
 	TSubclassOf<class ADeadActor> DeadTestTemplate;

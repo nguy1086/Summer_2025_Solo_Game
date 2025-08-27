@@ -9,6 +9,9 @@
 #include "../Players/Inheritance/PlayableCharacterState.h"
 #include "../Players/Inheritance/PlayerCamera.h"
 #include "../Players/Inheritance/PlayableController.h"
+#include "../Players/Inheritance/PlayableAttackHitbox.h"
+
+#include "GameFramework/ProjectileMovementComponent.h"
 
 #include "EngineUtils.h"
 #include "Engine/World.h"
@@ -19,13 +22,15 @@
 #include "PaperTileMapComponent.h"
 #include "PaperTileMapActor.h"
 #include "PaperTileMap.h"
+#include "PaperCharacter.h"
 
 #include "NavMesh/NavMeshBoundsVolume.h"
 #include "Components/BrushComponent.h"
 
 
 ARadioactiveSpire_GameModeBase::ARadioactiveSpire_GameModeBase() :
-    Camera(nullptr)
+    Camera(nullptr),
+	SuperPauseTimer(0.0f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -40,9 +45,7 @@ void ARadioactiveSpire_GameModeBase::BeginPlay()
 	ApplyViewMode(EViewModeIndex::VMI_Unlit, false, *GetWorld()->GetGameViewport()->GetEngineShowFlags());
 
 	if (RedDesertLevel)
-	{
 		APaperTileMapActor* tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(RedDesertLevel, FVector(-1008.0f, 0.0f, 1500.0f), FRotator::ZeroRotator);
-	}
 	if (RedDesertSky)
 	{
 		APaperTileMapActor* tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(RedDesertSky, FVector(-1008.0f, 0.0f, 2000.0f), FRotator::ZeroRotator);
@@ -53,6 +56,20 @@ void ARadioactiveSpire_GameModeBase::BeginPlay()
 void ARadioactiveSpire_GameModeBase::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+
+	if (SuperPauseTimer >= 0.0f)
+	{
+		SuperPauseTimer -= DeltaTime;
+
+		if (SuperPauseTimer <= 0.0f)
+		{
+			UnpauseActors();
+			UnblackenActors();
+
+			if (SuperAttackPaused)
+				SuperAttackPaused->ProjectileMovementComponent->Velocity = SuperPausedVelocity;
+		}
+	}
 }
 
 void ARadioactiveSpire_GameModeBase::PlayerDied()
@@ -74,6 +91,31 @@ void ARadioactiveSpire_GameModeBase::DisableControls()
 	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 		if (ActorItr->ActorHasTag("Controller"))
 			ActorItr->CustomTimeDilation = 0.0f;
+}
+
+void ARadioactiveSpire_GameModeBase::SuperAttackPause(float timer)
+{
+	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		AActor* actor = *ActorItr;
+		actor->CustomTimeDilation = 0.0f;
+
+		APlayableCharacter* player = Cast<APlayableCharacter>(actor);
+		if (player)
+			player->CustomTimeDilation = 1.0f;
+		APlayableAttackHitbox* super = Cast<APlayableAttackHitbox>(actor);
+		if (super && super->ActorHasTag("Super"))
+		{
+			super->CustomTimeDilation = 1.0f;
+			SuperAttackPaused = super;
+			SuperPausedVelocity = SuperAttackPaused->ProjectileMovementComponent->Velocity;
+			SuperAttackPaused->ProjectileMovementComponent->Velocity = FVector::ZeroVector;
+		}
+	}
+	Camera->CustomTimeDilation = 1.0f;
+	CustomTimeDilation = 1.0f;
+	BlackenActors();
+	SuperPauseTimer = timer;
 }
 
 void ARadioactiveSpire_GameModeBase::SpawnDeathAnimation(FVector location)
@@ -144,5 +186,34 @@ void ARadioactiveSpire_GameModeBase::UnpauseActors()
 		APlayableCharacter* player = Cast<APlayableCharacter>(actor);
 		if (player)
 			player->GetSprite()->SetVisibility(true);
+	}
+}
+
+void ARadioactiveSpire_GameModeBase::BlackenActors()
+{
+	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		AActor* actor = *ActorItr;
+		APaperCharacter* character = Cast<APaperCharacter>(actor);
+		APaperTileMapActor* tilemap = Cast< APaperTileMapActor>(actor);
+		if (character && !character->ActorHasTag("Player"))
+			character->GetSprite()->SetSpriteColor(FLinearColor(0.2f, 0.2f, 0.2f, 0.5f));
+		else if (tilemap)
+			tilemap->SetActorHiddenInGame(true);
+
+	}
+}
+
+void ARadioactiveSpire_GameModeBase::UnblackenActors()
+{
+	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		AActor* actor = *ActorItr;
+		APaperCharacter* character = Cast<APaperCharacter>(actor);
+		APaperTileMapActor* tilemap = Cast< APaperTileMapActor>(actor);
+		if (character && !character->ActorHasTag("Player"))
+			character->GetSprite()->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 1.0f));
+		else if (tilemap)
+			tilemap->SetActorHiddenInGame(false);
 	}
 }

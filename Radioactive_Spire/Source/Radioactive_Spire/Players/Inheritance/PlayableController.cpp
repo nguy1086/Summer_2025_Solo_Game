@@ -78,9 +78,9 @@ void APlayableController::SetupInputComponent()
 
 		EnhancedInputComponent->BindAction(RollInputAction, ETriggerEvent::Started, this, &APlayableController::OnRollPressed);
 
-		EnhancedInputComponent->BindAction(SuperInputAction, ETriggerEvent::Started, this, &APlayableController::OnRollPressed);
+		EnhancedInputComponent->BindAction(SuperInputAction, ETriggerEvent::Started, this, &APlayableController::OnSuperPressed);
 
-		EnhancedInputComponent->BindAction(PauseInputAction, ETriggerEvent::Started, this, &APlayableController::OnRollPressed);
+		EnhancedInputComponent->BindAction(PauseInputAction, ETriggerEvent::Started, this, &APlayableController::OnPausePressed);
 
 		//EnhancedInputComponent->BindAction(UpInputAction, ETriggerEvent::Started, this, &APlayableController::OnUpPressed);
 	}
@@ -166,7 +166,8 @@ void APlayableController::OnMove(const FInputActionValue& Value)
 			PlayablePlayerState->State != EState::Special && 
 			PlayablePlayerState->State != EState::Attacking &&
 			PlayablePlayerState->State != EState::Roll &&
-			PlayablePlayerState->State != EState::Hurt)
+			PlayablePlayerState->State != EState::Hurt &&
+			PlayablePlayerState->State != EState::Super)
 		{
 			if (PlayablePlayerState->IsOnGround)
 				PlayablePlayer->ApplyStateChange(EState::Walking);
@@ -208,7 +209,8 @@ void APlayableController::OnMoveReleased(const FInputActionValue& Value)
 			PlayablePlayerState->State != EState::Special &&
 			PlayablePlayerState->State != EState::Attacking &&
 			PlayablePlayerState->State != EState::Roll &&
-			PlayablePlayerState->State != EState::Hurt)
+			PlayablePlayerState->State != EState::Hurt &&
+			PlayablePlayerState->State != EState::Super)
 			PlayablePlayer->ApplyStateChange(EState::Idle);
 }
 

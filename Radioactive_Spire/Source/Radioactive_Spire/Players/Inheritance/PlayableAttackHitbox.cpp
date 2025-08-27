@@ -52,7 +52,6 @@ void APlayableAttackHitbox::BeginPlay()
 
 void APlayableAttackHitbox::OnOverlapBegin(UPrimitiveComponent* OverlapComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	//OnHit(OverlapComponent, OtherActor, OtherComp, FVector::ZeroVector, SweepResult);
 	AEnemy* enemy = Cast<AEnemy>(OtherActor);
 	if (enemy)
 	{
@@ -73,61 +72,30 @@ void APlayableAttackHitbox::OnOverlapBegin(UPrimitiveComponent* OverlapComponent
 
 		if (!enemy->ActorHasTag("Unknockable"))
 			enemy->LaunchCharacter(Knockback, false, true);
-
-
 	}
 	else
 	{
-		if (IsProjectile)
+		if (ActorHasTag("Batter_proj"))
 		{
-			//if (Name == TEXT("Batter_Special_Duck") || Name == TEXT("Batter_Special"))
-			//{
-			//	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && (OtherActor != this->GetOwner()))
-			//	{
-			//		ProjectileMovementComponent->StopMovementImmediately();
-			//		if (OtherActor->ActorHasTag("Enemy"))
-			//		{
-			//			Damage *= (ProjectileMovementComponent->Velocity.Size() * 0.5f);//velocity.size() gets the current speed
-			//			Destroy();
-			//		}
-			//		else
-			//		{
-			//			Ricochet++;
-			//			Damage = Damage / 2.0f;
-
-			//			if (Ricochet >= PlayerConstants::BatterSpecialMaxBounce)
-			//			{
-			//				Destroy();
-			//			}
-			//		}
-			//	}
-			//}
-
-
-		}
-		else
-		{
-			if (ActorHasTag("Batter_proj"))
+			if (OtherActor->ActorHasTag("Baseball"))
 			{
-				if (OtherActor->ActorHasTag("Baseball"))
-				{
-					APlayableAttackHitbox* baseball = Cast<APlayableAttackHitbox>(OtherActor);
-					float z = FMath::FRandRange(-2.0f, 2.0f);
-					baseball->ProjectileMovementComponent->MaxSpeed = 3000.0f;
-					baseball->ProjectileMovementComponent->Velocity = FVector(3000.0f * CheckDirectionOfHitbox(), 0.0f, z);
-					baseball->Damage *= 5.5f;
-					baseball->Knockback.Z *= 3.0f;
-				}
+				APlayableAttackHitbox* baseball = Cast<APlayableAttackHitbox>(OtherActor);
+				float z = FMath::FRandRange(-2.0f, 2.0f);
+				baseball->ProjectileMovementComponent->MaxSpeed = 3000.0f;
+				baseball->ProjectileMovementComponent->Velocity = FVector(3000.0f * CheckDirectionOfHitbox(), 0.0f, z);
+				baseball->Damage *= 5.5f;
+				baseball->Knockback.Z *= 3.0f;
+			}
+			else if (OtherActor->ActorHasTag("Batter_Super"))
+			{
+				APlayableAttackHitbox* super = Cast<APlayableAttackHitbox>(OtherActor);
+				float z = FMath::FRandRange(-2.0f, 2.0f);
+				super->ProjectileMovementComponent->Velocity = FVector(400.0f * CheckDirectionOfHitbox(), 0.0f, z);
+				super->Timer += 1.0f;
 			}
 		}
 	}
-
 }
-
-//void APlayableAttackHitbox::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
-//{
-//
-//}
 
 void APlayableAttackHitbox::Spawn(FString name, float damage)
 {
@@ -156,19 +124,11 @@ void APlayableAttackHitbox::Projectile(FString name, float damage)
 {
 	if (!name.IsEmpty() && FlipbookComponent)
 	{
-		UPaperFlipbook* flipbook = nullptr;
-
 		Damage = damage;
 		Name = name;
 		IsProjectile = true;
 
-		if (name == TEXT("Batter_Special_Duck") || name == TEXT("Batter_Special"))
-		{
-			flipbook = BatterSpecialFlipbook;
-			Timer = PlayerConstants::BatterSpecialLifetime;//initiallifespan no work
-		}
-
-		FlipbookComponent->SetFlipbook(flipbook);
+		InitializeProjectileFlipbook();
 
 		InitializeHitbox();
 
@@ -191,7 +151,6 @@ void APlayableAttackHitbox::InitializeHitbox()
 	{
 		BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		BoxComponent->SetCollisionProfileName("PlayerProjectileWorldHitbox");
-		//BoxComponent->SetSimulatePhysics(false);
 		ProjectileMovementComponent->SetActive(true,true);
 		BoxComponent->SetBoxExtent(FVector(5.0f, 1.0f, 5.0f));
 
@@ -210,7 +169,6 @@ void APlayableAttackHitbox::InitializeHitbox()
 	{
 		BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		BoxComponent->SetCollisionProfileName("PlayerProjectileWorldHitbox");
-		//BoxComponent->SetSimulatePhysics(false);
 		ProjectileMovementComponent->SetActive(true, true);
 		BoxComponent->SetBoxExtent(FVector(5.0f, 1.0f, 5.0f));
 
@@ -284,6 +242,27 @@ void APlayableAttackHitbox::InitializeHitbox()
 
 		Tags.Add("GroundPound");
 	}
+	else if (Name == TEXT("Batter_Super"))
+	{
+		FlipbookComponent->SetRelativeScale3D(FVector(2.0f, 2.0f, 2.0f));
+
+		BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		BoxComponent->SetCollisionProfileName("PlayerProjectileWorldHitbox");
+		ProjectileMovementComponent->SetActive(true, true);
+		BoxComponent->SetBoxExtent(FVector(64.0f, 1.0f, 64.0f));
+
+		ProjectileMovementComponent->UpdatedComponent = BoxComponent;
+		ProjectileMovementComponent->Velocity.X = 400.0f * (GetActorRotation() == FRotator(0.0f, 180.0f, 0.0f) ? -1.0f : 1.0f);
+		ProjectileMovementComponent->InitialSpeed = 400.0f * (GetActorRotation() == FRotator(0.0f, 180.0f, 0.0f) ? -1.0f : 1.0f);
+		ProjectileMovementComponent->MaxSpeed = 400.0f;
+		ProjectileMovementComponent->bRotationFollowsVelocity = true;
+		ProjectileMovementComponent->bShouldBounce = true;
+		ProjectileMovementComponent->Bounciness = 2.0f;
+		ProjectileMovementComponent->ProjectileGravityScale = 0.0f;
+
+		Tags.Add("Batter_Super");
+		Tags.Add("Super");
+	}
 }
 
 void APlayableAttackHitbox::InitializeMeleeFlipbook()
@@ -303,6 +282,24 @@ void APlayableAttackHitbox::InitializeMeleeFlipbook()
 
 	FlipbookComponent->SetFlipbook(flipbook);
 	FlipbookComponent->SetLooping(false);
+}
+
+void APlayableAttackHitbox::InitializeProjectileFlipbook()
+{
+	UPaperFlipbook* flipbook = nullptr;
+
+	if (Name == TEXT("Batter_Special_Duck") || Name == TEXT("Batter_Special"))
+	{
+		flipbook = BatterSpecialFlipbook;
+		Timer = PlayerConstants::BatterSpecialLifetime;//initiallifespan no work
+	}
+	else if (Name == TEXT("Batter_Super"))
+	{
+		flipbook = BatterSuperProjectileFlipbook;
+		Timer = PlayerConstants::BatterSuperLifeTime;
+		FlipbookComponent->SetLooping(false);
+	}
+	FlipbookComponent->SetFlipbook(flipbook);
 }
 
 float APlayableAttackHitbox::CheckDirectionOfHitbox()

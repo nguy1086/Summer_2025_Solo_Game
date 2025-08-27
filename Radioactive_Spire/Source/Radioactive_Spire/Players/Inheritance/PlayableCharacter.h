@@ -55,7 +55,7 @@ public:
 	float Stats_MaxHealth = PlayerConstants::DefaultHealth;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-	float Stats_Super = 0.0f;
+	float Stats_Super = 100.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float Stats_MaxSuper = PlayerConstants::DefaultMaxSuper;
@@ -103,6 +103,7 @@ private:
 	void BatterSpecialSpawn();
 	void BatterComboAttackSpawn();
 	void BatterGroundPoundSpawn();
+	void BatterSuperSpawn();
 
 	//batter
 	bool DuckSpecial;
