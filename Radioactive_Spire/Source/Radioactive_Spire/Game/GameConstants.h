@@ -16,4 +16,11 @@ namespace GameConstants
 	// dead
 	constexpr float DeadHoldTime = 1.5f;
 	constexpr float DeadImpulseZ = 600.0f;
+
+	// states
+	const float WaitMax = 5.0f;
+
+	// levels
+	const float LevelPosYIncrement = 128.0f;
+	const float LevelPosZIncrement = 32.0f;
 }

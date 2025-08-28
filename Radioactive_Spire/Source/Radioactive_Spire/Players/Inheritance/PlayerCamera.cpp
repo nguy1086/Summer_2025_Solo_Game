@@ -61,13 +61,13 @@ void APlayerCamera::Tick(float DeltaTime)
 		cameraLocation.Y = FMath::FInterpTo(cameraLocation.Y, playerLocation.Y, DeltaTime, 8.0f) + GameConstants::CameraDepthY;
 
 		// set the Z value
-		cameraLocation.Z = InitialLocation.Z + GameConstants::CameraZOffset + ShakeOffset.Z + LevelZIncrease;
+		cameraLocation.Z = FMath::FInterpTo(InitialLocation.Z + LevelZIncrease, playerLocation.Z, DeltaTime, 1.0f) + GameConstants::CameraZOffset + ShakeOffset.Z;
 
 		// set the camera location
 		Camera->SetWorldLocation(cameraLocation);
 
 		if (LevelBackground)
-			LevelBackground->SetActorLocation(FVector(cameraLocation.X - 820.0f, cameraLocation.Y - 1640.0f, cameraLocation.Z + 1840.0f));
+			LevelBackground->SetActorLocation(FVector(cameraLocation.X - 820.0f, cameraLocation.Y - 2640.0f, cameraLocation.Z + 1840.0f));
 	}
 }
 

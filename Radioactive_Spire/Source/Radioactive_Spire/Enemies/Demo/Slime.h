@@ -43,7 +43,6 @@ protected:
 private:
 	void ApplyStateChange(ESlimeState newState);
 	float AttackTimer;
-	const float AttackMax = 6.0f;
 
 	FTimerHandle AttackTimerHandle;
 	ESlimeState State;

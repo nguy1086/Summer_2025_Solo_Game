@@ -41,7 +41,9 @@ ARadioactiveSpire_GameModeBase::ARadioactiveSpire_GameModeBase() :
 	SpawnDelay(0.0f),
 	EnemiesKilled(0),
 	LevelPosition(FVector(-1008.0f, 0.0f, 1500.0f)),
-	WaitTimer(5.0f)
+	TransitionPosition(),
+	WaitTimer(5.0f),
+	State(EGameState::Gameplay)
 {
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -51,7 +53,7 @@ void ARadioactiveSpire_GameModeBase::BeginPlay()
     Super::BeginPlay();
 	Player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
 	Player->SetActorLocation(FVector(360.0f, 0.0f, 200.0f));
-	MaxEnemiesSpawn = FMath::RandRange(7, 10);
+	MaxEnemiesSpawn = FMath::RandRange(1, 1);
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
@@ -62,8 +64,8 @@ void ARadioactiveSpire_GameModeBase::BeginPlay()
 	if (RedDesertLevel)
 	{
 		APaperTileMapActor* tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(RedDesertLevel, LevelPosition, FRotator::ZeroRotator);
-		//IncrementLevelPosition();
-		//tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(RedDesertLevel, LevelPosition, FRotator::ZeroRotator);
+		IncrementLevelPosition();
+		tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(RedDesertLevel, LevelPosition, FRotator::ZeroRotator);
 	}
 	if (RedDesertSky)
 	{
@@ -76,44 +78,79 @@ void ARadioactiveSpire_GameModeBase::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-	if (SuperPauseTimer >= 0.0f)
+	if (State == EGameState::Gameplay)
 	{
-		SuperPauseTimer -= DeltaTime;
+		//if (GEngine)
+		//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Gameplay"));
 
-		if (SuperPauseTimer <= 0.0f)
+		if (SuperPauseTimer >= 0.0f)
 		{
-			UnpauseActors();
-			UnblackenActors();
+			SuperPauseTimer -= DeltaTime;
 
-			if (SuperAttackPaused)
-				SuperAttackPaused->ProjectileMovementComponent->Velocity = SuperPausedVelocity;
-		}
-	}
-	else
-	{
-		TArray<AActor*> ActorsWithTag;
-		UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Enemy"), ActorsWithTag);
-		if (ActorsWithTag.Num() == 0)
-		{
-			if (WaitTimer > 0.0f)
+			if (SuperPauseTimer <= 0.0f)
 			{
-				WaitTimer -= DeltaTime;
-				float elapsed = FMath::Max(0.0f, GameConstants::BlackOverlayFadeInOutDuration - WaitTimer);
-				float alpha = elapsed / GameConstants::BlackOverlayFadeInOutDuration;
+				UnpauseActors();
+				UnblackenActors();
 
-				ARadioactiveSpire_GameStateBase* gameState = GetGameState<ARadioactiveSpire_GameStateBase>();
-				if (gameState != nullptr)
-					gameState->BlackOverlayAlpha = alpha;
-
-				if (WaitTimer <= 0.0f)
-					TransitionToNextLevel();
+				if (SuperAttackPaused)
+					SuperAttackPaused->ProjectileMovementComponent->Velocity = SuperPausedVelocity;
 			}
 		}
+		else
+		{
+			if (SpawnDelay < -1.0f)
+			{
+				TArray<AActor*> ActorsWithTag;
+				UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Enemy"), ActorsWithTag);
+				if (ActorsWithTag.Num() == 0)
+				{
+					State = EGameState::Wait;
+
+				}
+			}
+
+			SpawnDelay -= DeltaTime;
+			if (SpawnDelay <= 0.0f)
+				SpawnEnemy();
+		}
+	}
+	else if (State == EGameState::Wait)
+	{
+		//if (GEngine)
+		//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Wait"));
+		if (WaitTimer > 0.0f)
+		{
+			WaitTimer -= DeltaTime;
+			if (WaitTimer <= 0.0f)
+				TransitionToNextLevel();
+		}
+	}
+	else if (State == EGameState::Transition)
+	{
+		//if (GEngine)
+		//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("Transition"));
+		DisableControls();
+		//FVector p = FMath::VInterpTo(TransitionPosition, Player->GetActorLocation(), DeltaTime, 0.00000000001f);
+		Player->CustomTimeDilation = 0.0f;
+		FVector pos = Player->GetActorLocation();
+		FVector dir = TransitionPosition - pos;
+		dir.Normalize();
+		pos += dir * 300.0f * DeltaTime;
+		pos.X = Player->GetActorLocation().X;
+
+
+		Player->SetActorLocation(FVector(pos));
+		Player->NoGravity();
+		if (Player->GetActorLocation().Y <= TransitionPosition.Y + 1.0f)
+		{
+			State = EGameState::Gameplay;
+			EnableControls();
+			Player->SetGravity();
+			Player->SetActorLocation(FVector(Player->GetActorLocation().X, TransitionPosition.Y, Player->GetActorLocation().Z));
+			Player->CustomTimeDilation = 1.0f;
+		}
 	}
 
-	SpawnDelay -= DeltaTime;
-	if (SpawnDelay <= 0.0f)
-		SpawnEnemy();
 }
 
 void ARadioactiveSpire_GameModeBase::PlayerDied()
@@ -291,26 +328,25 @@ void ARadioactiveSpire_GameModeBase::TransitionToNextLevel()
 {
 	IncrementLevelPosition();
 	APaperTileMapActor* tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(RedDesertLevel, LevelPosition, FRotator::ZeroRotator);
-	Player->SetActorLocation(FVector(Player->GetActorLocation().X, tilemap->GetActorLocation().Y, Player->GetActorLocation().Z + 64.0f));
+	TransitionPosition = FVector(Player->GetActorLocation().X, tilemap->GetActorLocation().Y + GameConstants::LevelPosYIncrement, Player->GetActorLocation().Z + 64.0f);
+	//Player->SetActorLocation(FVector(Player->GetActorLocation().X, tilemap->GetActorLocation().Y, Player->GetActorLocation().Z + 64.0f));
 	MaxEnemiesSpawn += FMath::RandRange(7, 10);
 	Level++;
 	CurrentEnemiesSpawned = 0;
 	EnemiesKilled = 0;
-	WaitTimer = WaitMax;
+	WaitTimer = GameConstants::WaitMax;
 	SpawnDelay = 0.2f;
-
-	ARadioactiveSpire_GameStateBase* gameState = GetGameState<ARadioactiveSpire_GameStateBase>();
-	if (gameState != nullptr)
-		gameState->BlackOverlayAlpha = 1.0f;
 
 	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
 		AActor* actor = *ActorItr;
 		APaperTileMapActor* earlytilemap = Cast<APaperTileMapActor>(actor);
 		if (earlytilemap)
-			if (earlytilemap->GetActorLocation().Y > tilemap->GetActorLocation().Y + 128.0f)
+			if (earlytilemap->GetActorLocation().Y > tilemap->GetActorLocation().Y + GameConstants::LevelPosYIncrement)
 				earlytilemap->Destroy();
 	}
+
+	State = EGameState::Transition;
 }
 
 void ARadioactiveSpire_GameModeBase::SpawnEnemy()
@@ -323,29 +359,14 @@ void ARadioactiveSpire_GameModeBase::SpawnEnemy()
 		ASlime* slime = GetWorld()->SpawnActor<ASlime>(Slime, FVector(x[index], Player->GetActorLocation().Y, 940.0f + Camera->LevelZIncrease), FRotator::ZeroRotator);
 		CurrentEnemiesSpawned++;
 		SpawnDelay = FMath::RandRange(0.5f, 2.5f) - (0.1f * Level);
+		if (SpawnDelay < 0.0f)
+			SpawnDelay = 0.0f;
 	}
 }
 
 void ARadioactiveSpire_GameModeBase::IncrementLevelPosition()
 {
-	LevelPosition.Y -= 128.0f;
-	LevelPosition.Z += 32.0f;
-	Camera->LevelZIncrease += 32.0f;
+	LevelPosition.Y -= GameConstants::LevelPosYIncrement;
+	LevelPosition.Z += GameConstants::LevelPosZIncrement;
+	Camera->LevelZIncrease += GameConstants::LevelPosZIncrement;
 }
-
-//APlayableCharacter* player;
-//for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
-//{
-//	AActor* actor = *ActorItr;
-//	player = Cast<APlayableCharacter>(actor);
-//	if (player)
-//		break;
-//}
-//if (player)
-//{
-//	APlayableController* PlayableController = Cast<APlayableController>(player->GetController());
-//	SetPause(PlayableController, FCanUnpause::)
-//	Game_IsPaused = UGameplayStatics::IsGamePaused(GetWorld());
-//}
-
-//UGameplayStatics::SetGamePaused(GetWorld(), !Game_IsPaused);

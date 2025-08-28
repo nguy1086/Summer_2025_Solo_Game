@@ -14,9 +14,4 @@ class RADIOACTIVE_SPIRE_API ARadioactiveSpire_GameStateBase : public AGameStateB
 {
 	GENERATED_BODY()
 	
-public:
-	ARadioactiveSpire_GameStateBase();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
-	float BlackOverlayAlpha;
 };

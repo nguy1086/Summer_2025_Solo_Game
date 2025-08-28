@@ -14,7 +14,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 ASlime::ASlime() :
-    AttackTimer(AttackMax),
+    AttackTimer(FMath::RandRange(1.0f, 4.0f)),
     State(ESlimeState::Walk)
 {
     PrimaryActorTick.bCanEverTick = true;
@@ -77,7 +77,7 @@ void ASlime::UpdateFlipbook()
     if (ActorHasTag("EnemyHurtbox"))
         Tags.Remove("EnemyHurtbox");
 
-    AttackTimer = AttackMax;
+    AttackTimer = FMath::RandRange(1.0f, 4.0f);
 
     FlipbookComponent->SetPlayRate(1.0f);
     FlipbookComponent->SetFlipbook(flipbook);
@@ -105,15 +105,18 @@ void ASlime::Tick(float DeltaTime)
                     Direction = EEnemyDirection::Right;
                 else
                     Direction = EEnemyDirection::Left;
+
+                AttackTimer -= DeltaTime;
             }
-            else {
+            else 
+            {
                 AddMovementInput(FVector(1.0f, 0.0f, 0.0f), dir);
                 CheckDirection();
             }
 
             ChangeDirection(Direction);
         }
-        AttackTimer -= DeltaTime;
+
         if (AttackTimer < 0.0f)
         {
             float distance = GetHorizontalDistanceTo(player);

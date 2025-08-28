@@ -8,6 +8,15 @@
 
 enum class EPlayerType : uint8;
 
+UENUM(BlueprintType)
+enum class EGameState : uint8
+{
+	Unknown 	UMETA(DisplayName = "Unknown"),
+	Gameplay 	UMETA(DisplayName = "Gameplay"),
+	Wait 		UMETA(DisplayName = "Wait"),
+	Transition	UMETA(DisplayName = "Transition"),
+	EndGame     UMETA(DisplayName = "EndGame")
+};
 /**
  * 
  */
@@ -36,6 +45,7 @@ public:
 	bool Game_IsPaused;
 
 	int EnemiesKilled;
+	EGameState State;
 private:
 	void SpawnDeathAnimation(FVector location);
 
@@ -59,8 +69,9 @@ private:
 	int CurrentEnemiesSpawned;
 	float SpawnDelay;
 	FVector LevelPosition;
+	FVector TransitionPosition;
 	float WaitTimer;
-	const float WaitMax = 5.0f;
+
 	void IncrementLevelPosition();
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Death Templates")
