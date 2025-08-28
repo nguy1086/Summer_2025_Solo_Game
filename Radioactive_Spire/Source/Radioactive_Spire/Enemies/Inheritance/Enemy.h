@@ -41,6 +41,7 @@ public:
 
 	void CheckDirection();
 	void ChangeDirection(EEnemyDirection dir);
+	//virtual void Destroyed() override;
 	EEnemyDirection Direction;
 	float InvincibleTimer;
 	float Damage;

@@ -35,6 +35,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void ApplyCameraShake();
+	float LevelZIncrease;
 
 private:
 	void OnShake();

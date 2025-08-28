@@ -94,6 +94,7 @@ void UPlayableWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
     UpdateHealth();
     UpdateSuper();
     UpdatePause();
+    UpdateEnemies();
     DisplayGameOver();
 }
 
@@ -130,7 +131,7 @@ void UPlayableWidget::UpdateSuper()
         UTextBlock* Widget = Cast<UTextBlock>(GetWidgetFromName("SuperText"));
         if (Widget != nullptr)
         {
-            if (Value == TEXT("1"))
+            if ((int)Player->Stats_Super / (int)Player->Stats_MaxSuper == 1)
                 Widget->SetText(FText::FromString("SUPER"));
             else
                 Widget->SetText(FText::FromString(Value));
@@ -142,6 +143,17 @@ void UPlayableWidget::UpdateSuper()
             Bar->SetPercent((Player->Stats_Super / Player->Stats_MaxSuper));
         }
     }
+}
+
+void UPlayableWidget::UpdateEnemies()
+{
+    TArray<AActor*> ActorsWithTag;
+    UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Enemy"), ActorsWithTag);
+    FString Value = FString::Printf(TEXT("%d"), (int)ActorsWithTag.Num());
+
+    UTextBlock* Widget = Cast<UTextBlock>(GetWidgetFromName("EnemiesLeftNumber"));
+    if (Widget)
+        Widget->SetText(FText::FromString(Value));
 }
 
 void UPlayableWidget::UpdatePause()

@@ -12,7 +12,8 @@ APlayerCamera::APlayerCamera() :
 	Camera(nullptr),
 	SphereComponent(nullptr),
 	Player(nullptr),
-	OriginalZ(0.0f)
+	OriginalZ(0.0f),
+	LevelZIncrease(0.0f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -60,7 +61,7 @@ void APlayerCamera::Tick(float DeltaTime)
 		cameraLocation.Y = FMath::FInterpTo(cameraLocation.Y, playerLocation.Y, DeltaTime, 8.0f) + GameConstants::CameraDepthY;
 
 		// set the Z value
-		cameraLocation.Z = InitialLocation.Z + GameConstants::CameraZOffset + ShakeOffset.Z;
+		cameraLocation.Z = InitialLocation.Z + GameConstants::CameraZOffset + ShakeOffset.Z + LevelZIncrease;
 
 		// set the camera location
 		Camera->SetWorldLocation(cameraLocation);

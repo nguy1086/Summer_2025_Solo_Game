@@ -89,9 +89,9 @@ void APlayableAttackHitbox::OnOverlapBegin(UPrimitiveComponent* OverlapComponent
 			else if (OtherActor->ActorHasTag("Batter_Super"))
 			{
 				APlayableAttackHitbox* super = Cast<APlayableAttackHitbox>(OtherActor);
-				float z = FMath::FRandRange(-2.0f, 2.0f);
+				float z = FMath::FRandRange(-5.0f, 5.0f);
 				super->ProjectileMovementComponent->Velocity = FVector(400.0f * CheckDirectionOfHitbox(), 0.0f, z);
-				super->Timer += 1.0f;
+				super->Timer += 1.5f;
 			}
 		}
 	}
@@ -317,10 +317,13 @@ float APlayableAttackHitbox::CheckDirectionOfHitbox()
 void APlayableAttackHitbox::ChargeSuper()
 {
 	APlayableCharacter* player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
-	if (player->Type == EPlayerType::Test)
-		player->Stats_Super += Damage * PlayerConstants::DefaultSuperChargeRate;
-	else if (player->Type == EPlayerType::Batter)
-		player->Stats_Super += Damage * PlayerConstants::BatterSuperChargeRate;
+	if (player->Stats_Super < player->Stats_MaxSuper)
+	{
+		if (player->Type == EPlayerType::Test)
+			player->Stats_Super += Damage * PlayerConstants::DefaultSuperChargeRate;
+		else if (player->Type == EPlayerType::Batter)
+			player->Stats_Super += (Damage * PlayerConstants::BatterSuperChargeRate) / (ActorHasTag("Super") ? 2.0f : 1.0f);
+	}
 }
 
 // Called every frame

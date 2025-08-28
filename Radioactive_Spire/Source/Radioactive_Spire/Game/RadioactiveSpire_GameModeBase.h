@@ -35,6 +35,7 @@ public:
 	void GamePause();
 	bool Game_IsPaused;
 
+	int EnemiesKilled;
 private:
 	void SpawnDeathAnimation(FVector location);
 
@@ -44,10 +45,23 @@ private:
 	void BlackenActors();
 	void UnblackenActors();
 
+	void TransitionToNextLevel();
+	void SpawnEnemy();
+
 	UPROPERTY() class APlayerCamera* Camera;
+	class APlayableCharacter* Player;
 	float SuperPauseTimer;
 	FVector SuperPausedVelocity;
 	class APlayableAttackHitbox* SuperAttackPaused;
+
+	int Level;
+	int MaxEnemiesSpawn;
+	int CurrentEnemiesSpawned;
+	float SpawnDelay;
+	FVector LevelPosition;
+	float WaitTimer;
+	const float WaitMax = 5.0f;
+	void IncrementLevelPosition();
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Death Templates")
 	TSubclassOf<class ADeadActor> DeadTestTemplate;
@@ -60,4 +74,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level Templates")
 	TSubclassOf<class APaperTileMapActor> RedDesertSky;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enemy Templates")
+	TSubclassOf<class ASlime> Slime;
 };

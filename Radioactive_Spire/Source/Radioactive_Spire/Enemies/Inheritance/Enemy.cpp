@@ -5,8 +5,7 @@
 #include "PaperFlipbook.h"
 #include "PaperFlipbookComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "../../AIModule/Classes/Perception/PawnSensingComponent.h"
-#include "../../AIModule/Classes/AIController.h"
+#include "../../Game/RadioactiveSpire_GameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 
 AEnemy::AEnemy() :
@@ -65,3 +64,12 @@ void AEnemy::ChangeDirection(EEnemyDirection dir)
 		SetActorRotation(FRotator(0.0, 0.0f, 0.0f));
 	}
 }
+
+//void AEnemy::Destroyed()
+//{
+//	ARadioactiveSpire_GameModeBase* gameMode = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
+//	if (gameMode)
+//	{
+//		gameMode->EnemiesKilled++;
+//	}
+//}
