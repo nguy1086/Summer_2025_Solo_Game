@@ -6,20 +6,27 @@
 #include "Components/ProgressBar.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
+
 #include "Kismet/GameplayStatics.h"
+
 #include "RadioactiveSpire_GameModeBase.h"
 #include "RadioactiveSpire_GameStateBase.h"
+
 #include "../Players/Inheritance/PlayableCharacter.h"
 #include "../Players/Inheritance/PlayableCharacterState.h"
 #include "../Players/Inheritance/PlayableController.h"
+
 #include "Input/ReplyBase.h"
+
+#include "Engine/Texture2D.h"
+#include "Styling/SlateBrush.h"
+#include "Styling/SlateTypes.h"
 
 bool UPlayableWidget::Initialize()
 {
+    Increment = 0;
     bIsFocusable = true;
     SetKeyboardFocus();
-    if (GEngine)
-        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Focus: " + FString::FromInt(IsFocusable())));
 
     bool bResult = Super::Initialize();
     if (!bResult)
@@ -69,18 +76,19 @@ bool UPlayableWidget::Initialize()
         PauseButtons.Add(Button);
     }
 
-    Button = Cast<UButton>(GetWidgetFromName("Retry"));
-    if (Button)
-    {
-        Button->SetVisibility(ESlateVisibility::Hidden);
-        Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnRetry);
-        PauseButtons.Add(Button);
-    }
     Button = Cast<UButton>(GetWidgetFromName("Options"));
     if (Button)
     {
         Button->SetVisibility(ESlateVisibility::Hidden);
         Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnOptions);
+        PauseButtons.Add(Button);
+    }
+
+    Button = Cast<UButton>(GetWidgetFromName("Retry"));
+    if (Button)
+    {
+        Button->SetVisibility(ESlateVisibility::Hidden);
+        Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnRetry);
         PauseButtons.Add(Button);
     }
 
@@ -206,11 +214,11 @@ void UPlayableWidget::UpdatePause()
         if (Button)
             Button->SetVisibility(ESlateVisibility::Visible);
 
-        Button = Cast<UButton>(GetWidgetFromName("Retry"));
+        Button = Cast<UButton>(GetWidgetFromName("Options"));
         if (Button)
             Button->SetVisibility(ESlateVisibility::Visible);
 
-        Button = Cast<UButton>(GetWidgetFromName("Options"));
+        Button = Cast<UButton>(GetWidgetFromName("Retry"));
         if (Button)
             Button->SetVisibility(ESlateVisibility::Visible);
 
@@ -218,7 +226,26 @@ void UPlayableWidget::UpdatePause()
         if (Button)
             Button->SetVisibility(ESlateVisibility::Visible);
 
+        //static ConstructorHelpers::FClassFinder<UTexture2D> PlayerControllerBPClass(TEXT("/Game/ThirdPerson/Blueprints/BP_TankController"));
+        FSlateBrush brush;
+        UTexture2D* NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_ButtonHover.Game_ButtonHover")));
+        brush.SetResourceObject(NormalTexture);
+        brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.724268f, 0.724268f, 0.724268f, 1.0f)));
+        FButtonStyle style;
+        style.SetNormal(brush);
+        PauseButtons[Increment]->SetStyle(style);
 
+        for (int i = 0; i < PauseButtons.Num(); i++)
+        {
+            if (i != Increment)
+            {
+                NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_Button.Game_Button")));
+                brush.SetResourceObject(NormalTexture);
+                brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.495466f, 0.495466f, 0.495466f, 1.0f)));
+                style.SetNormal(brush);
+                PauseButtons[i]->SetStyle(style);
+            }
+        }
     }
     else if (GameModeBase && !GameModeBase->Game_IsPaused)
     {
@@ -258,17 +285,19 @@ void UPlayableWidget::UpdatePause()
         if (Button)
             Button->SetVisibility(ESlateVisibility::Hidden);
 
-        Button = Cast<UButton>(GetWidgetFromName("Retry"));
+        Button = Cast<UButton>(GetWidgetFromName("Options"));
         if (Button)
             Button->SetVisibility(ESlateVisibility::Hidden);
 
-        Button = Cast<UButton>(GetWidgetFromName("Options"));
+        Button = Cast<UButton>(GetWidgetFromName("Retry"));
         if (Button)
             Button->SetVisibility(ESlateVisibility::Hidden);
 
         Button = Cast<UButton>(GetWidgetFromName("Quit"));
         if (Button)
             Button->SetVisibility(ESlateVisibility::Hidden);
+
+        Increment = 0;
     }
 }
 
@@ -302,7 +331,10 @@ void UPlayableWidget::PauseMenuNavigation(float dir)//tried FReply UPlayableWidg
 {                                                       //didnt work
     Increment += dir;
     if (Increment < 0)
-        Increment = PauseButtons.Num();
-    else if (Increment > PauseButtons.Num())
+        Increment = PauseButtons.Num() -1;
+    else if (Increment >= PauseButtons.Num())
         Increment = 0;
+
+    if (GEngine)
+        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Increment: " + FString::FromInt(Increment)));
 }

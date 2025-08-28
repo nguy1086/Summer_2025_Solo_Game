@@ -5,6 +5,8 @@
 #include "PlayableCharacter.h"
 #include "PlayableCharacterState.h"
 #include "InputAction.h"
+#include "InputCoreTypes.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "../../Game/PlayableWidget.h"
@@ -40,6 +42,8 @@ void APlayableController::BeginPlay()
 		GameInfoWidget->AddToViewport();
 	}
 	GameModeBase = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
+
+	bEnableMouseOverEvents = false;
 }
 
 void APlayableController::OnPossess(APawn* aPawn)
