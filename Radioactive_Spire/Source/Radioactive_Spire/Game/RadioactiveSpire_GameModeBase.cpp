@@ -205,7 +205,6 @@ void ARadioactiveSpire_GameModeBase::GamePause()
 		Game_IsPaused = false;
 		UnpauseActors();
 		APlayableController* PlayableController = Cast<APlayableController>(Player->GetController());
-		PlayableController->SetShowMouseCursor(false);
 	}
 	else if (!Game_IsPaused)
 	{
@@ -220,7 +219,6 @@ void ARadioactiveSpire_GameModeBase::GamePause()
 		}
 		Camera->CustomTimeDilation = 1.0f;
 		APlayableController* PlayableController = Cast<APlayableController>(Player->GetController());
-		PlayableController->SetShowMouseCursor(true);
 	}
 }
 

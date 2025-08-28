@@ -16,6 +16,11 @@
 
 bool UPlayableWidget::Initialize()
 {
+    bIsFocusable = true;
+    SetKeyboardFocus();
+    if (GEngine)
+        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Focus: " + FString::FromInt(IsFocusable())));
+
     bool bResult = Super::Initialize();
     if (!bResult)
         return false;
@@ -61,6 +66,7 @@ bool UPlayableWidget::Initialize()
     {
         Button->SetVisibility(ESlateVisibility::Hidden);
         Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnResume);
+        PauseButtons.Add(Button);
     }
 
     Button = Cast<UButton>(GetWidgetFromName("Retry"));
@@ -68,12 +74,14 @@ bool UPlayableWidget::Initialize()
     {
         Button->SetVisibility(ESlateVisibility::Hidden);
         Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnRetry);
+        PauseButtons.Add(Button);
     }
     Button = Cast<UButton>(GetWidgetFromName("Options"));
     if (Button)
     {
         Button->SetVisibility(ESlateVisibility::Hidden);
         Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnOptions);
+        PauseButtons.Add(Button);
     }
 
     Button = Cast<UButton>(GetWidgetFromName("Quit"));
@@ -81,6 +89,7 @@ bool UPlayableWidget::Initialize()
     {
         Button->SetVisibility(ESlateVisibility::Hidden);
         Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnQuit);
+        PauseButtons.Add(Button);
     }
 
 
@@ -208,6 +217,8 @@ void UPlayableWidget::UpdatePause()
         Button = Cast<UButton>(GetWidgetFromName("Quit"));
         if (Button)
             Button->SetVisibility(ESlateVisibility::Visible);
+
+
     }
     else if (GameModeBase && !GameModeBase->Game_IsPaused)
     {
@@ -285,4 +296,13 @@ void UPlayableWidget::OnQuit()
     APlayableCharacter* player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
     APlayableController* PlayableController = Cast<APlayableController>(player->GetController());
     UKismetSystemLibrary::QuitGame(GetWorld(), PlayableController, EQuitPreference::Quit, true);
+}
+
+void UPlayableWidget::PauseMenuNavigation(float dir)//tried FReply UPlayableWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
+{                                                       //didnt work
+    Increment += dir;
+    if (Increment < 0)
+        Increment = PauseButtons.Num();
+    else if (Increment > PauseButtons.Num())
+        Increment = 0;
 }

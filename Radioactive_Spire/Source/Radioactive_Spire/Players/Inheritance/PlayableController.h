@@ -52,6 +52,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* PauseInputAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* PauseButtonNavigation;
+
 
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced input")
 	//class UInputAction* UpInputAction;
@@ -91,6 +94,8 @@ protected:
 	void OnSuperPressed(const struct FInputActionValue& Value);
 
 	void OnPausePressed(const struct FInputActionValue& Value);
+
+	void OnPauseButtonNavigation(const struct FInputActionValue& Value);
 
 private:
 	class APlayableCharacter* PlayablePlayer;

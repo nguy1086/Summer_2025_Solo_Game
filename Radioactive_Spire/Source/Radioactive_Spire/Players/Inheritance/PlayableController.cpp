@@ -38,8 +38,6 @@ void APlayableController::BeginPlay()
 	{
 		GameInfoWidget = CreateWidget<UPlayableWidget>(this, GameInfoBP);
 		GameInfoWidget->AddToViewport();
-		GameInfoWidget->bIsFocusable = true;
-		GameInfoWidget->SetKeyboardFocus();
 	}
 	GameModeBase = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
 }
@@ -83,6 +81,8 @@ void APlayableController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(SuperInputAction, ETriggerEvent::Started, this, &APlayableController::OnSuperPressed);
 
 		EnhancedInputComponent->BindAction(PauseInputAction, ETriggerEvent::Started, this, &APlayableController::OnPausePressed);
+
+		EnhancedInputComponent->BindAction(PauseButtonNavigation, ETriggerEvent::Started, this, &APlayableController::OnPauseButtonNavigation);
 
 		//EnhancedInputComponent->BindAction(UpInputAction, ETriggerEvent::Started, this, &APlayableController::OnUpPressed);
 	}
@@ -225,8 +225,9 @@ void APlayableController::OnMoveReleased(const FInputActionValue& Value)
 
 void APlayableController::OnJumpPressed(const FInputActionValue& Value)
 {
-	if (PlayablePlayer != nullptr)
-		PlayablePlayer->Jump();
+	if (!GameModeBase->Game_IsPaused)
+		if (PlayablePlayer != nullptr)
+			PlayablePlayer->Jump();
 }
 
 void APlayableController::OnJumpReleased(const FInputActionValue& Value)
@@ -237,8 +238,9 @@ void APlayableController::OnJumpReleased(const FInputActionValue& Value)
 
 void APlayableController::OnDuckPressed(const FInputActionValue& Value)
 {
-	if (PlayablePlayer != nullptr)
-		PlayablePlayer->Duck();
+	if (!GameModeBase->Game_IsPaused)
+		if (PlayablePlayer != nullptr)
+			PlayablePlayer->Duck();
 
 	//if (GEngine)
 	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Start Ducking!"));
@@ -310,6 +312,14 @@ void APlayableController::OnPausePressed(const FInputActionValue& Value)
 {
 	if (GameModeBase != nullptr)
 		GameModeBase->GamePause();
+}
+
+void APlayableController::OnPauseButtonNavigation(const FInputActionValue& Value)
+{
+	float Direction = Value.Get<float>();
+	if (GameModeBase->Game_IsPaused)
+		if (GameInfoWidget)
+			GameInfoWidget->PauseMenuNavigation(Direction);
 }
 
 //void APlayableController::OnUpPressed(const FInputActionValue& Value)

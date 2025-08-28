@@ -33,4 +33,10 @@ public:
 	void OnRetry();
 	UFUNCTION()
 	void OnQuit();
+
+	void PauseMenuNavigation(float dir);
+
+private:
+	TArray<class UButton*> PauseButtons;
+	int Increment;
 };
