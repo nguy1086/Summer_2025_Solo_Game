@@ -35,6 +35,7 @@ public:
 	void OnQuit();
 
 	void PauseMenuNavigation(float dir);
+	void PauseMenuPressed();
 
 private:
 	TArray<class UButton*> PauseButtons;

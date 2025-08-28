@@ -334,7 +334,9 @@ void UPlayableWidget::PauseMenuNavigation(float dir)//tried FReply UPlayableWidg
         Increment = PauseButtons.Num() -1;
     else if (Increment >= PauseButtons.Num())
         Increment = 0;
+}
 
-    if (GEngine)
-        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Increment: " + FString::FromInt(Increment)));
+void UPlayableWidget::PauseMenuPressed()
+{
+    PauseButtons[Increment]->OnClicked.Broadcast();
 }
