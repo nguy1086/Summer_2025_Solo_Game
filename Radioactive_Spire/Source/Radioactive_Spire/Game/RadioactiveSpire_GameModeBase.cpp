@@ -89,12 +89,6 @@ void ARadioactiveSpire_GameModeBase::Tick(float DeltaTime)
 				SuperAttackPaused->ProjectileMovementComponent->Velocity = SuperPausedVelocity;
 		}
 	}
-	else if (SpawnDelay >= 0.0f)
-	{
-		SpawnDelay -= DeltaTime;
-		if (SpawnDelay <= 0.0f)
-			SpawnEnemy();
-	}
 	else
 	{
 		TArray<AActor*> ActorsWithTag;
@@ -116,6 +110,10 @@ void ARadioactiveSpire_GameModeBase::Tick(float DeltaTime)
 			}
 		}
 	}
+
+	SpawnDelay -= DeltaTime;
+	if (SpawnDelay <= 0.0f)
+		SpawnEnemy();
 }
 
 void ARadioactiveSpire_GameModeBase::PlayerDied()
@@ -299,10 +297,20 @@ void ARadioactiveSpire_GameModeBase::TransitionToNextLevel()
 	CurrentEnemiesSpawned = 0;
 	EnemiesKilled = 0;
 	WaitTimer = WaitMax;
+	SpawnDelay = 0.2f;
 
 	ARadioactiveSpire_GameStateBase* gameState = GetGameState<ARadioactiveSpire_GameStateBase>();
 	if (gameState != nullptr)
 		gameState->BlackOverlayAlpha = 1.0f;
+
+	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		AActor* actor = *ActorItr;
+		APaperTileMapActor* earlytilemap = Cast<APaperTileMapActor>(actor);
+		if (earlytilemap)
+			if (earlytilemap->GetActorLocation().Y > tilemap->GetActorLocation().Y + 128.0f)
+				earlytilemap->Destroy();
+	}
 }
 
 void ARadioactiveSpire_GameModeBase::SpawnEnemy()
@@ -314,10 +322,7 @@ void ARadioactiveSpire_GameModeBase::SpawnEnemy()
 
 		ASlime* slime = GetWorld()->SpawnActor<ASlime>(Slime, FVector(x[index], Player->GetActorLocation().Y, 940.0f + Camera->LevelZIncrease), FRotator::ZeroRotator);
 		CurrentEnemiesSpawned++;
-		if (CurrentEnemiesSpawned == MaxEnemiesSpawn)
-			SpawnDelay = 0.0f;
-		else
-			SpawnDelay = FMath::RandRange(0.5f, 2.5f);
+		SpawnDelay = FMath::RandRange(0.5f, 2.5f) - (0.1f * Level);
 	}
 }
 
