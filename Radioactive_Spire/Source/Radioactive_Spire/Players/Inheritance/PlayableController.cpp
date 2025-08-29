@@ -258,11 +258,11 @@ void APlayableController::OnDuckReleased(const FInputActionValue& Value)
 void APlayableController::OnAttackPressed(const FInputActionValue& Value)
 {
 	if (PlayablePlayer != nullptr && GameModeBase != nullptr)
-		if (GameModeBase->Game_IsPaused)
+		if (!GameModeBase->Game_IsPaused)
+			PlayablePlayer->Attack();
+		else
 			if (GameInfoWidget)
 				GameInfoWidget->PauseMenuPressed();
-		else
-			PlayablePlayer->Attack();
 
 	//if (GEngine)
 	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Attack!"));

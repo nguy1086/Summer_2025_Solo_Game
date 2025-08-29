@@ -100,6 +100,12 @@ bool UPlayableWidget::Initialize()
         PauseButtons.Add(Button);
     }
 
+    Widget = Cast<UTextBlock>(GetWidgetFromName("PausedText"));
+    if (Widget)
+    {
+        Widget->SetText(FText::FromString("Paused"));
+        Widget->SetVisibility(ESlateVisibility::Hidden);
+    }
 
     return true;
 }
@@ -225,6 +231,9 @@ void UPlayableWidget::UpdatePause()
         Button = Cast<UButton>(GetWidgetFromName("Quit"));
         if (Button)
             Button->SetVisibility(ESlateVisibility::Visible);
+        Widget = Cast<UTextBlock>(GetWidgetFromName("PausedText"));
+        if (Widget)
+            Widget->SetVisibility(ESlateVisibility::Visible);
 
         //static ConstructorHelpers::FClassFinder<UTexture2D> PlayerControllerBPClass(TEXT("/Game/ThirdPerson/Blueprints/BP_TankController"));
         FSlateBrush brush;
@@ -296,6 +305,9 @@ void UPlayableWidget::UpdatePause()
         Button = Cast<UButton>(GetWidgetFromName("Quit"));
         if (Button)
             Button->SetVisibility(ESlateVisibility::Hidden);
+        Widget = Cast<UTextBlock>(GetWidgetFromName("PausedText"));
+        if (Widget)
+            Widget->SetVisibility(ESlateVisibility::Hidden);
 
         Increment = 0;
     }

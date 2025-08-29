@@ -53,7 +53,7 @@ void ARadioactiveSpire_GameModeBase::BeginPlay()
     Super::BeginPlay();
 	Player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
 	Player->SetActorLocation(FVector(360.0f, 0.0f, 200.0f));
-	MaxEnemiesSpawn = FMath::RandRange(1, 1);
+	MaxEnemiesSpawn = FMath::RandRange(7, 10);
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;

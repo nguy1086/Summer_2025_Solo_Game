@@ -3,8 +3,6 @@
 
 #include "Slime.h"
 #include "Components/CapsuleComponent.h"
-#include "../../AIModule/Classes/Perception/PawnSensingComponent.h"
-#include "../../AIModule/Classes/AIController.h"
 
 #include "PaperFlipbook.h"
 #include "PaperFlipbookComponent.h"
