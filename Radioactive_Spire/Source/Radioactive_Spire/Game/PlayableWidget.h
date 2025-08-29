@@ -34,6 +34,9 @@ public:
 	UFUNCTION()
 	void OnQuit();
 
+	UFUNCTION()
+	void SetIncrement(int i);
+
 	void PauseMenuNavigation(float dir);
 	void PauseMenuPressed();
 

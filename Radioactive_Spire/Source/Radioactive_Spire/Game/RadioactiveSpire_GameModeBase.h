@@ -73,6 +73,7 @@ private:
 	float WaitTimer;
 
 	void IncrementLevelPosition();
+	TSubclassOf<class APaperTileMapActor> GetRandomRedDesertLevel();
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Death Templates")
 	TSubclassOf<class ADeadActor> DeadTestTemplate;
@@ -81,7 +82,15 @@ public:
 	TSubclassOf<class ADeadActor> DeadBatterTemplate;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level Templates")
-	TSubclassOf<class APaperTileMapActor> RedDesertLevel;
+	TSubclassOf<class APaperTileMapActor> RedDesertLevelOne;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level Templates")
+	TSubclassOf<class APaperTileMapActor> RedDesertLevelTwo;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level Templates")
+	TSubclassOf<class APaperTileMapActor> RedDesertLevelThree;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level Templates")
+	TSubclassOf<class APaperTileMapActor> RedDesertLevelFour;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level Templates")
+	TSubclassOf<class APaperTileMapActor> RedDesertLevelFive;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level Templates")
 	TSubclassOf<class APaperTileMapActor> RedDesertSky;

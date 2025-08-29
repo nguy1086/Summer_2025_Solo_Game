@@ -61,12 +61,13 @@ void ARadioactiveSpire_GameModeBase::BeginPlay()
 	ApplyViewMode(EViewModeIndex::VMI_Unlit, false, *GetWorld()->GetGameViewport()->GetEngineShowFlags());
 
 
-	if (RedDesertLevel)
-	{
-		APaperTileMapActor* tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(RedDesertLevel, LevelPosition, FRotator::ZeroRotator);
-		IncrementLevelPosition();
-		tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(RedDesertLevel, LevelPosition, FRotator::ZeroRotator);
-	}
+	//if (RedDesertLevel)
+	//{
+	//}
+	APaperTileMapActor* tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(GetRandomRedDesertLevel(), LevelPosition, FRotator::ZeroRotator);
+	IncrementLevelPosition();
+	tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(GetRandomRedDesertLevel(), LevelPosition, FRotator::ZeroRotator);
+
 	if (RedDesertSky)
 	{
 		APaperTileMapActor* tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(RedDesertSky, FVector(-1008.0f, 0.0f, 2000.0f), FRotator::ZeroRotator);
@@ -325,7 +326,7 @@ void ARadioactiveSpire_GameModeBase::UnblackenActors()
 void ARadioactiveSpire_GameModeBase::TransitionToNextLevel()
 {
 	IncrementLevelPosition();
-	APaperTileMapActor* tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(RedDesertLevel, LevelPosition, FRotator::ZeroRotator);
+	APaperTileMapActor* tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(GetRandomRedDesertLevel(), LevelPosition, FRotator::ZeroRotator);
 	TransitionPosition = FVector(Player->GetActorLocation().X, tilemap->GetActorLocation().Y + GameConstants::LevelPosYIncrement, Player->GetActorLocation().Z + 64.0f);
 	//Player->SetActorLocation(FVector(Player->GetActorLocation().X, tilemap->GetActorLocation().Y, Player->GetActorLocation().Z + 64.0f));
 	MaxEnemiesSpawn += FMath::RandRange(7, 10);
@@ -367,4 +368,10 @@ void ARadioactiveSpire_GameModeBase::IncrementLevelPosition()
 	LevelPosition.Y -= GameConstants::LevelPosYIncrement;
 	LevelPosition.Z += GameConstants::LevelPosZIncrement;
 	Camera->LevelZIncrease += GameConstants::LevelPosZIncrement;
+}
+
+TSubclassOf<APaperTileMapActor> ARadioactiveSpire_GameModeBase::GetRandomRedDesertLevel()
+{
+	TArray<TSubclassOf<APaperTileMapActor>> x = { RedDesertLevelOne, RedDesertLevelTwo, RedDesertLevelThree, RedDesertLevelFour, RedDesertLevelFive };
+	return x[FMath::RandRange(0, 4)];
 }

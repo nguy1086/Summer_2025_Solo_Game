@@ -235,17 +235,24 @@ void UPlayableWidget::UpdatePause()
         if (Widget)
             Widget->SetVisibility(ESlateVisibility::Visible);
 
-        //static ConstructorHelpers::FClassFinder<UTexture2D> PlayerControllerBPClass(TEXT("/Game/ThirdPerson/Blueprints/BP_TankController"));
         FSlateBrush brush;
         UTexture2D* NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_ButtonHover.Game_ButtonHover")));
+
         brush.SetResourceObject(NormalTexture);
         brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.724268f, 0.724268f, 0.724268f, 1.0f)));
         FButtonStyle style;
         style.SetNormal(brush);
+        style.SetHovered(brush);
+
+        NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_ButtonPressed.Game_ButtonPressed")));
+        brush.SetResourceObject(NormalTexture);
+        style.SetPressed(brush);
         PauseButtons[Increment]->SetStyle(style);
 
         for (int i = 0; i < PauseButtons.Num(); i++)
         {
+            if (PauseButtons[i]->IsHovered())
+                Increment = i;
             if (i != Increment)
             {
                 NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_Button.Game_Button")));
@@ -337,6 +344,10 @@ void UPlayableWidget::OnQuit()
     APlayableCharacter* player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
     APlayableController* PlayableController = Cast<APlayableController>(player->GetController());
     UKismetSystemLibrary::QuitGame(GetWorld(), PlayableController, EQuitPreference::Quit, true);
+}
+
+void UPlayableWidget::SetIncrement(int i)
+{
 }
 
 void UPlayableWidget::PauseMenuNavigation(float dir)//tried FReply UPlayableWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
