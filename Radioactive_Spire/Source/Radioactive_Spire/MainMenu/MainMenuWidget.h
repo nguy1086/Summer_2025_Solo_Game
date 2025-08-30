@@ -44,11 +44,11 @@ public:
 	void MainMenuNavigation(float dir);
 	void MainMenuPressed();
 	void MainMenuBackPressed();
+	void MoveWidget(float posx, float posy, float DeltaTime, float speed = 48.0f);
 
 private:
 	class AMainMenu_GameModeBase* GameModeBase;
 	EMainMenuState State;
 	TArray<class UButton*> MainMenuButtons;
 	int Increment;
-	const float TransitionSpeed = 8.0f;
 };

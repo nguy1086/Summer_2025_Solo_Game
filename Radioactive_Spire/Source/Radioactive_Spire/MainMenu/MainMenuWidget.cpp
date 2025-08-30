@@ -74,18 +74,7 @@ void UMainMenuWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
     if (State == EMainMenuState::MainMenu)
     {
-        FWidgetTransform CurrentTransform = GetRenderTransform();
-
-        float x = FMath::FInterpTo(0.0f, CurrentTransform.Translation.X, InDeltaTime, TransitionSpeed);
-        float y = FMath::FInterpTo(0.0f, CurrentTransform.Translation.Y, InDeltaTime, TransitionSpeed);
-     
-        CurrentTransform.Translation = FVector2D(x, y);
-        SetRenderTransform(CurrentTransform);
-
-        if (GEngine)
-            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("x: " + FString::SanitizeFloat(CurrentTransform.Translation.X)));
-        if (GEngine)
-            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("y: " + FString::SanitizeFloat(CurrentTransform.Translation.Y)));
+        MoveWidget(0.0f, 0.0f, InDeltaTime);
 
         FSlateBrush brush;
         UTexture2D* NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_ButtonHover.Game_ButtonHover")));
@@ -117,33 +106,11 @@ void UMainMenuWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
     }
     else if (State == EMainMenuState::Options)
     {
-        FWidgetTransform CurrentTransform = GetRenderTransform();
-
-        float x = FMath::FInterpTo(2880.0f, CurrentTransform.Translation.X, InDeltaTime, TransitionSpeed);
-        float y = FMath::FInterpTo(0.0f, CurrentTransform.Translation.Y, InDeltaTime, TransitionSpeed);
-
-        CurrentTransform.Translation = FVector2D(x, y);
-        SetRenderTransform(CurrentTransform);
-
-        if (GEngine)
-            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("x: " + FString::SanitizeFloat(CurrentTransform.Translation.X)));
-        if (GEngine)
-            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("y: " + FString::SanitizeFloat(CurrentTransform.Translation.Y)));
+        MoveWidget(2880.0f, 0.0f, InDeltaTime);
     }
     else if (State == EMainMenuState::Character)
     {
-        FWidgetTransform CurrentTransform = GetRenderTransform();
-
-        float x = FMath::FInterpTo(0.0f, CurrentTransform.Translation.X, InDeltaTime, TransitionSpeed);
-        float y = FMath::FInterpTo(-1080.0f, CurrentTransform.Translation.Y, InDeltaTime, TransitionSpeed);
-
-        CurrentTransform.Translation = FVector2D(x, y);
-        SetRenderTransform(CurrentTransform);
-
-        if (GEngine)
-            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("x: " + FString::SanitizeFloat(CurrentTransform.Translation.X)));
-        if (GEngine)
-            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("y: " + FString::SanitizeFloat(CurrentTransform.Translation.Y)));
+        MoveWidget(0.0f, -1080.0f, InDeltaTime);
     }
 }
 
@@ -215,4 +182,22 @@ void UMainMenuWidget::MainMenuBackPressed()
 
     if (GEngine)
         GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Main Menu!"));
+}
+
+void UMainMenuWidget::MoveWidget(float posx, float posy, float DeltaTime, float speed = 48.0f)
+{
+    FWidgetTransform CurrentTransform = GetRenderTransform();
+
+    float x = FMath::FInterpTo(posx, CurrentTransform.Translation.X, DeltaTime, speed);
+    float y = FMath::FInterpTo(posy, CurrentTransform.Translation.Y, DeltaTime, speed);
+
+    if (GEngine)
+        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("x: " + FString::SanitizeFloat(CurrentTransform.Translation.X)));
+    if (GEngine)
+        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("y: " + FString::SanitizeFloat(CurrentTransform.Translation.Y)));
+    if (GEngine)
+        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("DeltaTime: " + FString::SanitizeFloat(DeltaTime)));
+
+    CurrentTransform.Translation = FVector2D(x, y);
+    SetRenderTransform(CurrentTransform);
 }
