@@ -18,7 +18,6 @@ AMainMenuController::AMainMenuController() :
     InputSubsystem(nullptr)
 {
     Tags.Add("Controller");
-    //PrimaryActorTick.bCanEverTick = true;
 }
 
 void AMainMenuController::BeginPlay()

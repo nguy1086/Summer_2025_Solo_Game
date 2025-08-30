@@ -27,10 +27,6 @@ bool UMainMenuWidget::Initialize()
     if (!bResult)
         return false;
 
-    UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(GetWidgetFromName("MainCanvas"));
-    if (CanvasSlot)
-        CanvasSlot->SetPosition(FVector2D(0.0f, 0.0f));
-
     UImage* Image = Cast<UImage>(GetWidgetFromName("Intro"));
     if (Image)
         Image->SetVisibility(ESlateVisibility::Visible);
@@ -78,17 +74,18 @@ void UMainMenuWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
     if (State == EMainMenuState::MainMenu)
     {
+        FWidgetTransform CurrentTransform = GetRenderTransform();
+
+        float x = FMath::FInterpTo(0.0f, CurrentTransform.Translation.X, InDeltaTime, TransitionSpeed);
+        float y = FMath::FInterpTo(0.0f, CurrentTransform.Translation.Y, InDeltaTime, TransitionSpeed);
+     
+        CurrentTransform.Translation = FVector2D(x, y);
+        SetRenderTransform(CurrentTransform);
+
         if (GEngine)
-	        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Main Menu!"));
-
-        UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(GetWidgetFromName("MainCanvas"));
-        if (CanvasSlot)
-        {
-            float x = FMath::FInterpTo(0.0f, CanvasSlot->GetPosition().X, InDeltaTime, 8.0f);
-            float y = FMath::FInterpTo(0.0f, CanvasSlot->GetPosition().Y, InDeltaTime, 8.0f);
-
-            CanvasSlot->SetPosition(FVector2D(x, y));
-        }
+            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("x: " + FString::SanitizeFloat(CurrentTransform.Translation.X)));
+        if (GEngine)
+            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("y: " + FString::SanitizeFloat(CurrentTransform.Translation.Y)));
 
         FSlateBrush brush;
         UTexture2D* NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_ButtonHover.Game_ButtonHover")));
@@ -120,31 +117,33 @@ void UMainMenuWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
     }
     else if (State == EMainMenuState::Options)
     {
+        FWidgetTransform CurrentTransform = GetRenderTransform();
+
+        float x = FMath::FInterpTo(2880.0f, CurrentTransform.Translation.X, InDeltaTime, TransitionSpeed);
+        float y = FMath::FInterpTo(0.0f, CurrentTransform.Translation.Y, InDeltaTime, TransitionSpeed);
+
+        CurrentTransform.Translation = FVector2D(x, y);
+        SetRenderTransform(CurrentTransform);
+
         if (GEngine)
-            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Options!"));
-
-        UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(GetWidgetFromName("MainCanvas"));
-        if (CanvasSlot)
-        {
-            float x = FMath::FInterpTo(0.0f, CanvasSlot->GetPosition().X, InDeltaTime, 8.0f);
-            float y = FMath::FInterpTo(-1920.0f, CanvasSlot->GetPosition().Y, InDeltaTime, 8.0f);
-
-            CanvasSlot->SetPosition(FVector2D(x, y));
-        }
+            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("x: " + FString::SanitizeFloat(CurrentTransform.Translation.X)));
+        if (GEngine)
+            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("y: " + FString::SanitizeFloat(CurrentTransform.Translation.Y)));
     }
     else if (State == EMainMenuState::Character)
     {
+        FWidgetTransform CurrentTransform = GetRenderTransform();
+
+        float x = FMath::FInterpTo(0.0f, CurrentTransform.Translation.X, InDeltaTime, TransitionSpeed);
+        float y = FMath::FInterpTo(-1080.0f, CurrentTransform.Translation.Y, InDeltaTime, TransitionSpeed);
+
+        CurrentTransform.Translation = FVector2D(x, y);
+        SetRenderTransform(CurrentTransform);
+
         if (GEngine)
-            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Character Select!"));
-
-        UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(GetWidgetFromName("MainCanvas"));
-        if (CanvasSlot)
-        {
-            float x = FMath::FInterpTo(1080.0f, CanvasSlot->GetPosition().X, InDeltaTime, 8.0f);
-            float y = FMath::FInterpTo(0.0f, CanvasSlot->GetPosition().Y, InDeltaTime, 8.0f);
-
-            CanvasSlot->SetPosition(FVector2D(x, y));
-        }
+            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("x: " + FString::SanitizeFloat(CurrentTransform.Translation.X)));
+        if (GEngine)
+            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("y: " + FString::SanitizeFloat(CurrentTransform.Translation.Y)));
     }
 }
 
@@ -167,7 +166,10 @@ void UMainMenuWidget::UpdateCharacterSelect()
 void UMainMenuWidget::OnCharacterSelect()
 {
     if (State == EMainMenuState::MainMenu || State == EMainMenuState::Options)
+    {
         State = EMainMenuState::Character;
+        Increment = 0;
+    }
 
     if (GEngine)
         GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Character Select!"));
@@ -176,7 +178,10 @@ void UMainMenuWidget::OnCharacterSelect()
 void UMainMenuWidget::OnMainMenuOptions()
 {
     if (State == EMainMenuState::MainMenu || State == EMainMenuState::Character)
+    {
         State = EMainMenuState::Options;
+        Increment = 0;
+    }
 
     if (GEngine)
         GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Options!"));

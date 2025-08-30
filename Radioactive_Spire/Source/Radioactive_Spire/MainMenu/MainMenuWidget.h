@@ -50,4 +50,5 @@ private:
 	EMainMenuState State;
 	TArray<class UButton*> MainMenuButtons;
 	int Increment;
+	const float TransitionSpeed = 8.0f;
 };
