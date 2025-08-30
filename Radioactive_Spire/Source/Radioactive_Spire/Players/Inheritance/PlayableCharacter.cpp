@@ -508,7 +508,7 @@ void APlayableCharacter::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
 
-	if (PlayerState->State == EState::Hurt)//safe check when doing air attacks
+	if (PlayerState != nullptr && PlayerState->State == EState::Hurt)//safe check when doing air attacks
 		ResetPlayerState();
 
 	if (PlayerState)

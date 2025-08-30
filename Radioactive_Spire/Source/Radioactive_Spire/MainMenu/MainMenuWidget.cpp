@@ -2,6 +2,8 @@
 
 
 #include "MainMenuWidget.h"
+#include "MainMenu_GameModeBase.h"
+
 #include "Components/TextBlock.h"
 #include "Components/ProgressBar.h"
 #include "Components/Button.h"
@@ -15,6 +17,8 @@
 
 bool UMainMenuWidget::Initialize()
 {
+    GameModeBase = GetWorld()->GetAuthGameMode<AMainMenu_GameModeBase>();
+    State = EMainMenuState::MainMenu;
     Increment = 0;
     bIsFocusable = true;
     SetKeyboardFocus();
@@ -164,18 +168,24 @@ void UMainMenuWidget::OnCharacterSelect()
 {
     if (State == EMainMenuState::MainMenu || State == EMainMenuState::Options)
         State = EMainMenuState::Character;
+
+    if (GEngine)
+        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Character Select!"));
 }
 
 void UMainMenuWidget::OnMainMenuOptions()
 {
     if (State == EMainMenuState::MainMenu || State == EMainMenuState::Character)
         State = EMainMenuState::Options;
+
+    if (GEngine)
+        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Options!"));
 }
 
 void UMainMenuWidget::OnMainMenuQuit()
 {
-    APawn* player = GetWorld()->GetFirstPlayerController()->GetPawn<APawn>();
-    AMainMenuController* PlayableController = Cast<AMainMenuController>(player->GetController());
+
+    AMainMenuController* PlayableController = Cast<AMainMenuController>(GameModeBase->GetInstigatorController());
     UKismetSystemLibrary::QuitGame(GetWorld(), PlayableController, EQuitPreference::Quit, true);
 }
 
@@ -197,4 +207,7 @@ void UMainMenuWidget::MainMenuBackPressed()
 {
     if (State == EMainMenuState::Character || State == EMainMenuState::Options)
         State = EMainMenuState::MainMenu;
+
+    if (GEngine)
+        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Main Menu!"));
 }

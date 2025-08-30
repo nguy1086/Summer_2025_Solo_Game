@@ -46,6 +46,7 @@ public:
 	void MainMenuBackPressed();
 
 private:
+	class AMainMenu_GameModeBase* GameModeBase;
 	EMainMenuState State;
 	TArray<class UButton*> MainMenuButtons;
 	int Increment;
