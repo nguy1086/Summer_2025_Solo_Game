@@ -6,6 +6,7 @@
 #include "Components/ProgressBar.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
+#include "Components/Border.h"
 
 #include "Kismet/GameplayStatics.h"
 
@@ -106,6 +107,10 @@ bool UPlayableWidget::Initialize()
         Widget->SetText(FText::FromString("Paused"));
         Widget->SetVisibility(ESlateVisibility::Hidden);
     }
+    //------------------------------------------------------------------------
+    UBorder* Border = Cast<UBorder>(GetWidgetFromName("Fade"));
+    if (Border)
+        Border->SetVisibility(ESlateVisibility::Visible);
 
     return true;
 }
@@ -341,9 +346,8 @@ void UPlayableWidget::OnRetry()
 
 void UPlayableWidget::OnPauseQuit()
 {
-    APlayableCharacter* player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
-    APlayableController* PlayableController = Cast<APlayableController>(player->GetController());
-    UKismetSystemLibrary::QuitGame(GetWorld(), PlayableController, EQuitPreference::Quit, true);
+    UObject* WorldContextObject = this;
+    UGameplayStatics::OpenLevel(WorldContextObject, FName(TEXT("MainMenu")));
 }
 
 void UPlayableWidget::PauseMenuNavigation(float dir)//tried FReply UPlayableWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)

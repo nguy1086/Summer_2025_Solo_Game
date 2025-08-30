@@ -36,7 +36,7 @@ APlayableCharacter::APlayableCharacter() :
 	//InitializeType();
 	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
 	//DEBUG
-	GetCapsuleComponent()->SetHiddenInGame(false);
+	//GetCapsuleComponent()->SetHiddenInGame(false);
 
     Tags.Add("Player");
 }

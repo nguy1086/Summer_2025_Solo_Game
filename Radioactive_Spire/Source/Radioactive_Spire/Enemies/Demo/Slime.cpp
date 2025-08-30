@@ -24,7 +24,7 @@ ASlime::ASlime() :
     GetCharacterMovement()->MaxWalkSpeed = 20.0f;
     Damage = 10.0f;
 
-    GetCapsuleComponent()->SetHiddenInGame(false);
+    //GetCapsuleComponent()->SetHiddenInGame(false);
 }
 
 void ASlime::BeginPlay()

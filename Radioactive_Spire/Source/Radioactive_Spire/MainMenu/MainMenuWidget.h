@@ -66,5 +66,5 @@ private:
 	int Increment;
 	int OptionIncrement;
 	int CharacterIncrement;
-	float IntroTimer;
+	float FadeTimer;
 };

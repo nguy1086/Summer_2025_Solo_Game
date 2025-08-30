@@ -39,7 +39,7 @@ APlayableAttackHitbox::APlayableAttackHitbox() :
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
 	ProjectileMovementComponent->bSimulationEnabled = true;
 
-	RootComponent->SetHiddenInGame(false);
+	//RootComponent->SetHiddenInGame(false);
 
 	Tags.Add("PlayerHitbox");
 }
@@ -55,8 +55,8 @@ void APlayableAttackHitbox::OnOverlapBegin(UPrimitiveComponent* OverlapComponent
 	AEnemy* enemy = Cast<AEnemy>(OtherActor);
 	if (enemy)
 	{
-		if (GEngine)
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Hit! Damage: " + FString::FromInt(Damage)) );
+		//if (GEngine)
+		//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Hit! Damage: " + FString::FromInt(Damage)) );
 
 		enemy->OnDamaged(Damage);
 		ChargeSuper();

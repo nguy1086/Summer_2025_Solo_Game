@@ -18,7 +18,7 @@
 
 bool UMainMenuWidget::Initialize()
 {
-    IntroTimer = 4.0f;
+    FadeTimer = 4.0f;
     GameModeBase = GetWorld()->GetAuthGameMode<AMainMenu_GameModeBase>();
     State = EMainMenuState::Intro;
     FWidgetTransform CurrentTransform = GetRenderTransform();
@@ -99,12 +99,59 @@ bool UMainMenuWidget::Initialize()
     }
     //-------------------------------------------------------------------------------------------------
     //character
+    FSlateBrush brush;
+    UTexture2D* NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/MainMenu/MainMenu_CharacterSelectBatterIcon.MainMenu_CharacterSelectBatterIcon")));
+    brush.SetResourceObject(NormalTexture);
+    FButtonStyle style;
+    style.SetNormal(brush);
+    style.SetHovered(brush);
+    style.SetPressed(brush);
     Button = Cast<UButton>(GetWidgetFromName("Batter_Select"));
     if (Button)
     {
         Button->SetVisibility(ESlateVisibility::Visible);
         Button->OnClicked.AddDynamic(this, &UMainMenuWidget::OnBatterSelect);
+        Button->SetStyle(style);
         CharacterSelections.Add(Button);
+    }
+    NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/MainMenu/MainMenu_CharacterSelectLockedIcon.MainMenu_CharacterSelectLockedIcon")));
+    brush.SetResourceObject(NormalTexture);
+    style.SetNormal(brush);
+    style.SetHovered(brush);
+    style.SetPressed(brush);
+    Button = Cast<UButton>(GetWidgetFromName("Locked1"));
+    if (Button)
+    {
+        Button->SetVisibility(ESlateVisibility::Visible);
+        Button->SetStyle(style);
+        CharacterSelections.Add(Button);
+    }
+    Button = Cast<UButton>(GetWidgetFromName("Locked2"));
+    if (Button)
+    {
+        Button->SetVisibility(ESlateVisibility::Visible);
+        Button->SetStyle(style);
+        CharacterSelections.Add(Button);
+    }
+    Button = Cast<UButton>(GetWidgetFromName("Locked3"));
+    if (Button)
+    {
+        Button->SetVisibility(ESlateVisibility::Visible);
+        Button->SetStyle(style);
+        CharacterSelections.Add(Button);
+    }
+    Button = Cast<UButton>(GetWidgetFromName("Locked4"));
+    if (Button)
+    {
+        Button->SetVisibility(ESlateVisibility::Visible);
+        Button->SetStyle(style);
+        CharacterSelections.Add(Button);
+    }
+    Border = Cast<UBorder>(GetWidgetFromName("CharacterFade"));
+    if (Border)
+    {
+        Border->SetVisibility(ESlateVisibility::Visible);
+        Border->SetRenderOpacity(0.0f);
     }
 
     return true;
@@ -153,16 +200,37 @@ void UMainMenuWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
     else if (State == EMainMenuState::Character)
     {
         MoveWidget(0.0f, -1080.0f, InDeltaTime);
+
+        //FSlateBrush brush;
+
+        //brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.724268f, 0.724268f, 0.724268f, 1.0f)));
+        //FButtonStyle style;
+        //style.SetNormal(brush);
+        //style.SetHovered(brush);
+        //style.SetPressed(brush);
+        //CharacterSelections[CharacterIncrement]->SetStyle(style);
+
+        //for (int i = 0; i < CharacterSelections.Num(); i++)
+        //{
+        //    if (CharacterSelections[i]->IsHovered())
+        //        CharacterIncrement = i;
+        //    if (i != CharacterIncrement)
+        //    {
+        //        brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.495466f, 0.495466f, 0.495466f, 1.0f)));
+        //        style.SetNormal(brush);
+        //        CharacterSelections[i]->SetStyle(style);
+        //    }
+        //}
     }
     else if (State == EMainMenuState::Intro)
     {
-        IntroTimer -= InDeltaTime;
+        FadeTimer -= InDeltaTime;
         UBorder* Border = Cast<UBorder>(GetWidgetFromName("Fade"));
         if (Border)
-            Border->SetRenderOpacity((IntroTimer - 2.0f) / 2.0f);
+            Border->SetRenderOpacity((FadeTimer - 2.0f) / 2.0f);
 
 
-        if (IntroTimer <= 0.0f)
+        if (FadeTimer <= 0.0f)
         {
             MoveWidget(0.0, 0.0f, InDeltaTime, 56.0f);
             FWidgetTransform CurrentTransform = GetRenderTransform();
@@ -171,7 +239,20 @@ void UMainMenuWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
                 State = EMainMenuState::MainMenu;
                 CurrentTransform.Translation = FVector2D(0.0f, 0.0f);
                 SetRenderTransform(CurrentTransform);
+                FadeTimer = 0.0f;
             }
+        }
+    }
+    else if (State == EMainMenuState::Loading)
+    {
+        FadeTimer += InDeltaTime;
+        UBorder* Border = Cast<UBorder>(GetWidgetFromName("CharacterFade"));
+        if (Border)
+            Border->SetRenderOpacity(FadeTimer / 1.5f);
+
+        if (FadeTimer >= 3.5f)
+        {
+            CharacterSelections[CharacterIncrement]->OnClicked.Broadcast();
         }
     }
 }
@@ -199,9 +280,6 @@ void UMainMenuWidget::OnCharacterSelect()
         State = EMainMenuState::Character;
         ResetIncrement();
     }
-
-    if (GEngine)
-        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Character Select!"));
 }
 
 void UMainMenuWidget::OnMainMenuOptions()
@@ -211,57 +289,56 @@ void UMainMenuWidget::OnMainMenuOptions()
         State = EMainMenuState::Options;
         ResetIncrement();
     }
-
-    if (GEngine)
-        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Options!"));
 }
 
 void UMainMenuWidget::OnMainMenuQuit()
 {
-
     AMainMenuController* PlayableController = Cast<AMainMenuController>(GameModeBase->GetInstigatorController());
     UKismetSystemLibrary::QuitGame(GetWorld(), PlayableController, EQuitPreference::Quit, true);
 }
 
 void UMainMenuWidget::MainMenuNavigation(float dir)
 {
-    if (State == EMainMenuState::MainMenu)
+    if (State != EMainMenuState::Loading)
     {
-        Increment += dir;
-        if (Increment < 0)
-            Increment = MainMenuButtons.Num() - 1;
-        else if (Increment >= MainMenuButtons.Num())
-            Increment = 0;
-    }
-    else if (State == EMainMenuState::Options)
-    {
-        OptionIncrement += dir;
-        if (OptionIncrement < 0)
-            OptionIncrement = MainMenuButtons.Num() - 1;
-        else if (OptionIncrement >= MainMenuButtons.Num())
-            OptionIncrement = 0;
-    }
-    else if (State == EMainMenuState::Character)
-    {
+        if (State == EMainMenuState::MainMenu)
+        {
+            Increment += dir;
+            if (Increment < 0)
+                Increment = MainMenuButtons.Num() - 1;
+            else if (Increment >= MainMenuButtons.Num())
+                Increment = 0;
+        }
+        else if (State == EMainMenuState::Options)
+        {
+            OptionIncrement += dir;
+            if (OptionIncrement < 0)
+                OptionIncrement = MainMenuButtons.Num() - 1;
+            else if (OptionIncrement >= MainMenuButtons.Num())
+                OptionIncrement = 0;
+        }
+        else if (State == EMainMenuState::Character)
+        {
 
+        }
     }
 }
 
 void UMainMenuWidget::MainMenuPressed()
 {
-    if (State == EMainMenuState::MainMenu)
-        MainMenuButtons[Increment]->OnClicked.Broadcast();
-    else if (State == EMainMenuState::Character)
-        CharacterSelections[CharacterIncrement]->OnClicked.Broadcast();
+    if (State != EMainMenuState::Loading)
+    {
+        if (State == EMainMenuState::MainMenu)
+            MainMenuButtons[Increment]->OnClicked.Broadcast();
+        else if (State == EMainMenuState::Character)
+            State = EMainMenuState::Loading;
+    }
 }
 
 void UMainMenuWidget::MainMenuBackPressed()
 {
-    if (State == EMainMenuState::Character || State == EMainMenuState::Options)
+    if ((State == EMainMenuState::Character || State == EMainMenuState::Options) && State != EMainMenuState::Loading)
         State = EMainMenuState::MainMenu;
-
-    if (GEngine)
-        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Main Menu!"));
 }
 
 void UMainMenuWidget::MoveWidget(float posx, float posy, float DeltaTime, float speed)
@@ -270,13 +347,6 @@ void UMainMenuWidget::MoveWidget(float posx, float posy, float DeltaTime, float 
 
     float x = FMath::FInterpTo(posx, CurrentTransform.Translation.X, DeltaTime, speed);
     float y = FMath::FInterpTo(posy, CurrentTransform.Translation.Y, DeltaTime, speed);
-
-    //if (GEngine)
-    //    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("x: " + FString::SanitizeFloat(CurrentTransform.Translation.X)));
-    //if (GEngine)
-    //    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("y: " + FString::SanitizeFloat(CurrentTransform.Translation.Y)));
-    //if (GEngine)
-    //    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("DeltaTime: " + FString::SanitizeFloat(DeltaTime)));
 
     CurrentTransform.Translation = FVector2D(x, y);
     SetRenderTransform(CurrentTransform);
