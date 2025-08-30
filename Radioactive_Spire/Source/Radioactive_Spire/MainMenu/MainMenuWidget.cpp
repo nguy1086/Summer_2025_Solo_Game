@@ -195,7 +195,7 @@ void UMainMenuWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
     }
     else if (State == EMainMenuState::Options)
     {
-        MoveWidget(2880.0f, 0.0f, InDeltaTime);
+        MoveWidget(1920.0f, 0.0f, InDeltaTime);
     }
     else if (State == EMainMenuState::Character)
     {

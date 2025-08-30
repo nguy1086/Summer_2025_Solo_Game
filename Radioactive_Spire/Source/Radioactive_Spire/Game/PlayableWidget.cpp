@@ -25,6 +25,7 @@
 
 bool UPlayableWidget::Initialize()
 {
+    GameModeBase = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
     Increment = 0;
     SetIsFocusable(true);
     SetKeyboardFocus();
@@ -119,11 +120,18 @@ void UPlayableWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
     Super::NativeTick(MyGeometry, InDeltaTime);
 
-    UpdateHealth();
-    UpdateSuper();
-    UpdatePause();
-    UpdateEnemies();
-    DisplayGameOver();
+    if (GameModeBase->State != EGameState::EndGame)
+    {
+        UpdateHealth();
+        UpdateSuper();
+        UpdatePause();
+        UpdateEnemies();
+
+    }
+    else
+    {
+        DisplayGameOver();
+    }
 }
 
 void UPlayableWidget::UpdateHealth()
@@ -186,7 +194,6 @@ void UPlayableWidget::UpdateEnemies()
 
 void UPlayableWidget::UpdatePause()
 {
-    ARadioactiveSpire_GameModeBase* GameModeBase = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
     if (GameModeBase && GameModeBase->Game_IsPaused)
     {
         UTextBlock* Widget = Cast<UTextBlock>(GetWidgetFromName("HealthText"));

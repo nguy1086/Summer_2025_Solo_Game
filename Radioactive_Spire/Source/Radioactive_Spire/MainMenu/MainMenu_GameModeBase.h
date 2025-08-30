@@ -14,4 +14,7 @@ class RADIOACTIVE_SPIRE_API AMainMenu_GameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+
+protected:
+	virtual void BeginPlay() override;
 };

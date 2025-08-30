@@ -40,4 +40,5 @@ public:
 private:
 	TArray<class UButton*> PauseButtons;
 	int Increment;
+	class ARadioactiveSpire_GameModeBase* GameModeBase;
 };

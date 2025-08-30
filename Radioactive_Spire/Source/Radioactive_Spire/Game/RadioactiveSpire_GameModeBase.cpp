@@ -13,6 +13,7 @@
 #include "../Players/Inheritance/PlayableAttackHitbox.h"
 
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "GameFramework/GameUserSettings.h" 
 
 #include "EngineUtils.h"
 #include "Engine/World.h"
@@ -30,6 +31,7 @@
 #include "NavMesh/NavMeshBoundsVolume.h"
 #include "Components/BrushComponent.h"
 #include "Kismet/GameplayStatics.h"
+
 
 ARadioactiveSpire_GameModeBase::ARadioactiveSpire_GameModeBase() :
 	Camera(nullptr),
@@ -51,6 +53,21 @@ ARadioactiveSpire_GameModeBase::ARadioactiveSpire_GameModeBase() :
 void ARadioactiveSpire_GameModeBase::BeginPlay()
 {
     Super::BeginPlay();
+
+	UGameUserSettings* GameUserSettings = GEngine->GameUserSettings;
+	if (GameUserSettings)
+	{
+		GameUserSettings->SetScreenResolution(FIntPoint(1280.0f, 960.0f));
+		GameUserSettings->SetFullscreenMode(EWindowMode::WindowedFullscreen);
+		GameUserSettings->ApplyResolutionSettings(true);
+		GameUserSettings->ApplySettings(true);
+	}
+
+	if (GEngine && GEngine->GameViewport)
+	{
+		GEngine->GameViewport->HandleToggleFullscreenCommand();
+	}
+
 	Player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
 	Player->SetActorLocation(FVector(360.0f, 0.0f, 200.0f));
 	MaxEnemiesSpawn = FMath::RandRange(7, 10);
@@ -60,10 +77,6 @@ void ARadioactiveSpire_GameModeBase::BeginPlay()
 	Camera = GetWorld()->SpawnActor<APlayerCamera>(APlayerCamera::StaticClass(), FVector(), FRotator(), SpawnParams);
 	ApplyViewMode(EViewModeIndex::VMI_Unlit, false, *GetWorld()->GetGameViewport()->GetEngineShowFlags());
 
-
-	//if (RedDesertLevel)
-	//{
-	//}
 	APaperTileMapActor* tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(GetRandomRedDesertLevel(), LevelPosition, FRotator::ZeroRotator);
 	IncrementLevelPosition();
 	tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(GetRandomRedDesertLevel(), LevelPosition, FRotator::ZeroRotator);
