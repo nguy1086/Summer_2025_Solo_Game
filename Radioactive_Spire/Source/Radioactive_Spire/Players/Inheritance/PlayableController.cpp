@@ -172,7 +172,7 @@ void APlayableController::OnMove(const FInputActionValue& Value)
 
 	if (PlayablePlayer != nullptr && PlayablePlayerState != nullptr && GameModeBase != nullptr)
 	{
-		if (!GameModeBase->Game_IsPaused || GameModeBase->State != EGameState::EndGame)
+		if (!GameModeBase->Game_IsPaused && GameModeBase->State != EGameState::EndGame)
 		{
 			if (PlayablePlayerState->State != EState::Ducking &&
 				PlayablePlayerState->State != EState::Special &&
@@ -229,7 +229,7 @@ void APlayableController::OnMoveReleased(const FInputActionValue& Value)
 
 void APlayableController::OnJumpPressed(const FInputActionValue& Value)
 {
-	if (!GameModeBase->Game_IsPaused || GameModeBase->State != EGameState::EndGame)
+	if (!GameModeBase->Game_IsPaused && GameModeBase->State != EGameState::EndGame)
 		if (PlayablePlayer != nullptr)
 			PlayablePlayer->Jump();
 }
@@ -242,7 +242,7 @@ void APlayableController::OnJumpReleased(const FInputActionValue& Value)
 
 void APlayableController::OnDuckPressed(const FInputActionValue& Value)
 {
-	if (!GameModeBase->Game_IsPaused || GameModeBase->State != EGameState::EndGame)
+	if (!GameModeBase->Game_IsPaused && GameModeBase->State != EGameState::EndGame)
 		if (PlayablePlayer != nullptr)
 			PlayablePlayer->Duck();
 
@@ -262,7 +262,7 @@ void APlayableController::OnDuckReleased(const FInputActionValue& Value)
 void APlayableController::OnAttackPressed(const FInputActionValue& Value)
 {
 	if (PlayablePlayer != nullptr && GameModeBase != nullptr)
-		if (!GameModeBase->Game_IsPaused || GameModeBase->State != EGameState::EndGame)
+		if (!GameModeBase->Game_IsPaused && GameModeBase->State != EGameState::EndGame)
 			PlayablePlayer->Attack();
 		else
 			if (GameInfoWidget)
@@ -275,7 +275,7 @@ void APlayableController::OnAttackPressed(const FInputActionValue& Value)
 void APlayableController::OnSpecialPressed(const FInputActionValue& Value)
 {
 	if (PlayablePlayer != nullptr && GameModeBase != nullptr)
-		if (GameModeBase->Game_IsPaused || GameModeBase->State != EGameState::EndGame)
+		if (GameModeBase->Game_IsPaused && GameModeBase->State != EGameState::EndGame)
 		{
 
 		}
@@ -289,7 +289,7 @@ void APlayableController::OnSpecialPressed(const FInputActionValue& Value)
 void APlayableController::OnRollPressed(const FInputActionValue& Value)
 {
 	if (PlayablePlayer != nullptr && GameModeBase != nullptr)
-		if (!GameModeBase->Game_IsPaused || GameModeBase->State != EGameState::EndGame)
+		if (!GameModeBase->Game_IsPaused && GameModeBase->State != EGameState::EndGame)
 			PlayablePlayer->Roll();
 
 	//if (GEngine)
@@ -299,7 +299,7 @@ void APlayableController::OnRollPressed(const FInputActionValue& Value)
 void APlayableController::OnSuperPressed(const FInputActionValue& Value)
 {
 	if (PlayablePlayer != nullptr && GameModeBase != nullptr)
-		if (!GameModeBase->Game_IsPaused || GameModeBase->State != EGameState::EndGame)
+		if (!GameModeBase->Game_IsPaused && GameModeBase->State != EGameState::EndGame)
 			PlayablePlayer->SuperAttack();
 }
 

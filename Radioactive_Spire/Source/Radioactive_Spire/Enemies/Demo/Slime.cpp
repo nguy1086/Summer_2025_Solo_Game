@@ -12,7 +12,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 ASlime::ASlime() :
-    AttackTimer(FMath::RandRange(1.0f, 1.0f)),
+    AttackTimer(FMath::RandRange(1.0f, 4.0f)),
     State(ESlimeState::Walk)
 {
     PrimaryActorTick.bCanEverTick = true;
@@ -22,7 +22,7 @@ ASlime::ASlime() :
     FlipbookComponent->SetWorldScale3D(FVector(2.0f, 2.0f, 2.0f));
 
     GetCharacterMovement()->MaxWalkSpeed = 20.0f;
-    Damage = 999.0f;
+    Damage = 10.0f;
 
     //GetCapsuleComponent()->SetHiddenInGame(false);
 }

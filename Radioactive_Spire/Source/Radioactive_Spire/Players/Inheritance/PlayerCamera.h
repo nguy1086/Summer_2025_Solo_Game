@@ -48,4 +48,5 @@ private:
 	int32 ShakeCount;
 
 	float OriginalZ;
+	bool GameOverCamera;
 };

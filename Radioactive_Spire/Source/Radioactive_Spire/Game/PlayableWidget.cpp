@@ -158,6 +158,10 @@ void UPlayableWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
     {
         FadeQuit(InDeltaTime);
     }
+    else if (GameModeBase->State == EGameState::FadeToRetry)
+    {
+        FadeRetry(InDeltaTime);
+    }
     else if (GameModeBase->State != EGameState::EndGame)
     {
         UpdateHealth();
@@ -384,6 +388,14 @@ void UPlayableWidget::FadeEnter(float DeltaTime)
 }
 
 void UPlayableWidget::FadeQuit(float DeltaTime)
+{
+    FadeTimer += DeltaTime;
+    UBorder* Border = Cast<UBorder>(GetWidgetFromName("Fade"));
+    if (Border)
+        Border->SetRenderOpacity(FadeTimer / 1.5f);
+}
+
+void UPlayableWidget::FadeRetry(float DeltaTime)
 {
     FadeTimer += DeltaTime;
     UBorder* Border = Cast<UBorder>(GetWidgetFromName("Fade"));

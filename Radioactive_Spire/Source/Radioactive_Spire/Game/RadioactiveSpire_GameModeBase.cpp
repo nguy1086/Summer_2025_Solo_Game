@@ -175,10 +175,13 @@ void ARadioactiveSpire_GameModeBase::Tick(float DeltaTime)
 			Player->CustomTimeDilation = 1.0f;
 			Player->ApplyStateChange(EState::Falling);
 			State = EGameState::Gameplay;
+			PlayableController->GameInfoWidget->FadeTimer = 0.0f;
 		}
 	}
 	else if (State == EGameState::FadeToQuit)
 	{
+		CustomTimeDilation = 1.0f;
+		DisableControls();
 		PauseActors();
 		APlayableController* PlayableController = Cast<APlayableController>(Player->GetController());
 		if ((PlayableController->GameInfoWidget->FadeTimer / 1.5f) >= 1.5f)
@@ -186,7 +189,9 @@ void ARadioactiveSpire_GameModeBase::Tick(float DeltaTime)
 	}
 	else if (State == EGameState::FadeToRetry)
 	{
+		DisableControls();
 		APlayableController* PlayableController = Cast<APlayableController>(Player->GetController());
+
 		if ((PlayableController->GameInfoWidget->FadeTimer / 1.5f) >= 1.5f)
 			PlayableController->GameInfoWidget->OnRetry();
 	}

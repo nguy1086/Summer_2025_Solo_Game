@@ -25,6 +25,7 @@ public:
 	void UpdatePause();
 	void FadeEnter(float DeltaTime);
 	void FadeQuit(float DeltaTime);
+	void FadeRetry(float DeltaTime);
 	void HideAllButGameOver();
 	void DisplayGameOver();
 

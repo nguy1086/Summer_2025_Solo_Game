@@ -14,6 +14,7 @@ APlayerCamera::APlayerCamera() :
 	SphereComponent(nullptr),
 	Player(nullptr),
 	OriginalZ(0.0f),
+	GameOverCamera(false),
 	LevelZIncrease(0.0f)
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -55,7 +56,7 @@ void APlayerCamera::Tick(float DeltaTime)
 	{
 		FVector playerLocation = Player->GetActorLocation();
 		FVector cameraLocation = Camera->GetComponentLocation();
-		if (GameModeBase->State != EGameState::EndGame)
+		if (GameModeBase->State != EGameState::EndGame && !GameOverCamera)
 		{
 			cameraLocation.X = FMath::FInterpTo(cameraLocation.X, 500.0f/*playerLocation.X*/, DeltaTime, 8.0f) + ShakeOffset.X;
 
@@ -65,6 +66,7 @@ void APlayerCamera::Tick(float DeltaTime)
 		}
 		else
 		{
+			GameOverCamera = true;
 			cameraLocation.X = FMath::FInterpTo(cameraLocation.X, playerLocation.X, DeltaTime, 8.0f) + ShakeOffset.X;
 
 			cameraLocation.Y = FMath::FInterpTo(cameraLocation.Y, playerLocation.Y, DeltaTime, 8.0f) + GameConstants::CameraDepthY / 2.0f;
