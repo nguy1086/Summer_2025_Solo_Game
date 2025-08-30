@@ -10,6 +10,7 @@
 #include "Components/Image.h"
 #include "Components/Slider.h"
 #include "Components/CanvasPanelSlot.h"
+#include "Components/Border.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "MainMenuController.h"
@@ -17,16 +18,21 @@
 
 bool UMainMenuWidget::Initialize()
 {
+    IntroTimer = 4.0f;
     GameModeBase = GetWorld()->GetAuthGameMode<AMainMenu_GameModeBase>();
-    State = EMainMenuState::MainMenu;
-    Increment = 0;
-    bIsFocusable = true;
+    State = EMainMenuState::Intro;
+    FWidgetTransform CurrentTransform = GetRenderTransform();
+    CurrentTransform.Translation = FVector2D(0.0f, 1080.0f);
+    SetRenderTransform(CurrentTransform);
+    ResetIncrement();
+    SetIsFocusable(true);
     SetKeyboardFocus();
 
     bool bResult = Super::Initialize();
     if (!bResult)
         return false;
-
+    //-------------------------------------------------------------------------------------------------
+    //main/intro
     UImage* Image = Cast<UImage>(GetWidgetFromName("Intro"));
     if (Image)
         Image->SetVisibility(ESlateVisibility::Visible);
@@ -42,6 +48,10 @@ bool UMainMenuWidget::Initialize()
     Image = Cast<UImage>(GetWidgetFromName("GameName"));
     if (Image)
         Image->SetVisibility(ESlateVisibility::Visible);
+
+    UBorder* Border = Cast<UBorder>(GetWidgetFromName("Fade"));
+    if (Border)
+        Border->SetVisibility(ESlateVisibility::Visible);
 
     UButton* Button = Cast<UButton>(GetWidgetFromName("PlayButton"));
     if (Button)
@@ -63,6 +73,38 @@ bool UMainMenuWidget::Initialize()
         Button->SetVisibility(ESlateVisibility::Visible);
         Button->OnClicked.AddDynamic(this, &UMainMenuWidget::OnMainMenuQuit);
         MainMenuButtons.Add(Button);
+    }
+    //-------------------------------------------------------------------------------------------------
+    //options
+    USlider* Slider = Cast<USlider>(GetWidgetFromName("Master"));
+    if (Slider)
+    {
+        Slider->SetVisibility(ESlateVisibility::Visible);
+        Slider->OnValueChanged.AddDynamic(this, &UMainMenuWidget::OnMasterChange);
+        VolumeSliders.Add(Slider);
+    }
+    Slider = Cast<USlider>(GetWidgetFromName("Sound Effects"));
+    if (Slider)
+    {
+        Slider->SetVisibility(ESlateVisibility::Visible);
+        Slider->OnValueChanged.AddDynamic(this, &UMainMenuWidget::OnMasterChange);
+        VolumeSliders.Add(Slider);
+    }
+    Slider = Cast<USlider>(GetWidgetFromName("Ambience"));
+    if (Slider)
+    {
+        Slider->SetVisibility(ESlateVisibility::Visible);
+        Slider->OnValueChanged.AddDynamic(this, &UMainMenuWidget::OnMasterChange);
+        VolumeSliders.Add(Slider);
+    }
+    //-------------------------------------------------------------------------------------------------
+    //character
+    Button = Cast<UButton>(GetWidgetFromName("Batter_Select"));
+    if (Button)
+    {
+        Button->SetVisibility(ESlateVisibility::Visible);
+        Button->OnClicked.AddDynamic(this, &UMainMenuWidget::OnBatterSelect);
+        CharacterSelections.Add(Button);
     }
 
     return true;
@@ -112,6 +154,26 @@ void UMainMenuWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
     {
         MoveWidget(0.0f, -1080.0f, InDeltaTime);
     }
+    else if (State == EMainMenuState::Intro)
+    {
+        IntroTimer -= InDeltaTime;
+        UBorder* Border = Cast<UBorder>(GetWidgetFromName("Fade"));
+        if (Border)
+            Border->SetRenderOpacity((IntroTimer - 2.0f) / 2.0f);
+
+
+        if (IntroTimer <= 0.0f)
+        {
+            MoveWidget(0.0, 0.0f, InDeltaTime, 56.0f);
+            FWidgetTransform CurrentTransform = GetRenderTransform();
+            if (FMath::IsNearlyEqual(CurrentTransform.Translation.Y, 0.0f, 6.0f))
+            {
+                State = EMainMenuState::MainMenu;
+                CurrentTransform.Translation = FVector2D(0.0f, 0.0f);
+                SetRenderTransform(CurrentTransform);
+            }
+        }
+    }
 }
 
 void UMainMenuWidget::UpdateIntro()
@@ -135,7 +197,7 @@ void UMainMenuWidget::OnCharacterSelect()
     if (State == EMainMenuState::MainMenu || State == EMainMenuState::Options)
     {
         State = EMainMenuState::Character;
-        Increment = 0;
+        ResetIncrement();
     }
 
     if (GEngine)
@@ -147,7 +209,7 @@ void UMainMenuWidget::OnMainMenuOptions()
     if (State == EMainMenuState::MainMenu || State == EMainMenuState::Character)
     {
         State = EMainMenuState::Options;
-        Increment = 0;
+        ResetIncrement();
     }
 
     if (GEngine)
@@ -163,16 +225,34 @@ void UMainMenuWidget::OnMainMenuQuit()
 
 void UMainMenuWidget::MainMenuNavigation(float dir)
 {
-    Increment += dir;
-    if (Increment < 0)
-        Increment = MainMenuButtons.Num() - 1;
-    else if (Increment >= MainMenuButtons.Num())
-        Increment = 0;
+    if (State == EMainMenuState::MainMenu)
+    {
+        Increment += dir;
+        if (Increment < 0)
+            Increment = MainMenuButtons.Num() - 1;
+        else if (Increment >= MainMenuButtons.Num())
+            Increment = 0;
+    }
+    else if (State == EMainMenuState::Options)
+    {
+        OptionIncrement += dir;
+        if (OptionIncrement < 0)
+            OptionIncrement = MainMenuButtons.Num() - 1;
+        else if (OptionIncrement >= MainMenuButtons.Num())
+            OptionIncrement = 0;
+    }
+    else if (State == EMainMenuState::Character)
+    {
+
+    }
 }
 
 void UMainMenuWidget::MainMenuPressed()
 {
-    MainMenuButtons[Increment]->OnClicked.Broadcast();
+    if (State == EMainMenuState::MainMenu)
+        MainMenuButtons[Increment]->OnClicked.Broadcast();
+    else if (State == EMainMenuState::Character)
+        CharacterSelections[CharacterIncrement]->OnClicked.Broadcast();
 }
 
 void UMainMenuWidget::MainMenuBackPressed()
@@ -184,20 +264,46 @@ void UMainMenuWidget::MainMenuBackPressed()
         GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Main Menu!"));
 }
 
-void UMainMenuWidget::MoveWidget(float posx, float posy, float DeltaTime, float speed = 48.0f)
+void UMainMenuWidget::MoveWidget(float posx, float posy, float DeltaTime, float speed)
 {
     FWidgetTransform CurrentTransform = GetRenderTransform();
 
     float x = FMath::FInterpTo(posx, CurrentTransform.Translation.X, DeltaTime, speed);
     float y = FMath::FInterpTo(posy, CurrentTransform.Translation.Y, DeltaTime, speed);
 
-    if (GEngine)
-        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("x: " + FString::SanitizeFloat(CurrentTransform.Translation.X)));
-    if (GEngine)
-        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("y: " + FString::SanitizeFloat(CurrentTransform.Translation.Y)));
-    if (GEngine)
-        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("DeltaTime: " + FString::SanitizeFloat(DeltaTime)));
+    //if (GEngine)
+    //    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("x: " + FString::SanitizeFloat(CurrentTransform.Translation.X)));
+    //if (GEngine)
+    //    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("y: " + FString::SanitizeFloat(CurrentTransform.Translation.Y)));
+    //if (GEngine)
+    //    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("DeltaTime: " + FString::SanitizeFloat(DeltaTime)));
 
     CurrentTransform.Translation = FVector2D(x, y);
     SetRenderTransform(CurrentTransform);
+}
+
+void UMainMenuWidget::OnMasterChange(float v)
+{
+
+}
+
+void UMainMenuWidget::OnSFXChange(float v)
+{
+}
+
+void UMainMenuWidget::OnAmbienceChange(float v)
+{
+}
+
+void UMainMenuWidget::OnBatterSelect()
+{
+    UObject* WorldContextObject = this;
+    UGameplayStatics::OpenLevel(WorldContextObject, FName(TEXT("Game")));
+}
+
+void UMainMenuWidget::ResetIncrement()
+{
+    Increment = 0;
+    OptionIncrement = 0;
+    CharacterIncrement = 0;
 }

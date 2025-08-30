@@ -25,7 +25,7 @@
 bool UPlayableWidget::Initialize()
 {
     Increment = 0;
-    bIsFocusable = true;
+    SetIsFocusable(true);
     SetKeyboardFocus();
 
     bool bResult = Super::Initialize();

@@ -46,9 +46,25 @@ public:
 	void MainMenuBackPressed();
 	void MoveWidget(float posx, float posy, float DeltaTime, float speed = 48.0f);
 
+	UFUNCTION()
+	void OnMasterChange(float v);
+	UFUNCTION()
+	void OnSFXChange(float v);
+	UFUNCTION()
+	void OnAmbienceChange(float v);
+
+	UFUNCTION()
+	void OnBatterSelect();
+
 private:
+	void ResetIncrement();
 	class AMainMenu_GameModeBase* GameModeBase;
 	EMainMenuState State;
 	TArray<class UButton*> MainMenuButtons;
+	TArray<class USlider*> VolumeSliders;
+	TArray<class UButton*> CharacterSelections;
 	int Increment;
+	int OptionIncrement;
+	int CharacterIncrement;
+	float IntroTimer;
 };
