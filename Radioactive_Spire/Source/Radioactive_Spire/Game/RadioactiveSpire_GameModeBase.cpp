@@ -70,7 +70,7 @@ void ARadioactiveSpire_GameModeBase::BeginPlay()
 
 	if (RedDesertSky)
 	{
-		APaperTileMapActor* tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(RedDesertSky, FVector(-1008.0f, 0.0f, 2000.0f), FRotator::ZeroRotator);
+		tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(RedDesertSky, FVector(-1008.0f, 0.0f, 2000.0f), FRotator::ZeroRotator);
 		Camera->LevelBackground = tilemap;
 	}
 }
