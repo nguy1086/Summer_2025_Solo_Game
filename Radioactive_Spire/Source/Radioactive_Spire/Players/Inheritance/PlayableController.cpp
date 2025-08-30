@@ -19,6 +19,12 @@ APlayableController::APlayableController() :
 	JumpInputAction(nullptr),
 	DuckInputAction(nullptr),
 	//UpInputAction(nullptr),
+	AttackInputAction(nullptr),
+	SpecialInputAction(nullptr),
+	RollInputAction(nullptr),
+	SuperInputAction(nullptr),
+	PauseInputAction(nullptr),
+	PauseButtonNavigation(nullptr),
 	PlayablePlayer(nullptr),
 	PlayablePlayerState(nullptr),
 	InputSubsystem(nullptr)
@@ -42,8 +48,6 @@ void APlayableController::BeginPlay()
 		GameInfoWidget->AddToViewport();
 	}
 	GameModeBase = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
-
-	bEnableMouseOverEvents = false;
 }
 
 void APlayableController::OnPossess(APawn* aPawn)

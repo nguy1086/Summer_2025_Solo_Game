@@ -28,14 +28,11 @@ public:
 	UFUNCTION()
 	void OnResume();
 	UFUNCTION()
-	void OnOptions();
+	void OnPauseOptions();
 	UFUNCTION()
 	void OnRetry();
 	UFUNCTION()
-	void OnQuit();
-
-	UFUNCTION()
-	void SetIncrement(int i);
+	void OnPauseQuit();
 
 	void PauseMenuNavigation(float dir);
 	void PauseMenuPressed();

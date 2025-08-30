@@ -23,5 +23,30 @@ UCLASS()
 class RADIOACTIVE_SPIRE_API UMainMenuWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+	virtual bool Initialize() override;
+
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
+public:
+	void UpdateIntro();
+	void UpdateMainMenu();
+	void UpdateOptions();
+	void UpdateCharacterSelect();
+
+	UFUNCTION()
+	void OnCharacterSelect();
+	UFUNCTION()
+	void OnMainMenuOptions();
+	UFUNCTION()
+	void OnMainMenuQuit();
+
+	void MainMenuNavigation(float dir);
+	void MainMenuPressed();
+	void MainMenuBackPressed();
+
+private:
+	EMainMenuState State;
+	TArray<class UButton*> MainMenuButtons;
+	int Increment;
 };

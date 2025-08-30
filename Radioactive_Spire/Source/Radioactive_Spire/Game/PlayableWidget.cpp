@@ -80,7 +80,7 @@ bool UPlayableWidget::Initialize()
     if (Button)
     {
         Button->SetVisibility(ESlateVisibility::Hidden);
-        Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnOptions);
+        Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnPauseOptions);
         PauseButtons.Add(Button);
     }
 
@@ -96,7 +96,7 @@ bool UPlayableWidget::Initialize()
     if (Button)
     {
         Button->SetVisibility(ESlateVisibility::Hidden);
-        Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnQuit);
+        Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnPauseQuit);
         PauseButtons.Add(Button);
     }
 
@@ -330,7 +330,7 @@ void UPlayableWidget::OnResume()
     gameMode->GamePause();
 }
 
-void UPlayableWidget::OnOptions()
+void UPlayableWidget::OnPauseOptions()
 {
 }
 
@@ -339,15 +339,11 @@ void UPlayableWidget::OnRetry()
     UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
 }
 
-void UPlayableWidget::OnQuit()
+void UPlayableWidget::OnPauseQuit()
 {
     APlayableCharacter* player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
     APlayableController* PlayableController = Cast<APlayableController>(player->GetController());
     UKismetSystemLibrary::QuitGame(GetWorld(), PlayableController, EQuitPreference::Quit, true);
-}
-
-void UPlayableWidget::SetIncrement(int i)
-{
 }
 
 void UPlayableWidget::PauseMenuNavigation(float dir)//tried FReply UPlayableWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)

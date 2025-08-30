@@ -14,4 +14,6 @@ class RADIOACTIVE_SPIRE_API AMainMenu_GameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+public:
+	virtual void Tick(float DeltaTime) override;
 };
