@@ -67,7 +67,6 @@ void APlayableCharacter::Tick(float DeltaTime)
 
 	if (PlayerState != nullptr)
 	{
-		// ensure that the player isn't dead
 		if (PlayerState->State != EState::Dead)
 		{
 			// if player falls of the edge,no longer on ground, movement component 
@@ -580,8 +579,6 @@ void APlayableCharacter::Death()
 
 		ApplyStateChange(EState::Dead);
 
-		SetActorHiddenInGame(true);
-
 		ARadioactiveSpire_GameModeBase* gameMode = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
 		if (gameMode)
 			gameMode->PlayerDied();
@@ -654,6 +651,11 @@ UPaperFlipbook* APlayableCharacter::GetBatterFlipbook()
 		}
 		else if (!PlayerState->IsOnGround)
 			flipbook = BatterAIRSpecialFlipbook;
+	}
+	else if (PlayerState->State == EState::Dead)
+	{
+		flipbook = BatterDeadFlipbook;
+		GetSprite()->SetLooping(false);
 	}
 	else if (PlayerState->State == EState::Roll)
 		flipbook = BatterRollFlipbook;

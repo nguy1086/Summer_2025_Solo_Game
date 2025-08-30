@@ -41,6 +41,7 @@ private:
 	void OnShake();
 
 	class APlayableCharacter* Player;
+	class ARadioactiveSpire_GameModeBase* GameModeBase;
 	FVector InitialLocation;
 	FVector ShakeOffset;
 	FTimerHandle ShakeTimer;

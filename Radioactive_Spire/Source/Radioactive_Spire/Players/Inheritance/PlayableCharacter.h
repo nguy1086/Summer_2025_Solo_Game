@@ -161,6 +161,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
 	class UPaperFlipbook* BatterSuperFlipbook;//SUPER
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
+	class UPaperFlipbook* BatterDeadFlipbook;//DEAD
+
 	//Attacks
 	UPROPERTY(EditAnyWhere, Category = "Hitbox attack")
 	TSubclassOf<class APlayableAttackHitbox> AttackHitboxTemplate;

@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/SphereComponent.h"
 #include "PaperTileMapActor.h"
+#include "../../Game/RadioactiveSpire_GameModeBase.h"
 
 APlayerCamera::APlayerCamera() :
 	Camera(nullptr),
@@ -39,6 +40,7 @@ void APlayerCamera::BeginPlay()
 
 	APlayerController* playerController = GetWorld()->GetFirstPlayerController();
 	Player = playerController->GetPawn<APlayableCharacter>();
+	GameModeBase = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
 
 	playerController->SetViewTargetWithBlend(this);
 
@@ -49,21 +51,26 @@ void APlayerCamera::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (Player != nullptr)
+	if (Player != nullptr && GameModeBase != nullptr)
 	{
-		// get player and the camera locations
 		FVector playerLocation = Player->GetActorLocation();
 		FVector cameraLocation = Camera->GetComponentLocation();
+		if (GameModeBase->State != EGameState::EndGame)
+		{
+			cameraLocation.X = FMath::FInterpTo(cameraLocation.X, 500.0f/*playerLocation.X*/, DeltaTime, 8.0f) + ShakeOffset.X;
 
-		// set the X value  FInterpTO MOVES THE X CAMERA
-		cameraLocation.X = FMath::FInterpTo(cameraLocation.X, 500.0f/*playerLocation.X*/, DeltaTime, 8.0f) + ShakeOffset.X;
+			cameraLocation.Y = FMath::FInterpTo(cameraLocation.Y, playerLocation.Y, DeltaTime, 8.0f) + GameConstants::CameraDepthY;
 
-		cameraLocation.Y = FMath::FInterpTo(cameraLocation.Y, playerLocation.Y, DeltaTime, 8.0f) + GameConstants::CameraDepthY;
+			cameraLocation.Z = FMath::FInterpTo(InitialLocation.Z + LevelZIncrease, playerLocation.Z, DeltaTime, 1.0f) + GameConstants::CameraZOffset + ShakeOffset.Z;
+		}
+		else
+		{
+			cameraLocation.X = FMath::FInterpTo(cameraLocation.X, playerLocation.X, DeltaTime, 8.0f) + ShakeOffset.X;
 
-		// set the Z value
-		cameraLocation.Z = FMath::FInterpTo(InitialLocation.Z + LevelZIncrease, playerLocation.Z, DeltaTime, 1.0f) + GameConstants::CameraZOffset + ShakeOffset.Z;
+			cameraLocation.Y = FMath::FInterpTo(cameraLocation.Y, playerLocation.Y, DeltaTime, 8.0f) + GameConstants::CameraDepthY / 2.0f;
 
-		// set the camera location
+			cameraLocation.Z = FMath::FInterpTo(cameraLocation.Z, playerLocation.Z, DeltaTime, 8.0f) + ShakeOffset.Z;
+		}
 		Camera->SetWorldLocation(cameraLocation);
 
 		if (LevelBackground)

@@ -184,12 +184,32 @@ void ARadioactiveSpire_GameModeBase::Tick(float DeltaTime)
 		if ((PlayableController->GameInfoWidget->FadeTimer / 1.5f) >= 1.5f)
 			PlayableController->GameInfoWidget->OnPauseQuit();
 	}
+	else if (State == EGameState::EndGame)
+	{
+		for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+		{
+			AActor* actor = *ActorItr;
+			APlayableCharacter* player = Cast<APlayableCharacter>(actor);
+			AEnemy* enemy = Cast<AEnemy>(actor);
+			APaperTileMapActor* tilemap = Cast< APaperTileMapActor>(actor);
+			if (!player && actor->CustomTimeDilation > 0.0f && !actor->ActorHasTag("PlayerCamera"))
+				actor->CustomTimeDilation -= DeltaTime;
+			if (enemy)
+				enemy->FlipbookComponent->SetSpriteColor(enemy->FlipbookComponent->GetSpriteColor() - FLinearColor(DeltaTime, DeltaTime, DeltaTime, DeltaTime));
+			else if (tilemap)
+				tilemap->SetActorHiddenInGame(true);
+		}
+	}
 }
 
 void ARadioactiveSpire_GameModeBase::PlayerDied()
 {
 	if (Player)
+	{
+		State = EGameState::EndGame;
+		BlackenActors();
 		SpawnDeathAnimation(Player->GetActorLocation());
+	}
 }
 
 void ARadioactiveSpire_GameModeBase::EnableControls()
@@ -257,7 +277,7 @@ void ARadioactiveSpire_GameModeBase::GamePause()
 
 void ARadioactiveSpire_GameModeBase::SpawnDeathAnimation(FVector location)
 {
-	PauseActors();
+	//PauseActors();
 
 	APlayableCharacter* player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
 	if (player)
