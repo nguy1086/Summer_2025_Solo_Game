@@ -184,6 +184,12 @@ void ARadioactiveSpire_GameModeBase::Tick(float DeltaTime)
 		if ((PlayableController->GameInfoWidget->FadeTimer / 1.5f) >= 1.5f)
 			PlayableController->GameInfoWidget->OnPauseQuit();
 	}
+	else if (State == EGameState::FadeToRetry)
+	{
+		APlayableController* PlayableController = Cast<APlayableController>(Player->GetController());
+		if ((PlayableController->GameInfoWidget->FadeTimer / 1.5f) >= 1.5f)
+			PlayableController->GameInfoWidget->OnRetry();
+	}
 	else if (State == EGameState::EndGame)
 	{
 		for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
@@ -253,25 +259,21 @@ void ARadioactiveSpire_GameModeBase::SuperAttackPause(float timer)
 
 void ARadioactiveSpire_GameModeBase::GamePause()
 {
-	if (Game_IsPaused)
+	if (State != EGameState::EndGame)
 	{
-		Game_IsPaused = false;
-		UnpauseActors();
-		APlayableController* PlayableController = Cast<APlayableController>(Player->GetController());
-	}
-	else if (!Game_IsPaused)
-	{
-		Game_IsPaused = true;
-		for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+		if (Game_IsPaused)
 		{
-			AActor* actor = *ActorItr;
-			actor->CustomTimeDilation = 0.0f;
-
-			if (actor->ActorHasTag("Controller"))
-				actor->CustomTimeDilation = 1.0f;
+			Game_IsPaused = false;
+			UnpauseActors();
+			APlayableController* PlayableController = Cast<APlayableController>(Player->GetController());
 		}
-		Camera->CustomTimeDilation = 1.0f;
-		APlayableController* PlayableController = Cast<APlayableController>(Player->GetController());
+		else if (!Game_IsPaused)
+		{
+			Game_IsPaused = true;
+			PauseActors();
+			Camera->CustomTimeDilation = 1.0f;
+			APlayableController* PlayableController = Cast<APlayableController>(Player->GetController());
+		}
 	}
 }
 
@@ -326,10 +328,8 @@ void ARadioactiveSpire_GameModeBase::PauseActors()
 		if (player)
 			player->GetSprite()->SetVisibility(false);
 
-		//if (actor->ActorHasTag("Controller"))
-		//{
-		//	actor->CustomTimeDilation = 1.0f;
-		//}
+		if (actor->ActorHasTag("Controller"))
+			actor->CustomTimeDilation = 1.0f;
 	}
 }
 

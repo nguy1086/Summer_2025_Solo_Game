@@ -28,6 +28,7 @@ bool UPlayableWidget::Initialize()
     GameModeBase = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
     Increment = 0;
     FadeTimer = 2.5f;
+    GameOverDelay = 4.0f;
     SetIsFocusable(true);
     SetKeyboardFocus();
 
@@ -91,7 +92,7 @@ bool UPlayableWidget::Initialize()
     if (Button)
     {
         Button->SetVisibility(ESlateVisibility::Hidden);
-        Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnRetry);
+        Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnPauseFadeToRetry);
         PauseButtons.Add(Button);
     }
 
@@ -113,6 +114,31 @@ bool UPlayableWidget::Initialize()
     UBorder* Border = Cast<UBorder>(GetWidgetFromName("Fade"));
     if (Border)
         Border->SetVisibility(ESlateVisibility::Visible);
+    //------------------------------------------------------------------------
+    //gameover
+    Widget = Cast<UTextBlock>(GetWidgetFromName("GameOverText"));
+    if (Widget)
+    {
+        Widget->SetText(FText::FromString("Game Over"));
+        Widget->SetVisibility(ESlateVisibility::Hidden);
+    }
+    Image = Cast<UImage>(GetWidgetFromName("GameOver"));
+    if (Image)
+        Image->SetVisibility(ESlateVisibility::Hidden);
+    Button = Cast<UButton>(GetWidgetFromName("GameOverRetry"));
+    if (Button)
+    {
+        Button->SetVisibility(ESlateVisibility::Hidden);
+        Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnPauseFadeToRetry);
+        GameOverButtons.Add(Button);
+    }
+    Button = Cast<UButton>(GetWidgetFromName("GameOverQuit"));
+    if (Button)
+    {
+        Button->SetVisibility(ESlateVisibility::Hidden);
+        Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnPauseFadeToRetry);
+        GameOverButtons.Add(Button);
+    }
 
     return true;
 }
@@ -124,6 +150,9 @@ void UPlayableWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
     if (GameModeBase->State == EGameState::FadeToEnter)
     {
         FadeEnter(InDeltaTime);
+        UpdateHealth();
+        UpdateSuper();
+        UpdateEnemies();
     }
     else if (GameModeBase->State == EGameState::FadeToQuit)
     {
@@ -136,9 +165,15 @@ void UPlayableWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
         UpdatePause();
         UpdateEnemies();
     }
-    else
+    else if (GameModeBase->State == EGameState::EndGame)
     {
-        DisplayGameOver();
+        if (GameOverDelay <= 0.0f)
+            DisplayGameOver();
+        else
+        {
+            GameOverDelay -= InDeltaTime;
+            HideAllButGameOver();
+        }
     }
 }
 
@@ -356,8 +391,98 @@ void UPlayableWidget::FadeQuit(float DeltaTime)
         Border->SetRenderOpacity(FadeTimer / 1.5f);
 }
 
+void UPlayableWidget::HideAllButGameOver()
+{
+    UTextBlock* Widget = Cast<UTextBlock>(GetWidgetFromName("HealthText"));
+    if (Widget)
+        Widget->SetVisibility(ESlateVisibility::Hidden);
+    Widget = Cast<UTextBlock>(GetWidgetFromName("SuperText"));
+    if (Widget)
+        Widget->SetVisibility(ESlateVisibility::Hidden);
+    Widget = Cast<UTextBlock>(GetWidgetFromName("EnemiesLeftText"));
+    if (Widget)
+        Widget->SetVisibility(ESlateVisibility::Hidden);
+    Widget = Cast<UTextBlock>(GetWidgetFromName("EnemiesLeftNumber"));
+    if (Widget)
+        Widget->SetVisibility(ESlateVisibility::Hidden);
+    Widget = Cast<UTextBlock>(GetWidgetFromName("LocationText"));
+    if (Widget)
+        Widget->SetVisibility(ESlateVisibility::Hidden);
+    Widget = Cast<UTextBlock>(GetWidgetFromName("LocationWorld"));
+    if (Widget)
+        Widget->SetVisibility(ESlateVisibility::Hidden);
+    UProgressBar* Bar = Cast<UProgressBar>(GetWidgetFromName("HealthBar"));
+    if (Bar)
+        Bar->SetVisibility(ESlateVisibility::Hidden);
+    Bar = Cast<UProgressBar>(GetWidgetFromName("SuperBar"));
+    if (Bar)
+        Bar->SetVisibility(ESlateVisibility::Hidden);
+    UImage* Image = Cast<UImage>(GetWidgetFromName("InGameUI"));
+    if (Image)
+        Image->SetVisibility(ESlateVisibility::Hidden);
+    //--------------------------------------------------------------
+    Image = Cast<UImage>(GetWidgetFromName("PauseScreen"));
+    if (Image)
+        Image->SetVisibility(ESlateVisibility::Hidden);
+    UButton* Button = Cast<UButton>(GetWidgetFromName("Resume"));
+    if (Button)
+        Button->SetVisibility(ESlateVisibility::Hidden);
+    Button = Cast<UButton>(GetWidgetFromName("Options"));
+    if (Button)
+        Button->SetVisibility(ESlateVisibility::Hidden);
+    Button = Cast<UButton>(GetWidgetFromName("Retry"));
+    if (Button)
+        Button->SetVisibility(ESlateVisibility::Hidden);
+    Button = Cast<UButton>(GetWidgetFromName("Quit"));
+    if (Button)
+        Button->SetVisibility(ESlateVisibility::Hidden);
+    Widget = Cast<UTextBlock>(GetWidgetFromName("PausedText"));
+    if (Widget)
+        Widget->SetVisibility(ESlateVisibility::Hidden);
+}
+
 void UPlayableWidget::DisplayGameOver()
 {
+    UImage* Image = Cast<UImage>(GetWidgetFromName("GameOver"));
+    if (Image)
+        Image->SetVisibility(ESlateVisibility::Visible);
+    UTextBlock* Widget = Cast<UTextBlock>(GetWidgetFromName("GameOverText"));
+    if (Widget)
+        Widget->SetVisibility(ESlateVisibility::Visible);
+    UButton* Button = Cast<UButton>(GetWidgetFromName("GameOverRetry"));
+    if (Button)
+        Button->SetVisibility(ESlateVisibility::Visible);
+    Button = Cast<UButton>(GetWidgetFromName("GameOverQuit"));
+    if (Button)
+        Button->SetVisibility(ESlateVisibility::Visible);
+
+    FSlateBrush brush;
+    UTexture2D* NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_ButtonHover.Game_ButtonHover")));
+
+    brush.SetResourceObject(NormalTexture);
+    brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.724268f, 0.724268f, 0.724268f, 1.0f)));
+    FButtonStyle style;
+    style.SetNormal(brush);
+    style.SetHovered(brush);
+
+    NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_ButtonPressed.Game_ButtonPressed")));
+    brush.SetResourceObject(NormalTexture);
+    style.SetPressed(brush);
+    GameOverButtons[GameOverIncrement]->SetStyle(style);
+
+    for (int i = 0; i < GameOverButtons.Num(); i++)
+    {
+        if (GameOverButtons[i]->IsHovered())
+            GameOverIncrement = i;
+        if (i != GameOverIncrement)
+        {
+            NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_Button.Game_Button")));
+            brush.SetResourceObject(NormalTexture);
+            brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.495466f, 0.495466f, 0.495466f, 1.0f)));
+            style.SetNormal(brush);
+            GameOverButtons[i]->SetStyle(style);
+        }
+    }
 }
 
 void UPlayableWidget::OnResume()
@@ -383,19 +508,37 @@ void UPlayableWidget::OnPauseQuit()
 void UPlayableWidget::OnPauseFadeToQuit()
 {
     GameModeBase->State = EGameState::FadeToQuit;
-    GameModeBase->GamePause();
+}
+
+void UPlayableWidget::OnPauseFadeToRetry()
+{
+    GameModeBase->State = EGameState::FadeToRetry;
 }
 
 void UPlayableWidget::PauseMenuNavigation(float dir)//tried FReply UPlayableWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {                                                       //didnt work
-    Increment += dir;
-    if (Increment < 0)
-        Increment = PauseButtons.Num() -1;
-    else if (Increment >= PauseButtons.Num())
-        Increment = 0;
+    if (GameModeBase->Game_IsPaused)
+    {
+        Increment += dir;
+        if (Increment < 0)
+            Increment = PauseButtons.Num() - 1;
+        else if (Increment >= PauseButtons.Num())
+            Increment = 0;
+    }
+    else if (GameModeBase->State == EGameState::EndGame)
+    {
+        GameOverIncrement += dir;
+        if (GameOverIncrement < 0)
+            GameOverIncrement = GameOverButtons.Num() - 1;
+        else if (GameOverIncrement >= GameOverButtons.Num())
+            GameOverIncrement = 0;
+    }
 }
 
 void UPlayableWidget::PauseMenuPressed()
 {
-    PauseButtons[Increment]->OnClicked.Broadcast();
+    if (GameModeBase->Game_IsPaused)
+        PauseButtons[Increment]->OnClicked.Broadcast();
+    else if (GameModeBase->State == EGameState::EndGame)
+        GameOverButtons[GameOverIncrement]->OnClicked.Broadcast();
 }

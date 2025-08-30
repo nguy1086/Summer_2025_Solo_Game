@@ -25,6 +25,7 @@ public:
 	void UpdatePause();
 	void FadeEnter(float DeltaTime);
 	void FadeQuit(float DeltaTime);
+	void HideAllButGameOver();
 	void DisplayGameOver();
 
 	UFUNCTION()
@@ -37,6 +38,8 @@ public:
 	void OnPauseQuit();
 	UFUNCTION()
 	void OnPauseFadeToQuit();
+	UFUNCTION()
+	void OnPauseFadeToRetry();
 
 	void PauseMenuNavigation(float dir);
 	void PauseMenuPressed();
@@ -46,6 +49,9 @@ public:
 
 private:
 	TArray<class UButton*> PauseButtons;
+	TArray<class UButton*> GameOverButtons;
 	int Increment;
+	int GameOverIncrement;
+	float GameOverDelay;
 	class ARadioactiveSpire_GameModeBase* GameModeBase;
 };

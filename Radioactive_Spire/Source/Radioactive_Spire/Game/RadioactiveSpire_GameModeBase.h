@@ -17,6 +17,7 @@ enum class EGameState : uint8
 	Transition	UMETA(DisplayName = "Transition"),
 	FadeToQuit	UMETA(DisplayName = "FadeToQuit"),
 	FadeToEnter	UMETA(DisplayName = "FadeToEnter"),
+	FadeToRetry	UMETA(DisplayName = "FadeToRetry"),
 	EndGame     UMETA(DisplayName = "EndGame")
 };
 /**
