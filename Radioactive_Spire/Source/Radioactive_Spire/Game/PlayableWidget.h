@@ -23,6 +23,8 @@ public:
 	void UpdateSuper();
 	void UpdateEnemies();
 	void UpdatePause();
+	void FadeEnter(float DeltaTime);
+	void FadeQuit(float DeltaTime);
 	void DisplayGameOver();
 
 	UFUNCTION()
@@ -33,9 +35,14 @@ public:
 	void OnRetry();
 	UFUNCTION()
 	void OnPauseQuit();
+	UFUNCTION()
+	void OnPauseFadeToQuit();
 
 	void PauseMenuNavigation(float dir);
 	void PauseMenuPressed();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float FadeTimer = 2.5f;
 
 private:
 	TArray<class UButton*> PauseButtons;

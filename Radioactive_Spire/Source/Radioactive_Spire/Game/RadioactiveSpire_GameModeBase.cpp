@@ -3,6 +3,7 @@
 
 #include "RadioactiveSpire_GameModeBase.h"
 #include "RadioactiveSpire_GameStateBase.h"
+#include "PlayableWidget.h"
 #include "GameConstants.h"
 #include "DeadActor.h"
 
@@ -45,7 +46,7 @@ ARadioactiveSpire_GameModeBase::ARadioactiveSpire_GameModeBase() :
 	LevelPosition(FVector(-1008.0f, 0.0f, 1500.0f)),
 	TransitionPosition(),
 	WaitTimer(5.0f),
-	State(EGameState::Gameplay)
+	State(EGameState::FadeToEnter)
 {
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -69,7 +70,8 @@ void ARadioactiveSpire_GameModeBase::BeginPlay()
 	}
 
 	Player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
-	Player->SetActorLocation(FVector(360.0f, 0.0f, 200.0f));
+	Player->SetActorLocation(FVector(360.0f, 0.0f, 740.0f));
+
 	MaxEnemiesSpawn = FMath::RandRange(7, 10);
 
 	FActorSpawnParameters SpawnParams;
@@ -164,7 +166,24 @@ void ARadioactiveSpire_GameModeBase::Tick(float DeltaTime)
 			Player->CustomTimeDilation = 1.0f;
 		}
 	}
-
+	else if (State == EGameState::FadeToEnter)
+	{
+		Player->CustomTimeDilation = 0.0f;
+		APlayableController* PlayableController = Cast<APlayableController>(Player->GetController());
+		if ((PlayableController->GameInfoWidget->FadeTimer / 2.0f )<= 0.0f)
+		{
+			Player->CustomTimeDilation = 1.0f;
+			Player->ApplyStateChange(EState::Falling);
+			State = EGameState::Gameplay;
+		}
+	}
+	else if (State == EGameState::FadeToQuit)
+	{
+		PauseActors();
+		APlayableController* PlayableController = Cast<APlayableController>(Player->GetController());
+		if ((PlayableController->GameInfoWidget->FadeTimer / 1.5f) >= 1.5f)
+			PlayableController->GameInfoWidget->OnPauseQuit();
+	}
 }
 
 void ARadioactiveSpire_GameModeBase::PlayerDied()

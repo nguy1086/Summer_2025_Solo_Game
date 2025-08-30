@@ -27,6 +27,7 @@ bool UPlayableWidget::Initialize()
 {
     GameModeBase = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
     Increment = 0;
+    FadeTimer = 2.5f;
     SetIsFocusable(true);
     SetKeyboardFocus();
 
@@ -98,7 +99,7 @@ bool UPlayableWidget::Initialize()
     if (Button)
     {
         Button->SetVisibility(ESlateVisibility::Hidden);
-        Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnPauseQuit);
+        Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnPauseFadeToQuit);
         PauseButtons.Add(Button);
     }
 
@@ -120,13 +121,20 @@ void UPlayableWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
     Super::NativeTick(MyGeometry, InDeltaTime);
 
-    if (GameModeBase->State != EGameState::EndGame)
+    if (GameModeBase->State == EGameState::FadeToEnter)
+    {
+        FadeEnter(InDeltaTime);
+    }
+    else if (GameModeBase->State == EGameState::FadeToQuit)
+    {
+        FadeQuit(InDeltaTime);
+    }
+    else if (GameModeBase->State != EGameState::EndGame)
     {
         UpdateHealth();
         UpdateSuper();
         UpdatePause();
         UpdateEnemies();
-
     }
     else
     {
@@ -194,7 +202,7 @@ void UPlayableWidget::UpdateEnemies()
 
 void UPlayableWidget::UpdatePause()
 {
-    if (GameModeBase && GameModeBase->Game_IsPaused)
+    if (GameModeBase->Game_IsPaused)
     {
         UTextBlock* Widget = Cast<UTextBlock>(GetWidgetFromName("HealthText"));
         if (Widget)
@@ -275,7 +283,7 @@ void UPlayableWidget::UpdatePause()
             }
         }
     }
-    else if (GameModeBase && !GameModeBase->Game_IsPaused)
+    else if (!GameModeBase->Game_IsPaused)
     {
         UTextBlock* Widget = Cast<UTextBlock>(GetWidgetFromName("HealthText"));
         if (Widget)
@@ -332,14 +340,29 @@ void UPlayableWidget::UpdatePause()
     }
 }
 
+void UPlayableWidget::FadeEnter(float DeltaTime)
+{
+    FadeTimer -= DeltaTime;
+    UBorder* Border = Cast<UBorder>(GetWidgetFromName("Fade"));
+    if (Border)
+        Border->SetRenderOpacity(FadeTimer / 2.0f);
+}
+
+void UPlayableWidget::FadeQuit(float DeltaTime)
+{
+    FadeTimer += DeltaTime;
+    UBorder* Border = Cast<UBorder>(GetWidgetFromName("Fade"));
+    if (Border)
+        Border->SetRenderOpacity(FadeTimer / 1.5f);
+}
+
 void UPlayableWidget::DisplayGameOver()
 {
 }
 
 void UPlayableWidget::OnResume()
 {
-    ARadioactiveSpire_GameModeBase* gameMode = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
-    gameMode->GamePause();
+    GameModeBase->GamePause();
 }
 
 void UPlayableWidget::OnPauseOptions()
@@ -355,6 +378,12 @@ void UPlayableWidget::OnPauseQuit()
 {
     UObject* WorldContextObject = this;
     UGameplayStatics::OpenLevel(WorldContextObject, FName(TEXT("MainMenu")));
+}
+
+void UPlayableWidget::OnPauseFadeToQuit()
+{
+    GameModeBase->State = EGameState::FadeToQuit;
+    GameModeBase->GamePause();
 }
 
 void UPlayableWidget::PauseMenuNavigation(float dir)//tried FReply UPlayableWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
