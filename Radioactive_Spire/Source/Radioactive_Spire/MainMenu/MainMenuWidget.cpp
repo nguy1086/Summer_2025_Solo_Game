@@ -19,12 +19,15 @@
 bool UMainMenuWidget::Initialize()
 {
     FadeTimer = 4.0f;
+    CharacterScreenAnimateTimer = 0.2f;
+    CharacterScreenAnimateIncrement = 0;
     GameModeBase = GetWorld()->GetAuthGameMode<AMainMenu_GameModeBase>();
     State = EMainMenuState::Intro;
     FWidgetTransform CurrentTransform = GetRenderTransform();
     CurrentTransform.Translation = FVector2D(0.0f, 1080.0f);
     SetRenderTransform(CurrentTransform);
     ResetIncrement();
+
     SetIsFocusable(true);
     SetKeyboardFocus();
 
@@ -42,9 +45,24 @@ bool UMainMenuWidget::Initialize()
     Image = Cast<UImage>(GetWidgetFromName("Options"));
     if (Image)
         Image->SetVisibility(ESlateVisibility::Visible);
-    Image = Cast<UImage>(GetWidgetFromName("CharacterSelect"));
+    Image = Cast<UImage>(GetWidgetFromName("CharacterSelect1"));
     if (Image)
+    {
         Image->SetVisibility(ESlateVisibility::Visible);
+        CharacterScreenAnimate.Add(Image);
+    }
+    Image = Cast<UImage>(GetWidgetFromName("CharacterSelect2"));
+    if (Image)
+    {
+        Image->SetVisibility(ESlateVisibility::Hidden);
+        CharacterScreenAnimate.Add(Image);
+    }
+    Image = Cast<UImage>(GetWidgetFromName("CharacterSelect3"));
+    if (Image)
+    {
+        Image->SetVisibility(ESlateVisibility::Hidden);
+        CharacterScreenAnimate.Add(Image);
+    }
     Image = Cast<UImage>(GetWidgetFromName("GameName"));
     if (Image)
         Image->SetVisibility(ESlateVisibility::Visible);
@@ -154,6 +172,10 @@ bool UMainMenuWidget::Initialize()
         Border->SetRenderOpacity(0.0f);
     }
 
+    UTextBlock* Widget = Cast<UTextBlock>(GetWidgetFromName("NameText"));
+    if (Widget)
+        Widget->SetText(FText::FromString("Name"));
+
     return true;
 }
 
@@ -206,9 +228,7 @@ void UMainMenuWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
             Border->SetRenderOpacity(FadeTimer / 1.5f);
 
         if (FadeTimer >= 3.5f)
-        {
             CharacterSelections[CharacterIncrement]->OnClicked.Broadcast();
-        }
     }
 }
 
@@ -254,12 +274,25 @@ void UMainMenuWidget::UpdateOptions()
 void UMainMenuWidget::UpdateCharacterSelect(float DeltaTime, float speed)
 {
     //100% know there's a for loop for this but too dumb to do that
+
+
+
     int i = CharacterIncrement;
     FWidgetTransform CurrentTransform = CharacterSelections[i]->GetRenderTransform();
     float x = FMath::FInterpTo(0.0f, CurrentTransform.Translation.X, DeltaTime, speed);
     float y = FMath::FInterpTo(200.0f, CurrentTransform.Translation.Y, DeltaTime, speed);
     CurrentTransform.Translation = FVector2D(x, y);
     CharacterSelections[i]->SetRenderTransform(CurrentTransform);
+
+
+    UTextBlock* Widget = Cast<UTextBlock>(GetWidgetFromName("NameText"));
+    if (Widget)
+    {
+        if (CharacterSelections[i]->GetFName() == TEXT("Batter_Select"))
+            Widget->SetText(FText::FromString("Batter"));
+        else
+            Widget->SetText(FText::FromString("Locked"));
+    }
     i + 1 > CharacterSelections.Num() - 1 ? i = 0 : i++;
 
     CurrentTransform = CharacterSelections[i]->GetRenderTransform();
@@ -288,6 +321,20 @@ void UMainMenuWidget::UpdateCharacterSelect(float DeltaTime, float speed)
     y = FMath::FInterpTo(50.0f, CurrentTransform.Translation.Y, DeltaTime, speed);
     CurrentTransform.Translation = FVector2D(x, y);
     CharacterSelections[i]->SetRenderTransform(CurrentTransform);
+
+    CharacterScreenAnimateTimer -= DeltaTime;
+    if (CharacterScreenAnimateTimer <= 0)
+    {
+        CharacterScreenAnimate[CharacterScreenAnimateIncrement]->SetVisibility(ESlateVisibility::Visible);
+        for (int j = 0; j < CharacterScreenAnimate.Num(); j++)
+            if (j != CharacterScreenAnimateIncrement)
+                CharacterScreenAnimate[j]->SetVisibility(ESlateVisibility::Hidden);
+
+        CharacterScreenAnimateTimer = 0.2f;
+        CharacterScreenAnimateIncrement++;
+        if (CharacterScreenAnimateIncrement >= CharacterScreenAnimate.Num())
+            CharacterScreenAnimateIncrement = 0;
+    }
 }
 
 void UMainMenuWidget::OnCharacterSelect()

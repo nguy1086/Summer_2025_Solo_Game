@@ -139,6 +139,11 @@ bool UPlayableWidget::Initialize()
         Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnPauseFadeToRetry);
         GameOverButtons.Add(Button);
     }
+    //------------------------------------------------------------------------
+    //options
+    Image = Cast<UImage>(GetWidgetFromName("OptionsScreen"));
+    if (Image)
+        Image->SetVisibility(ESlateVisibility::Hidden);
 
     return true;
 }

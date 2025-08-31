@@ -63,8 +63,11 @@ private:
 	TArray<class UButton*> MainMenuButtons;
 	TArray<class USlider*> VolumeSliders;
 	TArray<class UButton*> CharacterSelections;
+	TArray<class UImage*> CharacterScreenAnimate;
 	int Increment;
 	int OptionIncrement;
 	int CharacterIncrement;
 	float FadeTimer;
+	float CharacterScreenAnimateTimer;
+	int CharacterScreenAnimateIncrement;
 };
