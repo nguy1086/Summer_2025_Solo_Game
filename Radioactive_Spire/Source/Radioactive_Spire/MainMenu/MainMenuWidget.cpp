@@ -26,6 +26,13 @@ bool UMainMenuWidget::Initialize()
     FWidgetTransform CurrentTransform = GetRenderTransform();
     CurrentTransform.Translation = FVector2D(0.0f, 1080.0f);
     SetRenderTransform(CurrentTransform);
+
+    if (SelectSound != nullptr)
+        UGameplayStatics::PrimeSound(SelectSound);
+    if (NavigationSound != nullptr)
+        UGameplayStatics::PrimeSound(NavigationSound);
+    if (CancelSound != nullptr)
+        UGameplayStatics::PrimeSound(CancelSound);
     ResetIncrement();
 
     SetIsFocusable(true);
@@ -365,6 +372,9 @@ void UMainMenuWidget::MainMenuNavigation(float dir)
 {
     if (State != EMainMenuState::Loading)
     {
+        if (NavigationSound != nullptr)
+            UGameplayStatics::PlaySoundAtLocation(this, NavigationSound, FVector());
+
         if (State == EMainMenuState::MainMenu)
         {
             Increment += dir;
@@ -396,6 +406,9 @@ void UMainMenuWidget::MainMenuPressed()
 {
     if (State != EMainMenuState::Loading)
     {
+        if (SelectSound != nullptr)
+            UGameplayStatics::PlaySoundAtLocation(this, SelectSound, FVector());
+
         if (State == EMainMenuState::MainMenu)
             MainMenuButtons[Increment]->OnClicked.Broadcast();
         else if (State == EMainMenuState::Character)
@@ -413,7 +426,12 @@ void UMainMenuWidget::MainMenuPressed()
 void UMainMenuWidget::MainMenuBackPressed()
 {
     if ((State == EMainMenuState::Character || State == EMainMenuState::Options) && State != EMainMenuState::Loading)
+    {
+        if (CancelSound != nullptr)
+            UGameplayStatics::PlaySoundAtLocation(this, CancelSound, FVector());
+
         State = EMainMenuState::MainMenu;
+    }
 }
 
 void UMainMenuWidget::MoveWidget(float posx, float posy, float DeltaTime, float speed)

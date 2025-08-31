@@ -32,6 +32,13 @@ bool UPlayableWidget::Initialize()
     SetIsFocusable(true);
     SetKeyboardFocus();
 
+    if (SelectSound != nullptr)
+        UGameplayStatics::PrimeSound(SelectSound);
+    if (NavigationSound != nullptr)
+        UGameplayStatics::PrimeSound(NavigationSound);
+    if (CancelSound != nullptr)
+        UGameplayStatics::PrimeSound(CancelSound);
+
     bool bResult = Super::Initialize();
     if (!bResult)
         return false;
@@ -536,6 +543,9 @@ void UPlayableWidget::PauseMenuNavigation(float dir)//tried FReply UPlayableWidg
 {                                                       //didnt work
     if (GameModeBase->Game_IsPaused)
     {
+        if (NavigationSound != nullptr)
+            UGameplayStatics::PlaySoundAtLocation(this, NavigationSound, FVector());
+
         Increment += dir;
         if (Increment < 0)
             Increment = PauseButtons.Num() - 1;
@@ -544,6 +554,9 @@ void UPlayableWidget::PauseMenuNavigation(float dir)//tried FReply UPlayableWidg
     }
     else if (GameModeBase->State == EGameState::EndGame)
     {
+        if (NavigationSound != nullptr)
+            UGameplayStatics::PlaySoundAtLocation(this, NavigationSound, FVector());
+
         GameOverIncrement += dir;
         if (GameOverIncrement < 0)
             GameOverIncrement = GameOverButtons.Num() - 1;
@@ -554,6 +567,9 @@ void UPlayableWidget::PauseMenuNavigation(float dir)//tried FReply UPlayableWidg
 
 void UPlayableWidget::PauseMenuPressed()
 {
+    if (SelectSound != nullptr)
+        UGameplayStatics::PlaySoundAtLocation(this, SelectSound, FVector());
+
     if (GameModeBase->Game_IsPaused)
         PauseButtons[Increment]->OnClicked.Broadcast();
     else if (GameModeBase->State == EGameState::EndGame)

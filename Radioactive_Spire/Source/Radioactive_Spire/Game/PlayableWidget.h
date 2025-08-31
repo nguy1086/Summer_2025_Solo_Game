@@ -48,6 +48,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float FadeTimer = 2.5f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu SFX")
+	class USoundBase* SelectSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu SFX")
+	class USoundBase* NavigationSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu SFX")
+	class USoundBase* CancelSound;
+
 private:
 	TArray<class UButton*> PauseButtons;
 	TArray<class UButton*> GameOverButtons;

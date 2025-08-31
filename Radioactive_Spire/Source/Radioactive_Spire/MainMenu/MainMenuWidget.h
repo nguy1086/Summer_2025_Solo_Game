@@ -56,6 +56,13 @@ public:
 	UFUNCTION()
 	void OnBatterSelect();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu SFX")
+	class USoundBase* SelectSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu SFX")
+	class USoundBase* NavigationSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu SFX")
+	class USoundBase* CancelSound;
+
 private:
 	void ResetIncrement();
 	class AMainMenu_GameModeBase* GameModeBase;
