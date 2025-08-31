@@ -49,6 +49,7 @@ void APlayableCharacter::BeginPlay()
 	PlayableController = Cast<APlayableController>(Controller);
 
 	InitializeType();
+	PrimeSFX();
 
 	if (Type == EPlayerType::Test)
 		GetSprite()->SetRelativeLocation(PlayerConstants::DefaultSpriteOffset);
@@ -155,6 +156,22 @@ void APlayableCharacter::Attack()
 		{
 			if (PlayerState->IsOnGround)//ground combo
 			{
+				if (ComboNumber == 0 || ComboNumber == 2)
+				{
+					if (SwingOneSound != nullptr)
+						UGameplayStatics::PlaySoundAtLocation(this, SwingOneSound, GetActorLocation());
+				}
+				else if (ComboNumber == 1 || ComboNumber == 3)
+				{
+					if (SwingTwoSound != nullptr)
+						UGameplayStatics::PlaySoundAtLocation(this, SwingTwoSound, GetActorLocation());
+				}
+				else
+				{
+					if (SwingThreeSound != nullptr)
+						UGameplayStatics::PlaySoundAtLocation(this, SwingThreeSound, GetActorLocation());
+				}
+
 				DisableControls();
 				ApplyStateChange(EState::Attacking);
 
@@ -193,6 +210,17 @@ void APlayableCharacter::Attack()
 				}
 				else//air combo
 				{
+					if (ComboNumber == 0)
+					{
+						if (SwingOneSound != nullptr)
+							UGameplayStatics::PlaySoundAtLocation(this, SwingOneSound, GetActorLocation());
+					}
+					else
+					{
+						if (SwingTwoSound != nullptr)
+							UGameplayStatics::PlaySoundAtLocation(this, SwingTwoSound, GetActorLocation());
+					}
+
 					DisableControls();
 					ApplyStateChange(EState::Attacking);
 
@@ -226,6 +254,9 @@ void APlayableCharacter::Special()
 		{
 			if (PlayerState->IsOnGround)//ground special
 			{
+				if (SpecialSound != nullptr)
+					UGameplayStatics::PlaySoundAtLocation(this, SpecialSound, GetActorLocation());
+
 				if (PlayerState->State == EState::Ducking)
 					DuckSpecial = true;
 				DisableControls();
@@ -406,6 +437,9 @@ void APlayableCharacter::HandleDamage(float damage, AActor* OtherActor)
 		if (PlayerState && !IsInvincible())
 		{
 			Stats_Health -= damage;
+			if (HurtSound != nullptr)
+				UGameplayStatics::PlaySoundAtLocation(this, HurtSound, GetActorLocation());
+
 			if (Stats_Health <= 0)
 			{
 				DamagedTimer = PlayerConstants::DefaultInvincibleVisibilityDuration;
@@ -522,6 +556,9 @@ void APlayableCharacter::Landed(const FHitResult& Hit)
 				UnPauseSprite();
 				float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
 				float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
+
+				if (GroundPoundSound != nullptr)
+					UGameplayStatics::PlaySoundAtLocation(this, GroundPoundSound, GetActorLocation());
 
 				BatterGroundPoundSpawn();
 				GetWorldTimerManager().SetTimer(InputTimerHandle, this, &APlayableCharacter::EnableControls, (3.0f / FramesPerSecond), false);
@@ -737,6 +774,25 @@ void APlayableCharacter::InitializeType()
 	}
 }
 
+void APlayableCharacter::PrimeSFX()
+{
+	if (SwingOneSound != nullptr)
+		UGameplayStatics::PrimeSound(SwingOneSound);
+	if (SwingTwoSound != nullptr)
+		UGameplayStatics::PrimeSound(SwingTwoSound);
+	if (SwingThreeSound != nullptr)
+		UGameplayStatics::PrimeSound(SwingThreeSound);
+	if (SuperSound != nullptr)
+		UGameplayStatics::PrimeSound(SuperSound);
+	if (SpecialSound != nullptr)
+		UGameplayStatics::PrimeSound(SpecialSound);
+	if (GroundPoundSound != nullptr)
+		UGameplayStatics::PrimeSound(GroundPoundSound);
+
+	if (HurtSound != nullptr)
+		UGameplayStatics::PrimeSound(HurtSound);
+}
+
 void APlayableCharacter::EnableControls()
 {
 	ARadioactiveSpire_GameModeBase* gameMode = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
@@ -846,6 +902,9 @@ void APlayableCharacter::BatterSpecialSpawn()
 	}
 	else if (!PlayerState->IsOnGround)
 	{
+		if (AirSpecialSound != nullptr)
+			UGameplayStatics::PlaySoundAtLocation(this, AirSpecialSound, GetActorLocation());
+
 		FVector location = HandleMeleeHitBoxLocation(64.0f, 0.0f);
 		FRotator rotation = HandleMeleeHitBoxRotation();
 
@@ -932,6 +991,9 @@ void APlayableCharacter::BatterGroundPoundSpawn()
 
 void APlayableCharacter::BatterSuperSpawn()
 {
+	if (SuperSound != nullptr)
+		UGameplayStatics::PlaySoundAtLocation(this, SuperSound, GetActorLocation());
+
 	FVector location = GetActorLocation();
 	FRotator rotation = FRotator(0.0f, 0.0f, 0.0f);
 	location.Z += 48.0f;

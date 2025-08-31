@@ -48,6 +48,8 @@ APlayableAttackHitbox::APlayableAttackHitbox() :
 void APlayableAttackHitbox::BeginPlay()
 {
 	Super::BeginPlay();
+
+	PrimeHitSFX();
 }
 
 void APlayableAttackHitbox::OnOverlapBegin(UPrimitiveComponent* OverlapComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -60,6 +62,7 @@ void APlayableAttackHitbox::OnOverlapBegin(UPrimitiveComponent* OverlapComponent
 
 		enemy->OnDamaged(Damage);
 		ChargeSuper();
+		PlaySound();
 
 		if (ActorHasTag("Baseball"))
 			Destroy();
@@ -310,7 +313,7 @@ float APlayableAttackHitbox::CheckDirectionOfHitbox()
 		return -1.0f;
 	else if (PlayerState->Direction == EDirection::Right)
 		return 1.0f;
-	
+
 	return 0.0f;
 }
 
@@ -324,6 +327,49 @@ void APlayableAttackHitbox::ChargeSuper()
 		else if (player->Type == EPlayerType::Batter)
 			player->Stats_Super += (Damage * PlayerConstants::BatterSuperChargeRate) / (ActorHasTag("Super") ? 2.0f : 1.0f);
 	}
+}
+
+void APlayableAttackHitbox::PlaySound()
+{
+	if ((Name == TEXT("Batter_Finisher") || Name == TEXT("Batter_AirSpecial")))
+	{
+		if (HitSpecialSound != nullptr)
+			UGameplayStatics::PlaySoundAtLocation(this, HitSpecialSound, GetActorLocation());
+	}
+	else if (Name == TEXT("Batter_ComboOne") || Name == TEXT("Batter_AirComboOne"))
+	{
+		if (HitOneSound != nullptr)
+			UGameplayStatics::PlaySoundAtLocation(this, HitOneSound, GetActorLocation());
+	}
+	else if (Name == TEXT("Batter_ComboTwo") || Name == TEXT("Batter_AirComboTwo"))
+	{
+		if (HitTwoSound != nullptr)
+			UGameplayStatics::PlaySoundAtLocation(this, HitTwoSound, GetActorLocation());
+	}
+	else if (Name == TEXT("Batter_Finisher") || Name == TEXT("Batter_AirSpecial"))
+	{
+		if (HitThreeSound != nullptr)
+			UGameplayStatics::PlaySoundAtLocation(this, HitThreeSound, GetActorLocation());
+	}
+	else if (Name == TEXT("Batter_Super"))
+	{
+		if (HitSuperSound != nullptr)
+			UGameplayStatics::PlaySoundAtLocation(this, HitSuperSound, GetActorLocation());
+	}
+}
+
+void APlayableAttackHitbox::PrimeHitSFX()
+{
+	if (HitSpecialSound != nullptr)
+		UGameplayStatics::PrimeSound(HitSpecialSound);
+	if (HitOneSound != nullptr)
+		UGameplayStatics::PrimeSound(HitOneSound);
+	if (HitTwoSound != nullptr)
+		UGameplayStatics::PrimeSound(HitTwoSound);
+	if (HitThreeSound != nullptr)
+		UGameplayStatics::PrimeSound(HitThreeSound);
+	if (HitSuperSound != nullptr)
+		UGameplayStatics::PrimeSound(HitSuperSound);
 }
 
 // Called every frame

@@ -41,6 +41,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter flipbooks")
 	class UPaperFlipbook* BatterSuperProjectileFlipbook;
 
+	//SFX
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter SFX")
+	class USoundBase* HitOneSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter SFX")
+	class USoundBase* HitTwoSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter SFX")
+	class USoundBase* HitThreeSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter SFX")
+	class USoundBase* HitSuperSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter SFX")
+	class USoundBase* HitSpecialSound;
+
 	virtual void Tick(float DeltaTime) override;
 
 	void Spawn(FString name, float damage);
@@ -63,6 +75,8 @@ protected:
 	float CheckDirectionOfHitbox();
 
 	void ChargeSuper();
+	void PlaySound();
+	void PrimeHitSFX();
 
 private:
 	bool IsProjectile;

@@ -91,6 +91,7 @@ private:
 	class UPaperFlipbook* GetBatterFlipbook();
 
 	void InitializeType();
+	void PrimeSFX();
 
 	void EnableControls();
 	void DisableControls();
@@ -167,4 +168,22 @@ public:
 	//Attacks
 	UPROPERTY(EditAnyWhere, Category = "Hitbox attack")
 	TSubclassOf<class APlayableAttackHitbox> AttackHitboxTemplate;
+
+	//SFX
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter SFX")
+	class USoundBase* SwingOneSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter SFX")
+	class USoundBase* SwingTwoSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter SFX")
+	class USoundBase* SwingThreeSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter SFX")
+	class USoundBase* SuperSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter SFX")
+	class USoundBase* SpecialSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter SFX")
+	class USoundBase* AirSpecialSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter SFX")
+	class USoundBase* GroundPoundSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Batter SFX")
+	class USoundBase* HurtSound;
 };
