@@ -47,11 +47,11 @@ public:
 	void MoveWidget(float posx, float posy, float DeltaTime, float speed = 48.0f);
 
 	UFUNCTION()
-	void OnMusicChange();
+	void OnMasterChange(float v);
 	UFUNCTION()
-	void OnSFXChange();
-	//UFUNCTION()
-	//void OnAmbienceChange(float v);
+	void OnSFXChange(float v);
+	UFUNCTION()
+	void OnAmbienceChange(float v);
 
 	UFUNCTION()
 	void OnBatterSelect();
@@ -67,5 +67,4 @@ private:
 	int OptionIncrement;
 	int CharacterIncrement;
 	float FadeTimer;
-
 };

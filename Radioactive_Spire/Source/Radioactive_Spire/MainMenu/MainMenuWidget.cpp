@@ -352,11 +352,16 @@ void UMainMenuWidget::MoveWidget(float posx, float posy, float DeltaTime, float 
     SetRenderTransform(CurrentTransform);
 }
 
-void UMainMenuWidget::OnMusicChange()
+void UMainMenuWidget::OnMasterChange(float v)
+{
+
+}
+
+void UMainMenuWidget::OnSFXChange(float v)
 {
 }
 
-void UMainMenuWidget::OnSFXChange()
+void UMainMenuWidget::OnAmbienceChange(float v)
 {
 }
 
