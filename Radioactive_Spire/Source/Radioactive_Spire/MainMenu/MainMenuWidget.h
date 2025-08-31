@@ -32,7 +32,7 @@ public:
 	void UpdateIntro();
 	void UpdateMainMenu();
 	void UpdateOptions();
-	void UpdateCharacterSelect();
+	void UpdateCharacterSelect(float DeltaTime, float speed = 48.0f);
 
 	UFUNCTION()
 	void OnCharacterSelect();

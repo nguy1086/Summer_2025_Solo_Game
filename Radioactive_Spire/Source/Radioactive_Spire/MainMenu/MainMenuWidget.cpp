@@ -165,33 +165,7 @@ void UMainMenuWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
     {
         MoveWidget(0.0f, 0.0f, InDeltaTime);
 
-        FSlateBrush brush;
-        UTexture2D* NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_ButtonHover.Game_ButtonHover")));
-
-        brush.SetResourceObject(NormalTexture);
-        brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.724268f, 0.724268f, 0.724268f, 1.0f)));
-        FButtonStyle style;
-        style.SetNormal(brush);
-        style.SetHovered(brush);
-
-        NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_ButtonPressed.Game_ButtonPressed")));
-        brush.SetResourceObject(NormalTexture);
-        style.SetPressed(brush);
-        MainMenuButtons[Increment]->SetStyle(style);
-
-        for (int i = 0; i < MainMenuButtons.Num(); i++)
-        {
-            if (MainMenuButtons[i]->IsHovered())
-                Increment = i;
-            if (i != Increment)
-            {
-                NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_Button.Game_Button")));
-                brush.SetResourceObject(NormalTexture);
-                brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.495466f, 0.495466f, 0.495466f, 1.0f)));
-                style.SetNormal(brush);
-                MainMenuButtons[i]->SetStyle(style);
-            }
-        }
+        UpdateMainMenu();
     }
     else if (State == EMainMenuState::Options)
     {
@@ -201,26 +175,7 @@ void UMainMenuWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
     {
         MoveWidget(0.0f, -1080.0f, InDeltaTime);
 
-        //FSlateBrush brush;
-
-        //brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.724268f, 0.724268f, 0.724268f, 1.0f)));
-        //FButtonStyle style;
-        //style.SetNormal(brush);
-        //style.SetHovered(brush);
-        //style.SetPressed(brush);
-        //CharacterSelections[CharacterIncrement]->SetStyle(style);
-
-        //for (int i = 0; i < CharacterSelections.Num(); i++)
-        //{
-        //    if (CharacterSelections[i]->IsHovered())
-        //        CharacterIncrement = i;
-        //    if (i != CharacterIncrement)
-        //    {
-        //        brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.495466f, 0.495466f, 0.495466f, 1.0f)));
-        //        style.SetNormal(brush);
-        //        CharacterSelections[i]->SetStyle(style);
-        //    }
-        //}
+        UpdateCharacterSelect(InDeltaTime);
     }
     else if (State == EMainMenuState::Intro)
     {
@@ -263,14 +218,76 @@ void UMainMenuWidget::UpdateIntro()
 
 void UMainMenuWidget::UpdateMainMenu()
 {
+    FSlateBrush brush;
+    UTexture2D* NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_ButtonHover.Game_ButtonHover")));
+
+    brush.SetResourceObject(NormalTexture);
+    brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.724268f, 0.724268f, 0.724268f, 1.0f)));
+    FButtonStyle style;
+    style.SetNormal(brush);
+    style.SetHovered(brush);
+
+    NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_ButtonPressed.Game_ButtonPressed")));
+    brush.SetResourceObject(NormalTexture);
+    style.SetPressed(brush);
+    MainMenuButtons[Increment]->SetStyle(style);
+
+    for (int i = 0; i < MainMenuButtons.Num(); i++)
+    {
+        if (MainMenuButtons[i]->IsHovered())
+            Increment = i;
+        if (i != Increment)
+        {
+            NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_Button.Game_Button")));
+            brush.SetResourceObject(NormalTexture);
+            brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.495466f, 0.495466f, 0.495466f, 1.0f)));
+            style.SetNormal(brush);
+            MainMenuButtons[i]->SetStyle(style);
+        }
+    }
 }
 
 void UMainMenuWidget::UpdateOptions()
 {
 }
 
-void UMainMenuWidget::UpdateCharacterSelect()
+void UMainMenuWidget::UpdateCharacterSelect(float DeltaTime, float speed)
 {
+    //100% know there's a for loop for this but too dumb to do that
+    int i = CharacterIncrement;
+    FWidgetTransform CurrentTransform = CharacterSelections[i]->GetRenderTransform();
+    float x = FMath::FInterpTo(0.0f, CurrentTransform.Translation.X, DeltaTime, speed);
+    float y = FMath::FInterpTo(200.0f, CurrentTransform.Translation.Y, DeltaTime, speed);
+    CurrentTransform.Translation = FVector2D(x, y);
+    CharacterSelections[i]->SetRenderTransform(CurrentTransform);
+    i + 1 > CharacterSelections.Num() - 1 ? i = 0 : i++;
+
+    CurrentTransform = CharacterSelections[i]->GetRenderTransform();
+    x = FMath::FInterpTo(200.0f, CurrentTransform.Translation.X, DeltaTime, speed);
+    y = FMath::FInterpTo(50.0f, CurrentTransform.Translation.Y, DeltaTime, speed);
+    CurrentTransform.Translation = FVector2D(x, y);
+    CharacterSelections[i]->SetRenderTransform(CurrentTransform);
+    i + 1 > CharacterSelections.Num() - 1 ? i = 0 : i++;
+
+    CurrentTransform = CharacterSelections[i]->GetRenderTransform();
+    x = FMath::FInterpTo(100.0f, CurrentTransform.Translation.X, DeltaTime, speed);
+    y = FMath::FInterpTo(-200.0f, CurrentTransform.Translation.Y, DeltaTime, speed);
+    CurrentTransform.Translation = FVector2D(x, y);
+    CharacterSelections[i]->SetRenderTransform(CurrentTransform);
+    i + 1 > CharacterSelections.Num() - 1 ? i = 0 : i++;
+
+    CurrentTransform = CharacterSelections[i]->GetRenderTransform();
+    x = FMath::FInterpTo(-100.0f, CurrentTransform.Translation.X, DeltaTime, speed);
+    y = FMath::FInterpTo(-200.0f, CurrentTransform.Translation.Y, DeltaTime, speed);
+    CurrentTransform.Translation = FVector2D(x, y);
+    CharacterSelections[i]->SetRenderTransform(CurrentTransform);
+    i + 1 > CharacterSelections.Num() - 1 ? i = 0 : i++;
+
+    CurrentTransform = CharacterSelections[i]->GetRenderTransform();
+    x = FMath::FInterpTo(-200.0f, CurrentTransform.Translation.X, DeltaTime, speed);
+    y = FMath::FInterpTo(50.0f, CurrentTransform.Translation.Y, DeltaTime, speed);
+    CurrentTransform.Translation = FVector2D(x, y);
+    CharacterSelections[i]->SetRenderTransform(CurrentTransform);
 }
 
 void UMainMenuWidget::OnCharacterSelect()
@@ -311,15 +328,19 @@ void UMainMenuWidget::MainMenuNavigation(float dir)
         }
         else if (State == EMainMenuState::Options)
         {
-            OptionIncrement += dir;
-            if (OptionIncrement < 0)
-                OptionIncrement = MainMenuButtons.Num() - 1;
-            else if (OptionIncrement >= MainMenuButtons.Num())
-                OptionIncrement = 0;
+            //OptionIncrement += dir;
+            //if (OptionIncrement < 0)
+            //    OptionIncrement = MainMenuButtons.Num() - 1;
+            //else if (OptionIncrement >= MainMenuButtons.Num())
+            //    OptionIncrement = 0;
         }
         else if (State == EMainMenuState::Character)
         {
-
+            CharacterIncrement += dir;
+            if (CharacterIncrement < 0)
+                CharacterIncrement = CharacterSelections.Num() - 1;
+            else if (CharacterIncrement >= CharacterSelections.Num())
+                CharacterIncrement = 0;
         }
     }
 }
@@ -331,7 +352,14 @@ void UMainMenuWidget::MainMenuPressed()
         if (State == EMainMenuState::MainMenu)
             MainMenuButtons[Increment]->OnClicked.Broadcast();
         else if (State == EMainMenuState::Character)
-            State = EMainMenuState::Loading;
+        {
+            if (CharacterSelections[CharacterIncrement]->OnClicked.IsBound())
+                State = EMainMenuState::Loading;
+            else
+            {
+
+            }
+        }
     }
 }
 
