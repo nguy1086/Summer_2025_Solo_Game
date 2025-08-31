@@ -28,6 +28,7 @@
 
 #include "../Enemies/Inheritance/Enemy.h"
 #include "../Enemies/Demo/Slime.h"
+#include "../Enemies/Demo/Flying_Spiter.h"
 
 #include "NavMesh/NavMeshBoundsVolume.h"
 #include "Components/BrushComponent.h"
@@ -412,7 +413,12 @@ void ARadioactiveSpire_GameModeBase::SpawnEnemy()
 		int32 index = FMath::RandRange(0, 10) % 2;
 		float x[] = { 50.0f, 940.0f };
 
-		ASlime* slime = GetWorld()->SpawnActor<ASlime>(Slime, FVector(x[index], Player->GetActorLocation().Y, 940.0f + Camera->LevelZIncrease), FRotator::ZeroRotator);
+		int32 spawnchance = FMath::RandRange(0, 2);
+		if (spawnchance == 0)
+			ASlime* slime = GetWorld()->SpawnActor<ASlime>(Slime, FVector(x[index], Player->GetActorLocation().Y, 940.0f + Camera->LevelZIncrease), FRotator::ZeroRotator);
+		else
+			AFlying_Spiter* slime = GetWorld()->SpawnActor<AFlying_Spiter>(FlyingSpitter, FVector(x[index], Player->GetActorLocation().Y, 940.0f + Camera->LevelZIncrease), FRotator::ZeroRotator);
+
 		CurrentEnemiesSpawned++;
 		SpawnDelay = FMath::RandRange(0.5f, 2.5f) - (0.1f * Level);
 		if (SpawnDelay < 0.0f)

@@ -72,6 +72,12 @@ void APlayableAttackHitbox::OnOverlapBegin(UPrimitiveComponent* OverlapComponent
 			if (loc.X < GetActorLocation().X)
 				Knockback.X *= -1.0f;
 		}
+		else if (ActorHasTag("Air"))
+		{
+			APlayableCharacter* player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
+			if (player)
+				player->JumpMaxCount++;
+		}
 
 		if (!enemy->ActorHasTag("Unknockable"))
 			enemy->LaunchCharacter(Knockback, false, true);

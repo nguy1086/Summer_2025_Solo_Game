@@ -458,6 +458,8 @@ void APlayableCharacter::HandleDamage(float damage, AActor* OtherActor)
 				AEnemy* enemy = Cast<AEnemy>(OtherActor);
 				if (enemy)
 					EnemyKnockback(enemy);
+				else
+					LaunchCharacter(FVector(0.0f, 0.0f, 300.0f), false, true);
 
 				float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
 				float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
@@ -582,6 +584,8 @@ void APlayableCharacter::Landed(const FHitResult& Hit)
 			}
 		}
 	}
+
+	JumpMaxCount = 1;
 }
 
 void APlayableCharacter::UpdateFlipbook()

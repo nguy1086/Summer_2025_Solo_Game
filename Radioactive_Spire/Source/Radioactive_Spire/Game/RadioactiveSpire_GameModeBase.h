@@ -100,4 +100,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enemy Templates")
 	TSubclassOf<class ASlime> Slime;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enemy Templates")
+	TSubclassOf<class AFlying_Spiter> FlyingSpitter;
 };
