@@ -13,7 +13,7 @@ void AMainMenu_GameModeBase::BeginPlay()
     UGameUserSettings* GameUserSettings = GEngine->GameUserSettings;
     if (GameUserSettings)
     {
-        GameUserSettings->SetScreenResolution(FIntPoint(1280.0f, 960.0f));
+        GameUserSettings->SetScreenResolution(FIntPoint(1280.0f, 720.0f));
         GameUserSettings->SetFullscreenMode(EWindowMode::WindowedFullscreen);
         GameUserSettings->ApplyResolutionSettings(true);
         GameUserSettings->ApplySettings(true);
