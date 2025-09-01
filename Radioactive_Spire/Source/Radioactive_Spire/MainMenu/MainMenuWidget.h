@@ -29,7 +29,7 @@ class RADIOACTIVE_SPIRE_API UMainMenuWidget : public UUserWidget
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 public:
-	void UpdateIntro();
+	void UpdateIntro(float DeltaTime);
 	void UpdateMainMenu();
 	void UpdateOptions();
 	void UpdateCharacterSelect(float DeltaTime, float speed = 48.0f);
@@ -47,11 +47,17 @@ public:
 	void MoveWidget(float posx, float posy, float DeltaTime, float speed = 48.0f);
 
 	UFUNCTION()
-	void OnMasterChange(float v);
+	void OnMusicChange(float v);
+	UFUNCTION()
+	void OnMusicPressed();
 	UFUNCTION()
 	void OnSFXChange(float v);
 	UFUNCTION()
+	void OnSFXPressed();
+	UFUNCTION()
 	void OnAmbienceChange(float v);
+	UFUNCTION()
+	void OnAmbiencePressed();
 
 	UFUNCTION()
 	void OnBatterSelect();
@@ -63,12 +69,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu SFX")
 	class USoundBase* CancelSound;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float MusicValue = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float SFXValue = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float AmbienceValue = 1.0f;
+
 private:
 	void ResetIncrement();
 	class AMainMenu_GameModeBase* GameModeBase;
 	EMainMenuState State;
 	TArray<class UButton*> MainMenuButtons;
 	TArray<class USlider*> VolumeSliders;
+	TArray<class UButton*> VolumeButtons;
 	TArray<class UButton*> CharacterSelections;
 	TArray<class UImage*> CharacterScreenAnimate;
 	int Increment;

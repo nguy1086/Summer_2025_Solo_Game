@@ -101,27 +101,63 @@ bool UMainMenuWidget::Initialize()
     }
     //-------------------------------------------------------------------------------------------------
     //options
-    USlider* Slider = Cast<USlider>(GetWidgetFromName("Master"));
+    USlider* Slider = Cast<USlider>(GetWidgetFromName("MusicSlider"));
     if (Slider)
     {
         Slider->SetVisibility(ESlateVisibility::Visible);
-        Slider->OnValueChanged.AddDynamic(this, &UMainMenuWidget::OnMasterChange);
+        Slider->OnValueChanged.AddDynamic(this, &UMainMenuWidget::OnMusicChange);
+        Slider->SetValue(MusicValue);
         VolumeSliders.Add(Slider);
     }
-    Slider = Cast<USlider>(GetWidgetFromName("Sound Effects"));
+    Slider = Cast<USlider>(GetWidgetFromName("SoundEffectsSlider"));
     if (Slider)
     {
         Slider->SetVisibility(ESlateVisibility::Visible);
-        Slider->OnValueChanged.AddDynamic(this, &UMainMenuWidget::OnMasterChange);
+        Slider->OnValueChanged.AddDynamic(this, &UMainMenuWidget::OnSFXChange);
+        Slider->SetValue(SFXValue);
         VolumeSliders.Add(Slider);
     }
-    Slider = Cast<USlider>(GetWidgetFromName("Ambience"));
+    Slider = Cast<USlider>(GetWidgetFromName("AmbienceSlider"));
     if (Slider)
     {
         Slider->SetVisibility(ESlateVisibility::Visible);
-        Slider->OnValueChanged.AddDynamic(this, &UMainMenuWidget::OnMasterChange);
+        Slider->OnValueChanged.AddDynamic(this, &UMainMenuWidget::OnAmbienceChange);
+        Slider->SetValue(AmbienceValue);
         VolumeSliders.Add(Slider);
     }
+
+    Button = Cast<UButton>(GetWidgetFromName("MusicButton"));
+    if (Button)
+    {
+        Button->SetVisibility(ESlateVisibility::Visible);
+        Button->OnClicked.AddDynamic(this, &UMainMenuWidget::OnMusicPressed);
+        VolumeButtons.Add(Button);
+    }
+    Button = Cast<UButton>(GetWidgetFromName("SoundEffectsButton"));
+    if (Button)
+    {
+        Button->SetVisibility(ESlateVisibility::Visible);
+        Button->OnClicked.AddDynamic(this, &UMainMenuWidget::OnSFXPressed);
+        VolumeButtons.Add(Button);
+    }
+    Button = Cast<UButton>(GetWidgetFromName("AmbienceButton"));
+    if (Button)
+    {
+        Button->SetVisibility(ESlateVisibility::Visible);
+        Button->OnClicked.AddDynamic(this, &UMainMenuWidget::OnAmbiencePressed);
+        VolumeButtons.Add(Button);
+    }
+
+    UTextBlock* Widget = Cast<UTextBlock>(GetWidgetFromName("MusicValue"));
+    if (Widget)
+        Widget->SetText(FText::FromString("Music"));
+    Widget = Cast<UTextBlock>(GetWidgetFromName("SFXValue"));
+    if (Widget)
+        Widget->SetText(FText::FromString("SFX"));
+    Widget = Cast<UTextBlock>(GetWidgetFromName("AmbienceValue"));
+    if (Widget)
+        Widget->SetText(FText::FromString("Ambience"));
+
     //-------------------------------------------------------------------------------------------------
     //character
     FSlateBrush brush;
@@ -179,7 +215,7 @@ bool UMainMenuWidget::Initialize()
         Border->SetRenderOpacity(0.0f);
     }
 
-    UTextBlock* Widget = Cast<UTextBlock>(GetWidgetFromName("NameText"));
+    Widget = Cast<UTextBlock>(GetWidgetFromName("NameText"));
     if (Widget)
         Widget->SetText(FText::FromString("Name"));
 
@@ -199,6 +235,8 @@ void UMainMenuWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
     else if (State == EMainMenuState::Options)
     {
         MoveWidget(1920.0f, 0.0f, InDeltaTime);
+
+        UpdateOptions();
     }
     else if (State == EMainMenuState::Character)
     {
@@ -208,24 +246,7 @@ void UMainMenuWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
     }
     else if (State == EMainMenuState::Intro)
     {
-        FadeTimer -= InDeltaTime;
-        UBorder* Border = Cast<UBorder>(GetWidgetFromName("Fade"));
-        if (Border)
-            Border->SetRenderOpacity((FadeTimer - 2.0f) / 2.0f);
-
-
-        if (FadeTimer <= 0.0f)
-        {
-            MoveWidget(0.0, 0.0f, InDeltaTime, 56.0f);
-            FWidgetTransform CurrentTransform = GetRenderTransform();
-            if (FMath::IsNearlyEqual(CurrentTransform.Translation.Y, 0.0f, 6.0f))
-            {
-                State = EMainMenuState::MainMenu;
-                CurrentTransform.Translation = FVector2D(0.0f, 0.0f);
-                SetRenderTransform(CurrentTransform);
-                FadeTimer = 0.0f;
-            }
-        }
+        UpdateIntro(InDeltaTime);
     }
     else if (State == EMainMenuState::Loading)
     {
@@ -239,8 +260,26 @@ void UMainMenuWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
     }
 }
 
-void UMainMenuWidget::UpdateIntro()
+void UMainMenuWidget::UpdateIntro(float DeltaTime)
 {
+    FadeTimer -= DeltaTime;
+    UBorder* Border = Cast<UBorder>(GetWidgetFromName("Fade"));
+    if (Border)
+        Border->SetRenderOpacity((FadeTimer - 2.0f) / 2.0f);
+
+
+    if (FadeTimer <= 0.0f)
+    {
+        MoveWidget(0.0, 0.0f, DeltaTime, 56.0f);
+        FWidgetTransform CurrentTransform = GetRenderTransform();
+        if (FMath::IsNearlyEqual(CurrentTransform.Translation.Y, 0.0f, 6.0f))
+        {
+            State = EMainMenuState::MainMenu;
+            CurrentTransform.Translation = FVector2D(0.0f, 0.0f);
+            SetRenderTransform(CurrentTransform);
+            FadeTimer = 0.0f;
+        }
+    }
 }
 
 void UMainMenuWidget::UpdateMainMenu()
@@ -276,13 +315,51 @@ void UMainMenuWidget::UpdateMainMenu()
 
 void UMainMenuWidget::UpdateOptions()
 {
+    FString Value = FString::Printf(TEXT("%d"), (FMath::RoundToInt(MusicValue * 10.0f)));
+    UTextBlock* Widget = Cast<UTextBlock>(GetWidgetFromName("MusicValue"));
+    if (Widget)
+        Widget->SetText(FText::FromString(Value));
+    Value = FString::Printf(TEXT("%d"), (FMath::RoundToInt(SFXValue * 10.0f)));
+    Widget = Cast<UTextBlock>(GetWidgetFromName("SFXValue"));
+    if (Widget)
+        Widget->SetText(FText::FromString(Value));
+    Value = FString::Printf(TEXT("%d"), (FMath::RoundToInt(AmbienceValue * 10.0f)));
+    Widget = Cast<UTextBlock>(GetWidgetFromName("AmbienceValue"));
+    if (Widget)
+        Widget->SetText(FText::FromString(Value));
+
+    FSlateBrush brush;
+    UTexture2D* NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_ButtonHover.Game_ButtonHover")));
+
+    brush.SetResourceObject(NormalTexture);
+    brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.724268f, 0.724268f, 0.724268f, 1.0f)));
+    FButtonStyle style;
+    style.SetNormal(brush);
+    style.SetHovered(brush);
+
+    NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_ButtonPressed.Game_ButtonPressed")));
+    brush.SetResourceObject(NormalTexture);
+    style.SetPressed(brush);
+    VolumeButtons[OptionIncrement]->SetStyle(style);
+
+    for (int i = 0; i < VolumeButtons.Num(); i++)
+    {
+        if (VolumeButtons[i]->IsHovered())
+            OptionIncrement = i;
+        if (i != OptionIncrement)
+        {
+            NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_Button.Game_Button")));
+            brush.SetResourceObject(NormalTexture);
+            brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.495466f, 0.495466f, 0.495466f, 1.0f)));
+            style.SetNormal(brush);
+            VolumeButtons[i]->SetStyle(style);
+        }
+    }
 }
 
 void UMainMenuWidget::UpdateCharacterSelect(float DeltaTime, float speed)
 {
     //100% know there's a for loop for this but too dumb to do that
-
-
 
     int i = CharacterIncrement;
     FWidgetTransform CurrentTransform = CharacterSelections[i]->GetRenderTransform();
@@ -385,11 +462,11 @@ void UMainMenuWidget::MainMenuNavigation(float dir)
         }
         else if (State == EMainMenuState::Options)
         {
-            //OptionIncrement += dir;
-            //if (OptionIncrement < 0)
-            //    OptionIncrement = MainMenuButtons.Num() - 1;
-            //else if (OptionIncrement >= MainMenuButtons.Num())
-            //    OptionIncrement = 0;
+            OptionIncrement += dir;
+            if (OptionIncrement < 0)
+                OptionIncrement = VolumeButtons.Num() - 1;
+            else if (OptionIncrement >= VolumeButtons.Num())
+                OptionIncrement = 0;
         }
         else if (State == EMainMenuState::Character)
         {
@@ -415,11 +492,9 @@ void UMainMenuWidget::MainMenuPressed()
         {
             if (CharacterSelections[CharacterIncrement]->OnClicked.IsBound())
                 State = EMainMenuState::Loading;
-            else
-            {
-
-            }
         }
+        else if (State == EMainMenuState::Options)
+            VolumeButtons[OptionIncrement]->OnClicked.Broadcast();
     }
 }
 
@@ -445,17 +520,49 @@ void UMainMenuWidget::MoveWidget(float posx, float posy, float DeltaTime, float 
     SetRenderTransform(CurrentTransform);
 }
 
-void UMainMenuWidget::OnMasterChange(float v)
+void UMainMenuWidget::OnMusicChange(float v)
 {
+    MusicValue = v;
+}
 
+void UMainMenuWidget::OnMusicPressed()
+{
+    MusicValue += 0.1;
+    MusicValue = truncf(MusicValue * 1000.0f) / 1000.0f;
+    if (MusicValue > 1.0)
+        MusicValue = 0.0f;
+
+    VolumeSliders[0]->SetValue(MusicValue);
 }
 
 void UMainMenuWidget::OnSFXChange(float v)
 {
+    SFXValue = v;
+}
+
+void UMainMenuWidget::OnSFXPressed()
+{
+    SFXValue += 0.1;
+    SFXValue = truncf(SFXValue * 1000.0f) / 1000.0f;
+    if (SFXValue > 1.0)
+        SFXValue = 0.0f;
+
+    VolumeSliders[1]->SetValue(SFXValue);
 }
 
 void UMainMenuWidget::OnAmbienceChange(float v)
 {
+    AmbienceValue = v;
+}
+
+void UMainMenuWidget::OnAmbiencePressed()
+{
+    AmbienceValue += 0.1;
+    AmbienceValue = truncf(AmbienceValue * 1000.0f) / 1000.0f;
+    if (AmbienceValue > 1.0)
+        AmbienceValue = 0.0f;
+
+    VolumeSliders[2]->SetValue(AmbienceValue);
 }
 
 void UMainMenuWidget::OnBatterSelect()

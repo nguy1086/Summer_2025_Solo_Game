@@ -36,6 +36,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/AudioComponent.h"
 
+
 ARadioactiveSpire_GameModeBase::ARadioactiveSpire_GameModeBase() :
 	Camera(nullptr),
 	SuperPauseTimer(0.0f),
@@ -68,9 +69,7 @@ void ARadioactiveSpire_GameModeBase::BeginPlay()
 	}
 
 	if (GEngine && GEngine->GameViewport)
-	{
 		GEngine->GameViewport->HandleToggleFullscreenCommand();
-	}
 
 	Player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
 	Player->SetActorLocation(FVector(360.0f, 0.0f, 740.0f));
@@ -95,6 +94,9 @@ void ARadioactiveSpire_GameModeBase::BeginPlay()
 
 	if (LevelSound != nullptr)
 		LevelAudioComponent = UGameplayStatics::SpawnSound2D(this, LevelSound);
+
+	//#include "Sound/SoundClass.h"
+	//LevelSound->SoundClassObject->Properties.Volume = 0.0f;
 }
 
 void ARadioactiveSpire_GameModeBase::Tick(float DeltaTime)
