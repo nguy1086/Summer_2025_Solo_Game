@@ -3,6 +3,7 @@
 
 #include "MainMenuWidget.h"
 #include "MainMenu_GameModeBase.h"
+#include "Radioactive_Spire_GameInstance.h"
 
 #include "Components/TextBlock.h"
 #include "Components/ProgressBar.h"
@@ -16,8 +17,12 @@
 #include "MainMenuController.h"
 #include "Math/UnrealMathUtility.h"
 
+#include "Sound/SoundClass.h"
+#include "Engine/Engine.h"
+
 bool UMainMenuWidget::Initialize()
 {
+    GameInstance = Cast<URadioactive_Spire_GameInstance>(GetGameInstance());
     FadeTimer = 4.0f;
     CharacterScreenAnimateTimer = 0.2f;
     CharacterScreenAnimateIncrement = 0;
@@ -33,6 +38,7 @@ bool UMainMenuWidget::Initialize()
         UGameplayStatics::PrimeSound(NavigationSound);
     if (CancelSound != nullptr)
         UGameplayStatics::PrimeSound(CancelSound);
+
     ResetIncrement();
 
     SetIsFocusable(true);
@@ -106,7 +112,9 @@ bool UMainMenuWidget::Initialize()
     {
         Slider->SetVisibility(ESlateVisibility::Visible);
         Slider->OnValueChanged.AddDynamic(this, &UMainMenuWidget::OnMusicChange);
-        Slider->SetValue(MusicValue);
+        if (GameInstance)
+            Slider->SetValue(GameInstance->MusicValue);
+
         VolumeSliders.Add(Slider);
     }
     Slider = Cast<USlider>(GetWidgetFromName("SoundEffectsSlider"));
@@ -114,7 +122,9 @@ bool UMainMenuWidget::Initialize()
     {
         Slider->SetVisibility(ESlateVisibility::Visible);
         Slider->OnValueChanged.AddDynamic(this, &UMainMenuWidget::OnSFXChange);
-        Slider->SetValue(SFXValue);
+        if (GameInstance)
+            Slider->SetValue(GameInstance->SFXValue);
+
         VolumeSliders.Add(Slider);
     }
     Slider = Cast<USlider>(GetWidgetFromName("AmbienceSlider"));
@@ -122,7 +132,9 @@ bool UMainMenuWidget::Initialize()
     {
         Slider->SetVisibility(ESlateVisibility::Visible);
         Slider->OnValueChanged.AddDynamic(this, &UMainMenuWidget::OnAmbienceChange);
-        Slider->SetValue(AmbienceValue);
+        if (GameInstance)
+            Slider->SetValue(GameInstance->AmbienceValue);
+
         VolumeSliders.Add(Slider);
     }
 
@@ -315,15 +327,15 @@ void UMainMenuWidget::UpdateMainMenu()
 
 void UMainMenuWidget::UpdateOptions()
 {
-    FString Value = FString::Printf(TEXT("%d"), (FMath::RoundToInt(MusicValue * 10.0f)));
+    FString Value = FString::Printf(TEXT("%d"), (FMath::RoundToInt(GameInstance->MusicValue * 10.0f)));
     UTextBlock* Widget = Cast<UTextBlock>(GetWidgetFromName("MusicValue"));
     if (Widget)
         Widget->SetText(FText::FromString(Value));
-    Value = FString::Printf(TEXT("%d"), (FMath::RoundToInt(SFXValue * 10.0f)));
+    Value = FString::Printf(TEXT("%d"), (FMath::RoundToInt(GameInstance->SFXValue * 10.0f)));
     Widget = Cast<UTextBlock>(GetWidgetFromName("SFXValue"));
     if (Widget)
         Widget->SetText(FText::FromString(Value));
-    Value = FString::Printf(TEXT("%d"), (FMath::RoundToInt(AmbienceValue * 10.0f)));
+    Value = FString::Printf(TEXT("%d"), (FMath::RoundToInt(GameInstance->AmbienceValue * 10.0f)));
     Widget = Cast<UTextBlock>(GetWidgetFromName("AmbienceValue"));
     if (Widget)
         Widget->SetText(FText::FromString(Value));
@@ -355,6 +367,8 @@ void UMainMenuWidget::UpdateOptions()
             VolumeButtons[i]->SetStyle(style);
         }
     }
+
+    UpdateSoundChange();
 }
 
 void UMainMenuWidget::UpdateCharacterSelect(float DeltaTime, float speed)
@@ -447,7 +461,7 @@ void UMainMenuWidget::OnMainMenuQuit()
 
 void UMainMenuWidget::MainMenuNavigation(float dir)
 {
-    if (State != EMainMenuState::Loading)
+    if (State != EMainMenuState::Loading && State != EMainMenuState::Intro)
     {
         if (NavigationSound != nullptr)
             UGameplayStatics::PlaySoundAtLocation(this, NavigationSound, FVector());
@@ -481,7 +495,7 @@ void UMainMenuWidget::MainMenuNavigation(float dir)
 
 void UMainMenuWidget::MainMenuPressed()
 {
-    if (State != EMainMenuState::Loading || State != EMainMenuState::Intro)
+    if (State != EMainMenuState::Loading && State != EMainMenuState::Intro)
     {
         if (SelectSound != nullptr)
             UGameplayStatics::PlaySoundAtLocation(this, SelectSound, FVector());
@@ -500,7 +514,11 @@ void UMainMenuWidget::MainMenuPressed()
 
 void UMainMenuWidget::MainMenuBackPressed()
 {
-    if ((State == EMainMenuState::Character || State == EMainMenuState::Options) && State != EMainMenuState::Loading || State != EMainMenuState::Intro)
+    if ((State == EMainMenuState::Character || 
+        State == EMainMenuState::Options) && 
+        State != EMainMenuState::Loading || 
+        State != EMainMenuState::Intro || 
+        State != EMainMenuState::MainMenu)
     {
         if (CancelSound != nullptr)
             UGameplayStatics::PlaySoundAtLocation(this, CancelSound, FVector());
@@ -522,47 +540,62 @@ void UMainMenuWidget::MoveWidget(float posx, float posy, float DeltaTime, float 
 
 void UMainMenuWidget::OnMusicChange(float v)
 {
-    MusicValue = v;
+    GameInstance->MusicValue = v;
 }
 
 void UMainMenuWidget::OnMusicPressed()
 {
-    MusicValue += 0.1;
-    MusicValue = truncf(MusicValue * 1000.0f) / 1000.0f;
-    if (MusicValue > 1.0)
-        MusicValue = 0.0f;
+    if (GameInstance)
+    {
+        #define musVal GameInstance->MusicValue 
 
-    VolumeSliders[0]->SetValue(MusicValue);
+        musVal += 0.1;
+        musVal = truncf(musVal * 1000.0f) / 1000.0f;
+        if (musVal > 1.0)
+            musVal = 0.0f;
+
+        VolumeSliders[0]->SetValue(musVal);
+    }
 }
 
 void UMainMenuWidget::OnSFXChange(float v)
 {
-    SFXValue = v;
+    GameInstance->SFXValue = v;
 }
 
 void UMainMenuWidget::OnSFXPressed()
 {
-    SFXValue += 0.1;
-    SFXValue = truncf(SFXValue * 1000.0f) / 1000.0f;
-    if (SFXValue > 1.0)
-        SFXValue = 0.0f;
+    if (GameInstance)
+    {
+        #define sfxVal GameInstance->SFXValue 
 
-    VolumeSliders[1]->SetValue(SFXValue);
+        sfxVal += 0.1;
+        sfxVal = truncf(sfxVal * 1000.0f) / 1000.0f;
+        if (sfxVal > 1.0)
+            sfxVal = 0.0f;
+
+        VolumeSliders[1]->SetValue(sfxVal);
+    }
 }
 
 void UMainMenuWidget::OnAmbienceChange(float v)
 {
-    AmbienceValue = v;
+    GameInstance->AmbienceValue = v;
 }
 
 void UMainMenuWidget::OnAmbiencePressed()
 {
-    AmbienceValue += 0.1;
-    AmbienceValue = truncf(AmbienceValue * 1000.0f) / 1000.0f;
-    if (AmbienceValue > 1.0)
-        AmbienceValue = 0.0f;
+    if (GameInstance)
+    {
+        #define ambienceVal GameInstance->AmbienceValue 
 
-    VolumeSliders[2]->SetValue(AmbienceValue);
+        ambienceVal += 0.1;
+        ambienceVal = truncf(ambienceVal * 1000.0f) / 1000.0f;
+        if (ambienceVal > 1.0)
+            ambienceVal = 0.0f;
+
+        VolumeSliders[2]->SetValue(ambienceVal);
+    }
 }
 
 void UMainMenuWidget::OnBatterSelect()
@@ -576,4 +609,14 @@ void UMainMenuWidget::ResetIncrement()
     Increment = 0;
     OptionIncrement = 0;
     CharacterIncrement = 0;
+}
+
+void UMainMenuWidget::UpdateSoundChange()
+{
+    if (SelectSound != nullptr && GameInstance != nullptr)
+        SelectSound->GetSoundClass()->Properties.Volume = GameInstance->SFXValue;
+    if (NavigationSound != nullptr && GameInstance != nullptr)
+        NavigationSound->GetSoundClass()->Properties.Volume = GameInstance->SFXValue;
+    if (CancelSound != nullptr && GameInstance != nullptr)
+        CancelSound->GetSoundClass()->Properties.Volume = GameInstance->SFXValue;
 }

@@ -69,15 +69,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu SFX")
 	class USoundBase* CancelSound;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-	float MusicValue = 1.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-	float SFXValue = 1.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-	float AmbienceValue = 1.0f;
-
 private:
+	class URadioactive_Spire_GameInstance* GameInstance;
 	void ResetIncrement();
+	void UpdateSoundChange();
 	class AMainMenu_GameModeBase* GameModeBase;
 	EMainMenuState State;
 	TArray<class UButton*> MainMenuButtons;
