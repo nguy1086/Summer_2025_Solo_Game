@@ -143,7 +143,7 @@ bool UPlayableWidget::Initialize()
     if (Button)
     {
         Button->SetVisibility(ESlateVisibility::Hidden);
-        Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnPauseFadeToRetry);
+        Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnPauseFadeToQuit);
         GameOverButtons.Add(Button);
     }
     //------------------------------------------------------------------------

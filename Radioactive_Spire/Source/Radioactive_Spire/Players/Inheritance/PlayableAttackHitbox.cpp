@@ -18,7 +18,6 @@
 APlayableAttackHitbox::APlayableAttackHitbox() :
 	IsProjectile(false),
 	Timer(0.0f),
-	Ricochet(0),
 	Knockback(0.0f, 0.0f, 75.0f)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -100,6 +99,7 @@ void APlayableAttackHitbox::OnOverlapBegin(UPrimitiveComponent* OverlapComponent
 				APlayableAttackHitbox* super = Cast<APlayableAttackHitbox>(OtherActor);
 				float z = FMath::FRandRange(-5.0f, 5.0f);
 				super->ProjectileMovementComponent->Velocity = FVector(400.0f * CheckDirectionOfHitbox(), 0.0f, z);
+				super->SetActorRotation(GetActorRotation() + FRotator(0.0f, 180.0, 0.0f));
 				super->Timer += 1.5f;
 			}
 		}

@@ -309,17 +309,18 @@ void APlayableCharacter::SuperAttack()
 				DisableControls();
 				ApplyStateChange(EState::Super);
 				NoGravity();
+				GetCharacterMovement()->Velocity = FVector(0.0f, 0.0f, 0.0f);
+
+				BatterSuperSpawn();
 
 				float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
 				float TotalDuration = GetSprite()->GetFlipbookLengthInFrames();
-
-				BatterSuperSpawn();
 
 				GetWorldTimerManager().SetTimer(StateTimerHandle, this, &APlayableCharacter::ResetPlayerState, (TotalDuration / FramesPerSecond), false);
 
 				ARadioactiveSpire_GameModeBase* gameMode = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
 				if (gameMode)
-					gameMode->SuperAttackPause(TotalDuration/FramesPerSecond);
+					gameMode->SuperAttackPause(TotalDuration / FramesPerSecond);
 
 				Stats_Super = 0.0f;
 			}
@@ -1010,4 +1011,5 @@ void APlayableCharacter::BatterSuperSpawn()
 	}
 	APlayableAttackHitbox* hitbox = GetWorld()->SpawnActor<APlayableAttackHitbox>(AttackHitboxTemplate, location, rotation);
 	hitbox->Projectile(TEXT("Batter_Super"), PlayerConstants::BatterSuperDamage);
+	hitbox->Tags.Add("ActiveSuper");
 }
