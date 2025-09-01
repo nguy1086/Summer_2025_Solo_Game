@@ -77,7 +77,12 @@ private:
 
 	void IncrementLevelPosition();
 	TSubclassOf<class APaperTileMapActor> GetRandomRedDesertLevel();
+
+	class UAudioComponent* LevelAudioComponent;
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level audio")
+	class USoundBase* LevelSound;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Death Templates")
 	TSubclassOf<class ADeadActor> DeadTestTemplate;
 

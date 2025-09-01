@@ -13,7 +13,8 @@
 
 ASlime::ASlime() :
     AttackTimer(FMath::RandRange(1.0f, 4.0f)),
-    State(ESlimeState::Walk)
+    State(ESlimeState::Walk),
+    AttackOffset(FMath::RandRange(-16.0f, 16.0f))
 {
     PrimaryActorTick.bCanEverTick = true;
 
@@ -93,11 +94,11 @@ void ASlime::Tick(float DeltaTime)
         {
             float dir = player->GetActorLocation().X - GetActorLocation().X;
             float distance = GetHorizontalDistanceTo(player);
-            if (distance < 100.0f){
+            if (distance + AttackOffset < 100.0f){
                 AddMovementInput(FVector(1.0f, 0.0f, 0.0f), -dir);
                 CheckDirection();
             }
-            else if (distance < 105.0f)
+            else if (distance + AttackOffset < 105.0f)
             {
                 if (dir > 0.0f)
                     Direction = EEnemyDirection::Right;
@@ -118,7 +119,7 @@ void ASlime::Tick(float DeltaTime)
         if (AttackTimer < 0.0f)
         {
             float distance = GetHorizontalDistanceTo(player);
-            if (distance < 105.0f)
+            if (distance < 105.0f + AttackOffset)
                 ApplyStateChange(ESlimeState::Attack);
         }
     }

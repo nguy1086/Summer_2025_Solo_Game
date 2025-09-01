@@ -14,7 +14,7 @@
 #include "Flying_Spitter_Projectile.h"
 
 AFlying_Spiter::AFlying_Spiter() :
-    AttackTimer(FMath::RandRange(2.0f, 5.0f)),
+    AttackTimer(FMath::RandRange(1.0f, 1.5f)),
     State(EFlyingSpitterState::Flying)
 {
     PrimaryActorTick.bCanEverTick = true;
@@ -46,24 +46,25 @@ void AFlying_Spiter::Tick(float DeltaTime)
         APlayableCharacter* player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
         if (player && player->IsPlayerControlled())
         {
-            FVector dir = player->GetActorLocation() - GetActorLocation();
-            dir.Y = 0.0f;
+            float dir = player->GetActorLocation().X - GetActorLocation().X;
 
             float distanceX = GetHorizontalDistanceTo(player);
             float distanceZ = GetVerticalDistanceTo(player);
 
-            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("distanceX: " + FString::SanitizeFloat(dir.X)));
-            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("distanceX: " + FString::SanitizeFloat(dir.Z)));
-            if (distanceX < 100.0f && distanceZ < 150.0f ||
-                distanceX > -100.0f && distanceZ > -150.0f)
+            FVector Velocity = FVector(8750.0f, 8750.0f, 8750.0f);
+
+            FVector start = GetActorLocation();
+            FVector direction = player->GetActorLocation() - start;
+
+            direction.Normalize();
+
+            if (distanceX < 100.0f && distanceZ < 100.0f)
+                GetCharacterMovement()->Velocity = -(direction * Velocity * DeltaTime);
+            else if (distanceX <= 125.0f && distanceZ <= 125.0f)
             {
-                AddMovementInput(dir, -dir.X);
-                CheckDirection();
-            }
-            else if (distanceX < 125.0f && distanceZ < 175.0f ||
-                distanceX > -125.0f && distanceZ > -175.0f)
-            {
-                if (dir.X > 0.0f)
+                GetCharacterMovement()->Velocity = FVector::ZeroVector;
+
+                if (dir > 0.0f)
                     Direction = EEnemyDirection::Right;
                 else
                     Direction = EEnemyDirection::Left;
@@ -72,7 +73,7 @@ void AFlying_Spiter::Tick(float DeltaTime)
             }
             else
             {
-                AddMovementInput(dir, dir.X);
+                GetCharacterMovement()->Velocity = direction * Velocity * DeltaTime;
                 CheckDirection();
             }
 
@@ -80,24 +81,21 @@ void AFlying_Spiter::Tick(float DeltaTime)
         }
 
         if (AttackTimer < 0.0f)
-        {
-            float distance = GetHorizontalDistanceTo(player);
-            if (distance < 105.0f)
-                ApplyStateChange(EFlyingSpitterState::Attack);
-        }
+            ApplyStateChange(EFlyingSpitterState::Attack);
     }
     else if (State == EFlyingSpitterState::Hurt)
     {
         GetSprite()->ToggleVisibility();
-        if (InvincibleTimer >= 0.0f)
-            InvincibleTimer -= DeltaTime;
-        else
+        if (InvincibleTimer <= 0.0f)
             ApplyStateChange(EFlyingSpitterState::Flying);
     }
     else if (State == EFlyingSpitterState::Attack)
     {
 
     }
+
+    if (InvincibleTimer >= 0.0f)
+        InvincibleTimer -= DeltaTime;
 }
 
 void AFlying_Spiter::OnDamaged(float damage)
@@ -137,6 +135,7 @@ void AFlying_Spiter::ApplyStateChange(EFlyingSpitterState newState)
 
         GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &AFlying_Spiter::Attack, TotalDuration / FramesPerSecond, false);
     }
+    GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 }
 
 void AFlying_Spiter::UpdateFlipbook()
@@ -164,3 +163,25 @@ void AFlying_Spiter::Attack()
     AFlying_Spitter_Projectile* hitbox = GetWorld()->SpawnActor<AFlying_Spitter_Projectile>(ProjectileTemplate, GetActorLocation(), LookAtRotation);
     ApplyStateChange(EFlyingSpitterState::Flying);
 }
+
+//if ((distanceX < 100.0f && distanceZ < 150.0f) ||
+//    (distanceX > -125.0f && distanceZ > -175.0f))
+//{
+//    AddMovementInput(dir, -dir.X);
+//    CheckDirection();
+//}
+//else if ((distanceX < 125.0f && distanceZ < 175.0f) ||
+//    (distanceX > -100.0f && distanceZ > -150.0f))
+//{
+//    if (dir.X > 0.0f)
+//        Direction = EEnemyDirection::Right;
+//    else
+//        Direction = EEnemyDirection::Left;
+
+//    AttackTimer -= DeltaTime;
+//}
+//else
+//{
+//    AddMovementInput(dir, dir.X);
+//
+//}

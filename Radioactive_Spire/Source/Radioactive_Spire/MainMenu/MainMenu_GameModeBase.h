@@ -17,4 +17,10 @@ class RADIOACTIVE_SPIRE_API AMainMenu_GameModeBase : public AGameModeBase
 
 protected:
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level audio")
+	class USoundBase* LevelSound;
+
+private:
+	class UAudioComponent* LevelAudioComponent;
 };

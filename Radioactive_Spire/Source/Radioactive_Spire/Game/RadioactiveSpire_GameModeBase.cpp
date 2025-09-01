@@ -33,7 +33,7 @@
 #include "NavMesh/NavMeshBoundsVolume.h"
 #include "Components/BrushComponent.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "Components/AudioComponent.h"
 
 ARadioactiveSpire_GameModeBase::ARadioactiveSpire_GameModeBase() :
 	Camera(nullptr),
@@ -47,7 +47,8 @@ ARadioactiveSpire_GameModeBase::ARadioactiveSpire_GameModeBase() :
 	LevelPosition(FVector(-1008.0f, 0.0f, 1500.0f)),
 	TransitionPosition(),
 	WaitTimer(5.0f),
-	State(EGameState::FadeToEnter)
+	State(EGameState::FadeToEnter),
+	LevelAudioComponent(nullptr)
 {
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -89,6 +90,10 @@ void ARadioactiveSpire_GameModeBase::BeginPlay()
 		tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(RedDesertSky, FVector(-1008.0f, 0.0f, 2000.0f), FRotator::ZeroRotator);
 		Camera->LevelBackground = tilemap;
 	}
+
+
+	if (LevelSound != nullptr)
+		LevelAudioComponent = UGameplayStatics::SpawnSound2D(this, LevelSound);
 }
 
 void ARadioactiveSpire_GameModeBase::Tick(float DeltaTime)
@@ -218,6 +223,9 @@ void ARadioactiveSpire_GameModeBase::PlayerDied()
 {
 	if (Player)
 	{
+		if (LevelAudioComponent != nullptr)
+			LevelAudioComponent->Stop();
+
 		State = EGameState::EndGame;
 		BlackenActors();
 		SpawnDeathAnimation(Player->GetActorLocation());
@@ -411,9 +419,9 @@ void ARadioactiveSpire_GameModeBase::SpawnEnemy()
 	if (CurrentEnemiesSpawned < MaxEnemiesSpawn)
 	{
 		int32 index = FMath::RandRange(0, 10) % 2;
-		float x[] = { 940.0f, 940.0f };
+		float x[] = { 50.0f, 940.0f };
 
-		int32 spawnchance = FMath::RandRange(1, 2);
+		int32 spawnchance = FMath::RandRange(0, 2);
 		if (spawnchance == 0)
 			ASlime* slime = GetWorld()->SpawnActor<ASlime>(Slime, FVector(x[index], Player->GetActorLocation().Y, 940.0f + Camera->LevelZIncrease), FRotator::ZeroRotator);
 		else

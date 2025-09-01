@@ -404,7 +404,7 @@ void UMainMenuWidget::MainMenuNavigation(float dir)
 
 void UMainMenuWidget::MainMenuPressed()
 {
-    if (State != EMainMenuState::Loading)
+    if (State != EMainMenuState::Loading || State != EMainMenuState::Intro)
     {
         if (SelectSound != nullptr)
             UGameplayStatics::PlaySoundAtLocation(this, SelectSound, FVector());
@@ -425,7 +425,7 @@ void UMainMenuWidget::MainMenuPressed()
 
 void UMainMenuWidget::MainMenuBackPressed()
 {
-    if ((State == EMainMenuState::Character || State == EMainMenuState::Options) && State != EMainMenuState::Loading)
+    if ((State == EMainMenuState::Character || State == EMainMenuState::Options) && State != EMainMenuState::Loading || State != EMainMenuState::Intro)
     {
         if (CancelSound != nullptr)
             UGameplayStatics::PlaySoundAtLocation(this, CancelSound, FVector());

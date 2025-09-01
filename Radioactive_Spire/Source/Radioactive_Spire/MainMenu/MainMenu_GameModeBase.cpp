@@ -3,6 +3,8 @@
 
 #include "MainMenu_GameModeBase.h"
 #include "GameFramework/GameUserSettings.h" 
+#include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
 
 void AMainMenu_GameModeBase::BeginPlay()
 {
@@ -21,4 +23,7 @@ void AMainMenu_GameModeBase::BeginPlay()
     {
         GEngine->GameViewport->HandleToggleFullscreenCommand();
     }
+
+    if (LevelSound != nullptr)
+        LevelAudioComponent = UGameplayStatics::SpawnSound2D(this, LevelSound);
 }

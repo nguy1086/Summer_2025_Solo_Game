@@ -42,7 +42,7 @@ void AFlying_Spitter_Projectile::OnOverlapBegin(UPrimitiveComponent* OverlapComp
 	APlayableCharacter* player = Cast<APlayableCharacter>(OtherActor);
 	if (player)
 	{
-		player->HandleDamage(15.0f, this);
+		player->HandleDamage(8.0f, this);
 		Destroy();
 	}
 }
