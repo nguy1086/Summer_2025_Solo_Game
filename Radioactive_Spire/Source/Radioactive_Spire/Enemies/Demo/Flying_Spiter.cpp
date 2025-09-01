@@ -23,7 +23,7 @@ AFlying_Spiter::AFlying_Spiter() :
     GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AFlying_Spiter::OnOverlapBegin);
     GetCapsuleComponent()->SetSimulatePhysics(false);
     GetCapsuleComponent()->SetEnableGravity(false);
-    GetCharacterMovement()->MaxFlySpeed = 30.0f;
+    GetCharacterMovement()->MaxFlySpeed = 100.0f;
     FlipbookComponent->SetWorldScale3D(FVector(1.5f, 1.5f, 1.5f));
 
     GetCharacterMovement()->MaxWalkSpeed = 30.0f;
@@ -41,25 +41,29 @@ void AFlying_Spiter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    if (GEngine && GetCharacterMovement()->IsFlying())
-    {
-        GEngine->AddOnScreenDebugMessage(-1,5.0f,FColor::Red,TEXT("flying"));
-    }
-
     if (State == EFlyingSpitterState::Flying)
     {
         APlayableCharacter* player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
         if (player && player->IsPlayerControlled())
         {
-            float dir = player->GetActorLocation().X - GetActorLocation().X;
-            float distance = GetHorizontalDistanceTo(player);
-            if (distance < 100.0f) {
-                AddMovementInput(FVector(1.0f, 0.0f, 0.0f), -dir);
+            FVector dir = player->GetActorLocation() - GetActorLocation();
+            dir.Y = 0.0f;
+
+            float distanceX = GetHorizontalDistanceTo(player);
+            float distanceZ = GetVerticalDistanceTo(player);
+
+            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("distanceX: " + FString::SanitizeFloat(dir.X)));
+            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("distanceX: " + FString::SanitizeFloat(dir.Z)));
+            if (distanceX < 100.0f && distanceZ < 150.0f ||
+                distanceX > -100.0f && distanceZ > -150.0f)
+            {
+                AddMovementInput(dir, -dir.X);
                 CheckDirection();
             }
-            else if (distance < 105.0f)
+            else if (distanceX < 125.0f && distanceZ < 175.0f ||
+                distanceX > -125.0f && distanceZ > -175.0f)
             {
-                if (dir > 0.0f)
+                if (dir.X > 0.0f)
                     Direction = EEnemyDirection::Right;
                 else
                     Direction = EEnemyDirection::Left;
@@ -68,7 +72,7 @@ void AFlying_Spiter::Tick(float DeltaTime)
             }
             else
             {
-                AddMovementInput(FVector(1.0f, 0.0f, 0.0f), dir);
+                AddMovementInput(dir, dir.X);
                 CheckDirection();
             }
 
@@ -88,9 +92,7 @@ void AFlying_Spiter::Tick(float DeltaTime)
         if (InvincibleTimer >= 0.0f)
             InvincibleTimer -= DeltaTime;
         else
-        {
             ApplyStateChange(EFlyingSpitterState::Flying);
-        }
     }
     else if (State == EFlyingSpitterState::Attack)
     {
@@ -108,7 +110,7 @@ void AFlying_Spiter::OnDamaged(float damage)
         else
         {
             ApplyStateChange(EFlyingSpitterState::Hurt);
-            InvincibleTimer = 0.1f;
+            InvincibleTimer = 0.5f;
         }
     }
 }

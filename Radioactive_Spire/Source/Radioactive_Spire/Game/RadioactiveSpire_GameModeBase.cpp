@@ -411,9 +411,9 @@ void ARadioactiveSpire_GameModeBase::SpawnEnemy()
 	if (CurrentEnemiesSpawned < MaxEnemiesSpawn)
 	{
 		int32 index = FMath::RandRange(0, 10) % 2;
-		float x[] = { 50.0f, 940.0f };
+		float x[] = { 940.0f, 940.0f };
 
-		int32 spawnchance = FMath::RandRange(0, 2);
+		int32 spawnchance = FMath::RandRange(1, 2);
 		if (spawnchance == 0)
 			ASlime* slime = GetWorld()->SpawnActor<ASlime>(Slime, FVector(x[index], Player->GetActorLocation().Y, 940.0f + Camera->LevelZIncrease), FRotator::ZeroRotator);
 		else
