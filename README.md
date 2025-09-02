@@ -1,6 +1,6 @@
 # Radioactive Spire
 
-Radioactive Spire is a 2D pixel art roguelite game by ***COMPANY NAME WIP***.<br/>
+Radioactive Spire is a 2D pixel art hack'n'slash/beat'em up game by ***COMPANY NAME WIP***.<br/>
 You play as the Batter, one day during a normal day in high school a nuclear fallout happened.<br/>
 What came afterwards, a corrupted government has taken over the world.<br/>
 Miraculously surviving the fallout, you rise up from the debris of what was left of your old life.<br/>
@@ -26,6 +26,7 @@ This project is entirely made by Brendon Nguyen and not intended to get help fro
 • Z/Left Button = Normal Attack<br/>
 • X/Top Button = Heavy Attack<br/>
 • Space/Right Button = Dodge<br/>
+• C/Left or Right Trigger = Super<br/>
 
 ## Inspirations
 
