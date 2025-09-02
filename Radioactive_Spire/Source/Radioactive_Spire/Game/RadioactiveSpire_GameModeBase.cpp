@@ -211,6 +211,7 @@ void ARadioactiveSpire_GameModeBase::Tick(float DeltaTime)
 			AActor* actor = *ActorItr;
 			APlayableCharacter* player = Cast<APlayableCharacter>(actor);
 			AEnemy* enemy = Cast<AEnemy>(actor);
+			AFlying_Spitter_Projectile* spitter_proj = Cast< AFlying_Spitter_Projectile>(actor);
 			APaperTileMapActor* tilemap = Cast< APaperTileMapActor>(actor);
 			if (!player && actor->CustomTimeDilation > 0.0f && !actor->ActorHasTag("PlayerCamera"))
 				actor->CustomTimeDilation -= DeltaTime;
@@ -218,6 +219,8 @@ void ARadioactiveSpire_GameModeBase::Tick(float DeltaTime)
 				enemy->FlipbookComponent->SetSpriteColor(enemy->FlipbookComponent->GetSpriteColor() - FLinearColor(DeltaTime, DeltaTime, DeltaTime, DeltaTime));
 			else if (tilemap)
 				tilemap->SetActorHiddenInGame(true);
+			else if (spitter_proj)
+				spitter_proj->FlipbookComponent->SetSpriteColor(spitter_proj->FlipbookComponent->GetSpriteColor() - FLinearColor(DeltaTime, DeltaTime, DeltaTime, DeltaTime));
 		}
 	}
 }
@@ -401,7 +404,7 @@ void ARadioactiveSpire_GameModeBase::SpawnEnemy()
 		if (spawnchance == 0)
 			ASlime* slime = GetWorld()->SpawnActor<ASlime>(Slime, FVector(x[index], Player->GetActorLocation().Y, 940.0f + Camera->LevelZIncrease), FRotator::ZeroRotator);
 		else
-			AFlying_Spiter* spitter = GetWorld()->SpawnActor<AFlying_Spiter>(FlyingSpitter, FVector(x[index], Player->GetActorLocation().Y, 940.0f + Camera->LevelZIncrease), FRotator::ZeroRotator);
+			AFlying_Spiter* spitter = GetWorld()->SpawnActor<AFlying_Spiter>(FlyingSpitter, FVector(FMath::RandRange(50.0f, 940.0f), Player->GetActorLocation().Y, 940.0f + Camera->LevelZIncrease), FRotator::ZeroRotator);
 
 		Gameplay_CurrentEnemiesSpawned++;
 		Gameplay_SpawnDelay = FMath::RandRange(0.5f, 2.5f) - (0.1f * Gameplay_Level);
