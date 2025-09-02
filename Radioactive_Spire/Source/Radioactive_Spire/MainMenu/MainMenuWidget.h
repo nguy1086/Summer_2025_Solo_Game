@@ -61,22 +61,15 @@ public:
 	UFUNCTION()
 	void OnBatterSelect();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu SFX")
-	class USoundBase* SelectSound;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu SFX")
-	class USoundBase* NavigationSound;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu SFX")
-	class USoundBase* CancelSound;
-
 private:
 	class URadioactive_Spire_GameInstance* GameInstance;
 	void ResetIncrement();
-	void UpdateSoundChange();
+	void UpdateMainSoundChange();
 	class AMainMenu_GameModeBase* GameModeBase;
 	EMainMenuState State;
 	TArray<class UButton*> MainMenuButtons;
-	TArray<class USlider*> VolumeSliders;
-	TArray<class UButton*> VolumeButtons;
+	TArray<class USlider*> MainVolumeSliders;
+	TArray<class UButton*> MainVolumeButtons;
 	TArray<class UButton*> CharacterSelections;
 	TArray<class UImage*> CharacterScreenAnimate;
 	int Increment;

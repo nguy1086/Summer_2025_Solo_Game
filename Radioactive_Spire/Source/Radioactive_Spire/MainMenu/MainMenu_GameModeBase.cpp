@@ -5,10 +5,12 @@
 #include "GameFramework/GameUserSettings.h" 
 #include "Kismet/GameplayStatics.h"
 #include "Components/AudioComponent.h"
+#include "../MainMenu/Radioactive_Spire_GameInstance.h"
 
 void AMainMenu_GameModeBase::BeginPlay()
 {
     Super::BeginPlay();
+    GameInstance = Cast<URadioactive_Spire_GameInstance>(GetGameInstance());
 
     UGameUserSettings* GameUserSettings = GEngine->GameUserSettings;
     if (GameUserSettings)
@@ -24,6 +26,8 @@ void AMainMenu_GameModeBase::BeginPlay()
         GEngine->GameViewport->HandleToggleFullscreenCommand();
     }
 
-    if (LevelSound != nullptr)
-        LevelAudioComponent = UGameplayStatics::SpawnSound2D(this, LevelSound);
+    //if (GameInstance && GameInstance->MainMenuMusic != nullptr)
+    //    LevelAudioComponent = UGameplayStatics::SpawnSound2D(this, GameInstance->MainMenuMusic);
+    if (GameInstance->MainMenuMusic != nullptr)
+        UGameplayStatics::PlaySoundAtLocation(this, GameInstance->MainMenuMusic, FVector());
 }

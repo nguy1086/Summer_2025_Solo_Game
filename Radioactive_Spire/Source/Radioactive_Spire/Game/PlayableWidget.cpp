@@ -7,11 +7,13 @@
 #include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/Border.h"
+#include "Components/Slider.h"
 
 #include "Kismet/GameplayStatics.h"
 
 #include "RadioactiveSpire_GameModeBase.h"
 #include "RadioactiveSpire_GameStateBase.h"
+#include "../MainMenu/Radioactive_Spire_GameInstance.h"
 
 #include "../Players/Inheritance/PlayableCharacter.h"
 #include "../Players/Inheritance/PlayableCharacterState.h"
@@ -23,8 +25,12 @@
 #include "Styling/SlateBrush.h"
 #include "Styling/SlateTypes.h"
 
+#include "Sound/SoundClass.h"
+#include "Engine/Engine.h"
+
 bool UPlayableWidget::Initialize()
 {
+    GameInstance = Cast<URadioactive_Spire_GameInstance>(GetGameInstance());
     GameModeBase = GetWorld()->GetAuthGameMode<ARadioactiveSpire_GameModeBase>();
     Increment = 0;
     FadeTimer = 2.5f;
@@ -35,12 +41,12 @@ bool UPlayableWidget::Initialize()
     SetIsFocusable(true);
     SetKeyboardFocus();
 
-    if (SelectSound != nullptr)
-        UGameplayStatics::PrimeSound(SelectSound);
-    if (NavigationSound != nullptr)
-        UGameplayStatics::PrimeSound(NavigationSound);
-    if (CancelSound != nullptr)
-        UGameplayStatics::PrimeSound(CancelSound);
+    if (GameInstance && GameInstance->SelectSound != nullptr)
+        UGameplayStatics::PrimeSound(GameInstance->SelectSound);
+    if (GameInstance && GameInstance->NavigationSound != nullptr)
+        UGameplayStatics::PrimeSound(GameInstance->NavigationSound);
+    if (GameInstance && GameInstance->CancelSound != nullptr)
+        UGameplayStatics::PrimeSound(GameInstance->CancelSound);
 
     bool bResult = Super::Initialize();
     if (!bResult)
@@ -157,6 +163,17 @@ bool UPlayableWidget::Initialize()
     Image = Cast<UImage>(GetWidgetFromName("OptionsScreen1"));
     if (Image)
         Image->SetVisibility(ESlateVisibility::Hidden);
+
+    USlider* Slider = Cast<USlider>(GetWidgetFromName("MusicSlider"));
+    if (Slider)
+    {
+        Slider->SetVisibility(ESlateVisibility::Visible);
+        Slider->OnValueChanged.AddDynamic(this, &UPlayableWidget::OnPauseVolumeChange);
+        if (GameInstance)
+            Slider->SetValue(GameInstance->MusicValue);
+
+        PauseVolumeSliders.Add(Slider);
+    }
 
     return true;
 }
@@ -585,8 +602,8 @@ void UPlayableWidget::PauseMenuNavigation(float dir)//tried FReply UPlayableWidg
 {                                                       //didnt work
     if (GameModeBase->Game_IsPaused)
     {
-        if (NavigationSound != nullptr)
-            UGameplayStatics::PlaySoundAtLocation(this, NavigationSound, FVector());
+        if (GameInstance && GameInstance->NavigationSound != nullptr)
+            UGameplayStatics::PlaySoundAtLocation(this, GameInstance->NavigationSound, FVector());
 
         Increment += dir;
         if (Increment < 0)
@@ -596,8 +613,8 @@ void UPlayableWidget::PauseMenuNavigation(float dir)//tried FReply UPlayableWidg
     }
     else if (GameModeBase->State == EGameState::EndGame)
     {
-        if (NavigationSound != nullptr)
-            UGameplayStatics::PlaySoundAtLocation(this, NavigationSound, FVector());
+        if (GameInstance && GameInstance->NavigationSound != nullptr)
+            UGameplayStatics::PlaySoundAtLocation(this, GameInstance->NavigationSound, FVector());
 
         GameOverIncrement += dir;
         if (GameOverIncrement < 0)
@@ -609,8 +626,8 @@ void UPlayableWidget::PauseMenuNavigation(float dir)//tried FReply UPlayableWidg
 
 void UPlayableWidget::PauseMenuPressed()
 {
-    if (SelectSound != nullptr)
-        UGameplayStatics::PlaySoundAtLocation(this, SelectSound, FVector());
+    if (GameInstance && GameInstance->SelectSound != nullptr)
+        UGameplayStatics::PlaySoundAtLocation(this, GameInstance->SelectSound, FVector());
 
     if (GameModeBase->Game_IsPaused)
         PauseButtons[Increment]->OnClicked.Broadcast();
@@ -621,7 +638,12 @@ void UPlayableWidget::PauseMenuPressed()
 void UPlayableWidget::PauseMenuBackPressed()
 {
     if (State == EPauseMenuState::OptionsMenu)
+    {
+        if (GameInstance && GameInstance->CancelSound != nullptr)
+            UGameplayStatics::PlaySoundAtLocation(this, GameInstance->CancelSound, FVector());
+
         State = EPauseMenuState::PauseMenu;
+    }
 }
 
 void UPlayableWidget::PauseMoveWidget(float posx, float posy, float DeltaTime, float speed)
@@ -633,4 +655,22 @@ void UPlayableWidget::PauseMoveWidget(float posx, float posy, float DeltaTime, f
 
     CurrentTransform.Translation = FVector2D(x, y);
     SetRenderTransform(CurrentTransform);
+}
+
+void UPlayableWidget::OnPauseVolumeChange(float v)
+{
+}
+
+void UPlayableWidget::UpdatePauseSoundChange()
+{
+    if (GameInstance->SelectSound != nullptr && GameInstance != nullptr)
+        GameInstance->SelectSound->GetSoundClass()->Properties.Volume = GameInstance->SFXValue;
+    if (GameInstance->NavigationSound != nullptr && GameInstance != nullptr)
+        GameInstance->NavigationSound->GetSoundClass()->Properties.Volume = GameInstance->SFXValue;
+    if (GameInstance->CancelSound != nullptr && GameInstance != nullptr)
+        GameInstance->CancelSound->GetSoundClass()->Properties.Volume = GameInstance->SFXValue;
+    if (GameInstance->MainMenuMusic != nullptr && GameInstance != nullptr)
+        GameInstance->MainMenuMusic->GetSoundClass()->Properties.Volume = GameInstance->MusicValue;
+    if (GameInstance->LevelMusic != nullptr && GameInstance != nullptr)
+        GameInstance->LevelMusic->GetSoundClass()->Properties.Volume = GameInstance->MusicValue;
 }

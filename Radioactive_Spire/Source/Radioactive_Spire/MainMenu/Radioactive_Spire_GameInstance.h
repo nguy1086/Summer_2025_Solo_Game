@@ -21,4 +21,17 @@ public:
 	float SFXValue = 1.0f;
 	UPROPERTY(BlueprintReadWrite, Category = "Volume")
 	float AmbienceValue = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu SFX")
+	class USoundBase* SelectSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu SFX")
+	class USoundBase* NavigationSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu SFX")
+	class USoundBase* CancelSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main Menu Music")
+	class USoundBase* MainMenuMusic;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level Music")
+	class USoundBase* LevelMusic;
 };

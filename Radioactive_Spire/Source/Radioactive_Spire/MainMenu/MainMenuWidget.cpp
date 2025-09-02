@@ -32,12 +32,12 @@ bool UMainMenuWidget::Initialize()
     CurrentTransform.Translation = FVector2D(0.0f, 1080.0f);
     SetRenderTransform(CurrentTransform);
 
-    if (SelectSound != nullptr)
-        UGameplayStatics::PrimeSound(SelectSound);
-    if (NavigationSound != nullptr)
-        UGameplayStatics::PrimeSound(NavigationSound);
-    if (CancelSound != nullptr)
-        UGameplayStatics::PrimeSound(CancelSound);
+    if (GameInstance && GameInstance->SelectSound != nullptr)
+        UGameplayStatics::PrimeSound(GameInstance->SelectSound);
+    if (GameInstance && GameInstance->NavigationSound != nullptr)
+        UGameplayStatics::PrimeSound(GameInstance->NavigationSound);
+    if (GameInstance && GameInstance->CancelSound != nullptr)
+        UGameplayStatics::PrimeSound(GameInstance->CancelSound);
 
     ResetIncrement();
 
@@ -115,7 +115,7 @@ bool UMainMenuWidget::Initialize()
         if (GameInstance)
             Slider->SetValue(GameInstance->MusicValue);
 
-        VolumeSliders.Add(Slider);
+        MainVolumeSliders.Add(Slider);
     }
     Slider = Cast<USlider>(GetWidgetFromName("SoundEffectsSlider"));
     if (Slider)
@@ -125,7 +125,7 @@ bool UMainMenuWidget::Initialize()
         if (GameInstance)
             Slider->SetValue(GameInstance->SFXValue);
 
-        VolumeSliders.Add(Slider);
+        MainVolumeSliders.Add(Slider);
     }
     Slider = Cast<USlider>(GetWidgetFromName("AmbienceSlider"));
     if (Slider)
@@ -135,7 +135,7 @@ bool UMainMenuWidget::Initialize()
         if (GameInstance)
             Slider->SetValue(GameInstance->AmbienceValue);
 
-        VolumeSliders.Add(Slider);
+        MainVolumeSliders.Add(Slider);
     }
 
     Button = Cast<UButton>(GetWidgetFromName("MusicButton"));
@@ -143,21 +143,21 @@ bool UMainMenuWidget::Initialize()
     {
         Button->SetVisibility(ESlateVisibility::Visible);
         Button->OnClicked.AddDynamic(this, &UMainMenuWidget::OnMusicPressed);
-        VolumeButtons.Add(Button);
+        MainVolumeButtons.Add(Button);
     }
     Button = Cast<UButton>(GetWidgetFromName("SoundEffectsButton"));
     if (Button)
     {
         Button->SetVisibility(ESlateVisibility::Visible);
         Button->OnClicked.AddDynamic(this, &UMainMenuWidget::OnSFXPressed);
-        VolumeButtons.Add(Button);
+        MainVolumeButtons.Add(Button);
     }
     Button = Cast<UButton>(GetWidgetFromName("AmbienceButton"));
     if (Button)
     {
         Button->SetVisibility(ESlateVisibility::Visible);
         Button->OnClicked.AddDynamic(this, &UMainMenuWidget::OnAmbiencePressed);
-        VolumeButtons.Add(Button);
+        MainVolumeButtons.Add(Button);
     }
 
     UTextBlock* Widget = Cast<UTextBlock>(GetWidgetFromName("MusicValue"));
@@ -352,11 +352,11 @@ void UMainMenuWidget::UpdateOptions()
     NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_ButtonPressed.Game_ButtonPressed")));
     brush.SetResourceObject(NormalTexture);
     style.SetPressed(brush);
-    VolumeButtons[OptionIncrement]->SetStyle(style);
+    MainVolumeButtons[OptionIncrement]->SetStyle(style);
 
-    for (int i = 0; i < VolumeButtons.Num(); i++)
+    for (int i = 0; i < MainVolumeButtons.Num(); i++)
     {
-        if (VolumeButtons[i]->IsHovered())
+        if (MainVolumeButtons[i]->IsHovered())
             OptionIncrement = i;
         if (i != OptionIncrement)
         {
@@ -364,11 +364,11 @@ void UMainMenuWidget::UpdateOptions()
             brush.SetResourceObject(NormalTexture);
             brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.495466f, 0.495466f, 0.495466f, 1.0f)));
             style.SetNormal(brush);
-            VolumeButtons[i]->SetStyle(style);
+            MainVolumeButtons[i]->SetStyle(style);
         }
     }
 
-    UpdateSoundChange();
+    UpdateMainSoundChange();
 }
 
 void UMainMenuWidget::UpdateCharacterSelect(float DeltaTime, float speed)
@@ -463,8 +463,8 @@ void UMainMenuWidget::MainMenuNavigation(float dir)
 {
     if (State != EMainMenuState::Loading && State != EMainMenuState::Intro)
     {
-        if (NavigationSound != nullptr)
-            UGameplayStatics::PlaySoundAtLocation(this, NavigationSound, FVector());
+        if (GameInstance && GameInstance->NavigationSound != nullptr)
+            UGameplayStatics::PlaySoundAtLocation(this, GameInstance->NavigationSound, FVector());
 
         if (State == EMainMenuState::MainMenu)
         {
@@ -478,8 +478,8 @@ void UMainMenuWidget::MainMenuNavigation(float dir)
         {
             OptionIncrement += dir;
             if (OptionIncrement < 0)
-                OptionIncrement = VolumeButtons.Num() - 1;
-            else if (OptionIncrement >= VolumeButtons.Num())
+                OptionIncrement = MainVolumeButtons.Num() - 1;
+            else if (OptionIncrement >= MainVolumeButtons.Num())
                 OptionIncrement = 0;
         }
         else if (State == EMainMenuState::Character)
@@ -497,8 +497,8 @@ void UMainMenuWidget::MainMenuPressed()
 {
     if (State != EMainMenuState::Loading && State != EMainMenuState::Intro)
     {
-        if (SelectSound != nullptr)
-            UGameplayStatics::PlaySoundAtLocation(this, SelectSound, FVector());
+        if (GameInstance && GameInstance->SelectSound != nullptr)
+            UGameplayStatics::PlaySoundAtLocation(this, GameInstance->SelectSound, FVector());
 
         if (State == EMainMenuState::MainMenu)
             MainMenuButtons[Increment]->OnClicked.Broadcast();
@@ -508,7 +508,7 @@ void UMainMenuWidget::MainMenuPressed()
                 State = EMainMenuState::Loading;
         }
         else if (State == EMainMenuState::Options)
-            VolumeButtons[OptionIncrement]->OnClicked.Broadcast();
+            MainVolumeButtons[OptionIncrement]->OnClicked.Broadcast();
     }
 }
 
@@ -520,8 +520,8 @@ void UMainMenuWidget::MainMenuBackPressed()
         State != EMainMenuState::Intro || 
         State != EMainMenuState::MainMenu)
     {
-        if (CancelSound != nullptr)
-            UGameplayStatics::PlaySoundAtLocation(this, CancelSound, FVector());
+        if (GameInstance && GameInstance->CancelSound != nullptr)
+            UGameplayStatics::PlaySoundAtLocation(this, GameInstance->CancelSound, FVector());
 
         State = EMainMenuState::MainMenu;
     }
@@ -554,7 +554,7 @@ void UMainMenuWidget::OnMusicPressed()
         if (musVal > 1.0)
             musVal = 0.0f;
 
-        VolumeSliders[0]->SetValue(musVal);
+        MainVolumeSliders[0]->SetValue(musVal);
     }
 }
 
@@ -574,7 +574,7 @@ void UMainMenuWidget::OnSFXPressed()
         if (sfxVal > 1.0)
             sfxVal = 0.0f;
 
-        VolumeSliders[1]->SetValue(sfxVal);
+        MainVolumeSliders[1]->SetValue(sfxVal);
     }
 }
 
@@ -594,7 +594,7 @@ void UMainMenuWidget::OnAmbiencePressed()
         if (ambienceVal > 1.0)
             ambienceVal = 0.0f;
 
-        VolumeSliders[2]->SetValue(ambienceVal);
+        MainVolumeSliders[2]->SetValue(ambienceVal);
     }
 }
 
@@ -611,12 +611,16 @@ void UMainMenuWidget::ResetIncrement()
     CharacterIncrement = 0;
 }
 
-void UMainMenuWidget::UpdateSoundChange()
+void UMainMenuWidget::UpdateMainSoundChange()
 {
-    if (SelectSound != nullptr && GameInstance != nullptr)
-        SelectSound->GetSoundClass()->Properties.Volume = GameInstance->SFXValue;
-    if (NavigationSound != nullptr && GameInstance != nullptr)
-        NavigationSound->GetSoundClass()->Properties.Volume = GameInstance->SFXValue;
-    if (CancelSound != nullptr && GameInstance != nullptr)
-        CancelSound->GetSoundClass()->Properties.Volume = GameInstance->SFXValue;
+    if (GameInstance->SelectSound != nullptr && GameInstance != nullptr)
+        GameInstance->SelectSound->GetSoundClass()->Properties.Volume = GameInstance->SFXValue;
+    if (GameInstance->NavigationSound != nullptr && GameInstance != nullptr)
+        GameInstance->NavigationSound->GetSoundClass()->Properties.Volume = GameInstance->SFXValue;
+    if (GameInstance->CancelSound != nullptr && GameInstance != nullptr)
+        GameInstance->CancelSound->GetSoundClass()->Properties.Volume = GameInstance->SFXValue;
+    if (GameInstance->MainMenuMusic != nullptr && GameInstance != nullptr)
+        GameInstance->MainMenuMusic->GetSoundClass()->Properties.Volume = GameInstance->MusicValue;
+    if (GameInstance->LevelMusic != nullptr && GameInstance != nullptr)
+        GameInstance->LevelMusic->GetSoundClass()->Properties.Volume = GameInstance->MusicValue;
 }

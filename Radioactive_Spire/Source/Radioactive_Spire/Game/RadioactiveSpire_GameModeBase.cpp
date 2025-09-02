@@ -35,7 +35,7 @@
 #include "Components/BrushComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/AudioComponent.h"
-
+#include "../MainMenu/Radioactive_Spire_GameInstance.h"
 
 ARadioactiveSpire_GameModeBase::ARadioactiveSpire_GameModeBase() :
 	Camera(nullptr),
@@ -58,6 +58,7 @@ ARadioactiveSpire_GameModeBase::ARadioactiveSpire_GameModeBase() :
 void ARadioactiveSpire_GameModeBase::BeginPlay()
 {
     Super::BeginPlay();
+	GameInstance = Cast<URadioactive_Spire_GameInstance>(GetGameInstance());
 
 	UGameUserSettings* GameUserSettings = GEngine->GameUserSettings;
 	if (GameUserSettings)
@@ -92,8 +93,10 @@ void ARadioactiveSpire_GameModeBase::BeginPlay()
 	}
 
 
-	if (LevelSound != nullptr)
-		LevelAudioComponent = UGameplayStatics::SpawnSound2D(this, LevelSound);
+	//if (GameInstance && GameInstance->LevelMusic != nullptr)
+	//	LevelAudioComponent = UGameplayStatics::SpawnSound2D(this, GameInstance->LevelMusic);
+	if (GameInstance->LevelMusic != nullptr)
+		UGameplayStatics::PlaySoundAtLocation(this, GameInstance->LevelMusic, FVector());
 
 	//#include "Sound/SoundClass.h"
 	//LevelSound->SoundClassObject->Properties.Volume = 0.0f;

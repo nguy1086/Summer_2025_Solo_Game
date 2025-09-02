@@ -55,20 +55,19 @@ public:
 	void PauseMenuBackPressed();
 	void PauseMoveWidget(float posx, float posy, float DeltaTime, float speed = 48.0f);
 
+	UFUNCTION()
+	void OnPauseVolumeChange(float v);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float FadeTimer = 2.5f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu SFX")
-	class USoundBase* SelectSound;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu SFX")
-	class USoundBase* NavigationSound;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu SFX")
-	class USoundBase* CancelSound;
-
 private:
+	void UpdatePauseSoundChange();
+	class URadioactive_Spire_GameInstance* GameInstance;
 	EPauseMenuState State;
 	TArray<class UButton*> PauseButtons;
 	TArray<class UButton*> GameOverButtons;
+	TArray<class USlider*> PauseVolumeSliders;
 	int Increment;
 	int GameOverIncrement;
 	float GameOverDelay;

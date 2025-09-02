@@ -78,10 +78,8 @@ private:
 	TSubclassOf<class APaperTileMapActor> GetRandomRedDesertLevel();
 
 	class UAudioComponent* LevelAudioComponent;
+	class URadioactive_Spire_GameInstance* GameInstance;
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level audio")
-	class USoundBase* LevelSound;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level Templates")
 	TSubclassOf<class APaperTileMapActor> RedDesertLevelOne;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level Templates")
