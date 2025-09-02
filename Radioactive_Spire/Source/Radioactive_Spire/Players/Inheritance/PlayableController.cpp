@@ -261,7 +261,7 @@ void APlayableController::OnDuckPressed(const FInputActionValue& Value)
 			GameModeBase->State != EGameState::EndGame && 
 			GameModeBase->State != EGameState::FadeToQuit && 
 			GameModeBase->State != EGameState::FadeToRetry)
-				PlayablePlayer->Duck();
+				PlayablePlayer->Action_Duck();
 
 	//if (GEngine)
 	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Start Ducking!"));
@@ -274,7 +274,7 @@ void APlayableController::OnDuckReleased(const FInputActionValue& Value)
 			GameModeBase->State != EGameState::EndGame && 
 			GameModeBase->State != EGameState::FadeToQuit && 
 			GameModeBase->State != EGameState::FadeToRetry)
-				PlayablePlayer->StopDucking();
+				PlayablePlayer->Action_StopDucking();
 
 	//if (GEngine)
 	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Stop Ducking!"));
@@ -284,7 +284,7 @@ void APlayableController::OnAttackPressed(const FInputActionValue& Value)
 {
 	if (PlayablePlayer != nullptr && GameModeBase != nullptr)
 		if (!GameModeBase->Game_IsPaused && GameModeBase->State != EGameState::EndGame && GameModeBase->State != EGameState::FadeToQuit && GameModeBase->State != EGameState::FadeToRetry)
-			PlayablePlayer->Attack();
+			PlayablePlayer->Action_Attack();
 		else
 			if (GameInfoWidget)
 				GameInfoWidget->PauseMenuPressed();
@@ -296,12 +296,11 @@ void APlayableController::OnAttackPressed(const FInputActionValue& Value)
 void APlayableController::OnSpecialPressed(const FInputActionValue& Value)
 {
 	if (PlayablePlayer != nullptr && GameModeBase != nullptr)
-		if (GameModeBase->Game_IsPaused && GameModeBase->State != EGameState::EndGame && GameModeBase->State != EGameState::FadeToQuit && GameModeBase->State != EGameState::FadeToRetry)
-		{
-
-		}
+		if (!GameModeBase->Game_IsPaused && GameModeBase->State != EGameState::EndGame && GameModeBase->State != EGameState::FadeToQuit && GameModeBase->State != EGameState::FadeToRetry)
+			PlayablePlayer->Action_Special();
 		else
-			PlayablePlayer->Special();
+			if (GameInfoWidget)
+				GameInfoWidget->PauseMenuBackPressed();
 
 	//if (GEngine)
 	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Special!"));
@@ -311,7 +310,7 @@ void APlayableController::OnRollPressed(const FInputActionValue& Value)
 {
 	if (PlayablePlayer != nullptr && GameModeBase != nullptr)
 		if (!GameModeBase->Game_IsPaused && GameModeBase->State != EGameState::EndGame && GameModeBase->State != EGameState::FadeToQuit && GameModeBase->State != EGameState::FadeToRetry)
-			PlayablePlayer->Roll();
+			PlayablePlayer->Action_Roll();
 
 	//if (GEngine)
 	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Roll!"));
@@ -321,7 +320,7 @@ void APlayableController::OnSuperPressed(const FInputActionValue& Value)
 {
 	if (PlayablePlayer != nullptr && GameModeBase != nullptr)
 		if (!GameModeBase->Game_IsPaused && GameModeBase->State != EGameState::EndGame)
-			PlayablePlayer->SuperAttack();
+			PlayablePlayer->Action_Super();
 }
 
 void APlayableController::OnPausePressed(const FInputActionValue& Value)

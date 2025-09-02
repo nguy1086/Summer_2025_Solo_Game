@@ -50,7 +50,6 @@ public:
 	int EnemiesKilled;
 	EGameState State;
 private:
-	void SpawnDeathAnimation(FVector location);
 
 	void PauseActors();
 	void UnpauseActors();
@@ -67,13 +66,13 @@ private:
 	FVector SuperPausedVelocity;
 	class APlayableAttackHitbox* SuperAttackPaused;
 
-	int Level;
-	int MaxEnemiesSpawn;
-	int CurrentEnemiesSpawned;
-	float SpawnDelay;
-	FVector LevelPosition;
-	FVector TransitionPosition;
-	float WaitTimer;
+	int Gameplay_Level;
+	int Gameplay_MaxEnemiesSpawn;
+	int Gameplay_CurrentEnemiesSpawned;
+	float Gameplay_SpawnDelay;
+	FVector Gameplay_LevelPosition;
+	FVector Gameplay_TransitionPosition;
+	float Gameplay_WaitTimer;
 
 	void IncrementLevelPosition();
 	TSubclassOf<class APaperTileMapActor> GetRandomRedDesertLevel();
@@ -82,12 +81,6 @@ private:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level audio")
 	class USoundBase* LevelSound;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Death Templates")
-	TSubclassOf<class ADeadActor> DeadTestTemplate;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Death Templates")
-	TSubclassOf<class ADeadActor> DeadBatterTemplate;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level Templates")
 	TSubclassOf<class APaperTileMapActor> RedDesertLevelOne;

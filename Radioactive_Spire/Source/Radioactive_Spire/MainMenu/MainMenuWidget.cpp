@@ -240,19 +240,19 @@ void UMainMenuWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
     if (State == EMainMenuState::MainMenu)
     {
-        MoveWidget(0.0f, 0.0f, InDeltaTime);
+        MainMenuMoveWidget(0.0f, 0.0f, InDeltaTime);
 
         UpdateMainMenu();
     }
     else if (State == EMainMenuState::Options)
     {
-        MoveWidget(1920.0f, 0.0f, InDeltaTime);
+        MainMenuMoveWidget(1920.0f, 0.0f, InDeltaTime);
 
         UpdateOptions();
     }
     else if (State == EMainMenuState::Character)
     {
-        MoveWidget(0.0f, -1080.0f, InDeltaTime);
+        MainMenuMoveWidget(0.0f, -1080.0f, InDeltaTime);
 
         UpdateCharacterSelect(InDeltaTime);
     }
@@ -282,7 +282,7 @@ void UMainMenuWidget::UpdateIntro(float DeltaTime)
 
     if (FadeTimer <= 0.0f)
     {
-        MoveWidget(0.0, 0.0f, DeltaTime, 56.0f);
+        MainMenuMoveWidget(0.0, 0.0f, DeltaTime, 56.0f);
         FWidgetTransform CurrentTransform = GetRenderTransform();
         if (FMath::IsNearlyEqual(CurrentTransform.Translation.Y, 0.0f, 6.0f))
         {
@@ -527,7 +527,7 @@ void UMainMenuWidget::MainMenuBackPressed()
     }
 }
 
-void UMainMenuWidget::MoveWidget(float posx, float posy, float DeltaTime, float speed)
+void UMainMenuWidget::MainMenuMoveWidget(float posx, float posy, float DeltaTime, float speed)
 {
     FWidgetTransform CurrentTransform = GetRenderTransform();
 

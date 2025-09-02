@@ -6,6 +6,12 @@
 #include "Blueprint/UserWidget.h"
 #include "PlayableWidget.generated.h"
 
+UENUM(BlueprintType)
+enum class EPauseMenuState : uint8
+{
+	PauseMenu		UMETA(DisplayName = "PauseMenu"),
+	OptionsMenu 	UMETA(DisplayName = "OptionsMenu")
+};
 /**
  * 
  */
@@ -23,9 +29,11 @@ public:
 	void UpdateSuper();
 	void UpdateEnemies();
 	void UpdatePause();
+
 	void FadeEnter(float DeltaTime);
 	void FadeQuit(float DeltaTime);
 	void FadeRetry(float DeltaTime);
+
 	void HideAllButGameOver();
 	void DisplayGameOver();
 
@@ -44,6 +52,8 @@ public:
 
 	void PauseMenuNavigation(float dir);
 	void PauseMenuPressed();
+	void PauseMenuBackPressed();
+	void PauseMoveWidget(float posx, float posy, float DeltaTime, float speed = 48.0f);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float FadeTimer = 2.5f;
@@ -56,6 +66,7 @@ public:
 	class USoundBase* CancelSound;
 
 private:
+	EPauseMenuState State;
 	TArray<class UButton*> PauseButtons;
 	TArray<class UButton*> GameOverButtons;
 	int Increment;

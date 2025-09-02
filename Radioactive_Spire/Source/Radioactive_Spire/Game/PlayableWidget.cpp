@@ -29,6 +29,9 @@ bool UPlayableWidget::Initialize()
     Increment = 0;
     FadeTimer = 2.5f;
     GameOverDelay = 4.0f;
+
+    State = EPauseMenuState::PauseMenu;
+
     SetIsFocusable(true);
     SetKeyboardFocus();
 
@@ -151,6 +154,9 @@ bool UPlayableWidget::Initialize()
     Image = Cast<UImage>(GetWidgetFromName("OptionsScreen"));
     if (Image)
         Image->SetVisibility(ESlateVisibility::Hidden);
+    Image = Cast<UImage>(GetWidgetFromName("OptionsScreen1"));
+    if (Image)
+        Image->SetVisibility(ESlateVisibility::Hidden);
 
     return true;
 }
@@ -179,6 +185,11 @@ void UPlayableWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
         UpdateHealth();
         UpdateSuper();
         UpdatePause();
+        if (State == EPauseMenuState::PauseMenu)
+            PauseMoveWidget(0.0f, 0.0f, InDeltaTime);
+        else if (State == EPauseMenuState::OptionsMenu)
+            PauseMoveWidget(1920.0f, 0.0f, InDeltaTime);
+
         UpdateEnemies();
     }
     else if (GameModeBase->State == EGameState::EndGame)
@@ -305,33 +316,49 @@ void UPlayableWidget::UpdatePause()
         Widget = Cast<UTextBlock>(GetWidgetFromName("PausedText"));
         if (Widget)
             Widget->SetVisibility(ESlateVisibility::Visible);
+        //------------------------------------------------------------------------
+        //options
+        Image = Cast<UImage>(GetWidgetFromName("OptionsScreen"));
+        if (Image)
+            Image->SetVisibility(ESlateVisibility::Visible);
+        Image = Cast<UImage>(GetWidgetFromName("OptionsScreen1"));
+        if (Image)
+            Image->SetVisibility(ESlateVisibility::Visible);
 
-        FSlateBrush brush;
-        UTexture2D* NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_ButtonHover.Game_ButtonHover")));
-
-        brush.SetResourceObject(NormalTexture);
-        brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.724268f, 0.724268f, 0.724268f, 1.0f)));
-        FButtonStyle style;
-        style.SetNormal(brush);
-        style.SetHovered(brush);
-
-        NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_ButtonPressed.Game_ButtonPressed")));
-        brush.SetResourceObject(NormalTexture);
-        style.SetPressed(brush);
-        PauseButtons[Increment]->SetStyle(style);
-
-        for (int i = 0; i < PauseButtons.Num(); i++)
+        if (State == EPauseMenuState::PauseMenu)
         {
-            if (PauseButtons[i]->IsHovered())
-                Increment = i;
-            if (i != Increment)
+
+            FSlateBrush brush;
+            UTexture2D* NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_ButtonHover.Game_ButtonHover")));
+
+            brush.SetResourceObject(NormalTexture);
+            brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.724268f, 0.724268f, 0.724268f, 1.0f)));
+            FButtonStyle style;
+            style.SetNormal(brush);
+            style.SetHovered(brush);
+
+            NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_ButtonPressed.Game_ButtonPressed")));
+            brush.SetResourceObject(NormalTexture);
+            style.SetPressed(brush);
+            PauseButtons[Increment]->SetStyle(style);
+
+            for (int i = 0; i < PauseButtons.Num(); i++)
             {
-                NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_Button.Game_Button")));
-                brush.SetResourceObject(NormalTexture);
-                brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.495466f, 0.495466f, 0.495466f, 1.0f)));
-                style.SetNormal(brush);
-                PauseButtons[i]->SetStyle(style);
+                if (PauseButtons[i]->IsHovered())
+                    Increment = i;
+                if (i != Increment)
+                {
+                    NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_Button.Game_Button")));
+                    brush.SetResourceObject(NormalTexture);
+                    brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.495466f, 0.495466f, 0.495466f, 1.0f)));
+                    style.SetNormal(brush);
+                    PauseButtons[i]->SetStyle(style);
+                }
             }
+        }
+        else if (State == EPauseMenuState::OptionsMenu)
+        {
+
         }
     }
     else if (!GameModeBase->Game_IsPaused)
@@ -386,8 +413,21 @@ void UPlayableWidget::UpdatePause()
         Widget = Cast<UTextBlock>(GetWidgetFromName("PausedText"));
         if (Widget)
             Widget->SetVisibility(ESlateVisibility::Hidden);
+        //------------------------------------------------------------------------
+        //options
+        Image = Cast<UImage>(GetWidgetFromName("OptionsScreen"));
+        if (Image)
+            Image->SetVisibility(ESlateVisibility::Hidden);
+        Image = Cast<UImage>(GetWidgetFromName("OptionsScreen1"));
+        if (Image)
+            Image->SetVisibility(ESlateVisibility::Hidden);
 
         Increment = 0;
+        State = EPauseMenuState::PauseMenu;
+        FWidgetTransform CurrentTransform = GetRenderTransform();
+
+        CurrentTransform.Translation = FVector2D(0.0f, 0.0f);
+        SetRenderTransform(CurrentTransform);
     }
 }
 
@@ -516,6 +556,8 @@ void UPlayableWidget::OnResume()
 
 void UPlayableWidget::OnPauseOptions()
 {
+    if (State == EPauseMenuState::PauseMenu)
+        State = EPauseMenuState::OptionsMenu;
 }
 
 void UPlayableWidget::OnRetry()
@@ -574,4 +616,21 @@ void UPlayableWidget::PauseMenuPressed()
         PauseButtons[Increment]->OnClicked.Broadcast();
     else if (GameModeBase->State == EGameState::EndGame)
         GameOverButtons[GameOverIncrement]->OnClicked.Broadcast();
+}
+
+void UPlayableWidget::PauseMenuBackPressed()
+{
+    if (State == EPauseMenuState::OptionsMenu)
+        State = EPauseMenuState::PauseMenu;
+}
+
+void UPlayableWidget::PauseMoveWidget(float posx, float posy, float DeltaTime, float speed)
+{
+    FWidgetTransform CurrentTransform = GetRenderTransform();
+
+    float x = FMath::FInterpTo(posx, CurrentTransform.Translation.X, DeltaTime, speed);
+    float y = FMath::FInterpTo(posy, CurrentTransform.Translation.Y, DeltaTime, speed);
+
+    CurrentTransform.Translation = FVector2D(x, y);
+    SetRenderTransform(CurrentTransform);
 }

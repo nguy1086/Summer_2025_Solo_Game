@@ -26,14 +26,14 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	void Duck();
-	void StopDucking();
+	void Action_Duck();
+	void Action_StopDucking();
 
-	void Attack();
-	void Special();
-	void SuperAttack();
+	void Action_Attack();
+	void Action_Special();
+	void Action_Super();
 
-	void Roll();
+	void Action_Roll();
 
 	void ApplyStateChange(EState newState);
 
@@ -77,8 +77,8 @@ private:
 	class APlayableController* PlayableController;
 	float DamagedTimer;
 	int ComboNumber;
-	bool GroundPound;
-	float CanDash;
+	bool Action_GroundPound;
+	float Action_CanDash;
 
 	FTimerHandle AttackTimerHandle;
 	FTimerHandle InputTimerHandle;

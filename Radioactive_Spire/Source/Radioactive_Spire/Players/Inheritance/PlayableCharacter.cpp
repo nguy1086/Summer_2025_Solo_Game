@@ -27,8 +27,8 @@ APlayableCharacter::APlayableCharacter() :
 	Camera(nullptr),
 	PlayableController(nullptr),
 	DamagedTimer(0.0f),
-	GroundPound(false),
-	CanDash(0.0f),
+	Action_GroundPound(false),
+	Action_CanDash(0.0f),
 	DuckSpecial(false)
 {
     PrimaryActorTick.bCanEverTick = true;
@@ -103,20 +103,20 @@ void APlayableCharacter::Tick(float DeltaTime)
 		}
 	}
 
-	if (CanDash > 0.0f)
-		CanDash -= DeltaTime;
+	if (Action_CanDash > 0.0f)
+		Action_CanDash -= DeltaTime;
 }
 
-void APlayableCharacter::Duck()
+void APlayableCharacter::Action_Duck()
 {
-	if (PlayerState->IsOnGround && !GroundPound && //may need to remove !groundpound, that removes duck right after ground pound
+	if (PlayerState->IsOnGround && !Action_GroundPound && //may need to remove !groundpound, that removes duck right after ground pound
 		PlayerState->State != EState::Attacking && 
 		PlayerState->State != EState::Roll &&
 		PlayerState->State != EState::Special)//makes sure duck doesnt make attack/special/roll not play flipbook properly
 		ApplyStateChange(EState::Ducking);
 }
 
-void APlayableCharacter::StopDucking()
+void APlayableCharacter::Action_StopDucking()
 {
 	if (PlayerState->IsOnGround && PlayerState->State == EState::Ducking)
 	{
@@ -132,7 +132,7 @@ void APlayableCharacter::StopDucking()
 	}
 }
 
-void APlayableCharacter::Attack()
+void APlayableCharacter::Action_Attack()
 {
 	if (Type == EPlayerType::Test)
 	{
@@ -194,7 +194,7 @@ void APlayableCharacter::Attack()
 				{
 					ResetPlayerState();
 					DisableControls();
-					GroundPound = true;
+					Action_GroundPound = true;
 					ApplyStateChange(EState::Attacking);
 
 					float FramesPerSecond = GetSprite()->GetFlipbook()->GetFramesPerSecond();
@@ -246,7 +246,7 @@ void APlayableCharacter::Attack()
 	}
 }
 
-void APlayableCharacter::Special()
+void APlayableCharacter::Action_Special()
 {
 	if (Type == EPlayerType::Batter)
 	{
@@ -298,7 +298,7 @@ void APlayableCharacter::Special()
 	}
 }
 
-void APlayableCharacter::SuperAttack()
+void APlayableCharacter::Action_Super()
 {
 	if (Stats_Super >= Stats_MaxSuper)
 	{
@@ -328,13 +328,13 @@ void APlayableCharacter::SuperAttack()
 	}
 }
 
-void APlayableCharacter::Roll()
+void APlayableCharacter::Action_Roll()
 {
-	if (PlayerState->IsOnGround && CanDash <= 0.0f)
+	if (PlayerState->IsOnGround && Action_CanDash <= 0.0f)
 	{
 		if (Type == EPlayerType::Batter)
 		{
-			CanDash = PlayerConstants::BatterRollCooldown;
+			Action_CanDash = PlayerConstants::BatterRollCooldown;
 
 			DisableControls();
 			ApplyStateChange(EState::Roll);
@@ -536,7 +536,7 @@ void APlayableCharacter::NotifyJumpApex()
 {
 	Super::NotifyJumpApex();
 
-	if (PlayerState && !PlayerState->IsOnGround && !GroundPound)
+	if (PlayerState && !PlayerState->IsOnGround && !Action_GroundPound)
 		ApplyStateChange(EState::Falling);
 }
 
@@ -552,7 +552,7 @@ void APlayableCharacter::Landed(const FHitResult& Hit)
 		PlayerState->IsOnGround = true;
 
 
-		if (GroundPound)
+		if (Action_GroundPound)
 		{
 			if (Type == EPlayerType::Batter)
 			{
@@ -671,7 +671,7 @@ UPaperFlipbook* APlayableCharacter::GetBatterFlipbook()
 		}
 		else if (!PlayerState->IsOnGround)
 		{
-			if (GroundPound)
+			if (Action_GroundPound)
 				flipbook = BatterGroundPoundFlipbook;
 			else
 			{
@@ -827,7 +827,7 @@ void APlayableCharacter::ResetPlayerState()
 
 		ComboNumber = 0;
 		DuckSpecial = false;
-		GroundPound = false;
+		Action_GroundPound = false;
 
 		GetWorldTimerManager().ClearTimer(ImpulseTimerHandle);
 		GetWorldTimerManager().ClearTimer(AttackTimerHandle);

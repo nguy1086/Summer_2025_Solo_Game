@@ -9,7 +9,6 @@
 UENUM(BlueprintType)
 enum class EMainMenuState : uint8
 {
-	Unknown 	UMETA(DisplayName = "Unknown"),
 	Intro		UMETA(DisplayName = "Intro"),
 	MainMenu 	UMETA(DisplayName = "MainMenu"),
 	Options		UMETA(DisplayName = "Options"),
@@ -44,7 +43,7 @@ public:
 	void MainMenuNavigation(float dir);
 	void MainMenuPressed();
 	void MainMenuBackPressed();
-	void MoveWidget(float posx, float posy, float DeltaTime, float speed = 48.0f);
+	void MainMenuMoveWidget(float posx, float posy, float DeltaTime, float speed = 48.0f);
 
 	UFUNCTION()
 	void OnMusicChange(float v);

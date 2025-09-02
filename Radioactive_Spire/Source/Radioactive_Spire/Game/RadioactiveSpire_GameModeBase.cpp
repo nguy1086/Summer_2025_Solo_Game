@@ -41,14 +41,14 @@ ARadioactiveSpire_GameModeBase::ARadioactiveSpire_GameModeBase() :
 	Camera(nullptr),
 	SuperPauseTimer(0.0f),
 	Game_IsPaused(false),
-	Level(0),
-	MaxEnemiesSpawn(0),
-	CurrentEnemiesSpawned(0),
-	SpawnDelay(0.0f),
+	Gameplay_Level(0),
+	Gameplay_MaxEnemiesSpawn(0),
+	Gameplay_CurrentEnemiesSpawned(0),
+	Gameplay_SpawnDelay(0.0f),
 	EnemiesKilled(0),
-	LevelPosition(FVector(-1008.0f, 0.0f, 1500.0f)),
-	TransitionPosition(),
-	WaitTimer(5.0f),
+	Gameplay_LevelPosition(FVector(-1008.0f, 0.0f, 1500.0f)),
+	Gameplay_TransitionPosition(),
+	Gameplay_WaitTimer(5.0f),
 	State(EGameState::FadeToEnter),
 	LevelAudioComponent(nullptr)
 {
@@ -74,16 +74,16 @@ void ARadioactiveSpire_GameModeBase::BeginPlay()
 	Player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
 	Player->SetActorLocation(FVector(360.0f, 0.0f, 740.0f));
 
-	MaxEnemiesSpawn = FMath::RandRange(7, 10);
+	Gameplay_MaxEnemiesSpawn = FMath::RandRange(7, 10);
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	Camera = GetWorld()->SpawnActor<APlayerCamera>(APlayerCamera::StaticClass(), FVector(), FRotator(), SpawnParams);
 	ApplyViewMode(EViewModeIndex::VMI_Unlit, false, *GetWorld()->GetGameViewport()->GetEngineShowFlags());
 
-	APaperTileMapActor* tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(GetRandomRedDesertLevel(), LevelPosition, FRotator::ZeroRotator);
+	APaperTileMapActor* tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(GetRandomRedDesertLevel(), Gameplay_LevelPosition, FRotator::ZeroRotator);
 	IncrementLevelPosition();
-	tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(GetRandomRedDesertLevel(), LevelPosition, FRotator::ZeroRotator);
+	tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(GetRandomRedDesertLevel(), Gameplay_LevelPosition, FRotator::ZeroRotator);
 
 	if (RedDesertSky)
 	{
@@ -123,7 +123,7 @@ void ARadioactiveSpire_GameModeBase::Tick(float DeltaTime)
 		}
 		else
 		{
-			if (SpawnDelay < -1.0f)
+			if (Gameplay_SpawnDelay < -1.0f)
 			{
 				TArray<AActor*> ActorsWithTag;
 				UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Enemy"), ActorsWithTag);
@@ -131,8 +131,8 @@ void ARadioactiveSpire_GameModeBase::Tick(float DeltaTime)
 					State = EGameState::Wait;
 			}
 
-			SpawnDelay -= DeltaTime;
-			if (SpawnDelay <= 0.0f)
+			Gameplay_SpawnDelay -= DeltaTime;
+			if (Gameplay_SpawnDelay <= 0.0f)
 				SpawnEnemy();
 		}
 	}
@@ -140,10 +140,10 @@ void ARadioactiveSpire_GameModeBase::Tick(float DeltaTime)
 	{
 		//if (GEngine)
 		//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Wait"));
-		if (WaitTimer > 0.0f)
+		if (Gameplay_WaitTimer > 0.0f)
 		{
-			WaitTimer -= DeltaTime;
-			if (WaitTimer <= 0.0f)
+			Gameplay_WaitTimer -= DeltaTime;
+			if (Gameplay_WaitTimer <= 0.0f)
 				TransitionToNextLevel();
 		}
 	}
@@ -155,7 +155,7 @@ void ARadioactiveSpire_GameModeBase::Tick(float DeltaTime)
 		//FVector p = FMath::VInterpTo(TransitionPosition, Player->GetActorLocation(), DeltaTime, 0.00000000001f);
 		Player->CustomTimeDilation = 0.0f;
 		FVector pos = Player->GetActorLocation();
-		FVector dir = TransitionPosition - pos;
+		FVector dir = Gameplay_TransitionPosition - pos;
 		dir.Normalize();
 		pos += dir * 300.0f * DeltaTime;
 		pos.X = Player->GetActorLocation().X;
@@ -163,12 +163,12 @@ void ARadioactiveSpire_GameModeBase::Tick(float DeltaTime)
 
 		Player->SetActorLocation(FVector(pos));
 		Player->NoGravity();
-		if (Player->GetActorLocation().Y <= TransitionPosition.Y + 1.0f)
+		if (Player->GetActorLocation().Y <= Gameplay_TransitionPosition.Y + 1.0f)
 		{
 			State = EGameState::Gameplay;
 			EnableControls();
 			Player->SetGravity();
-			Player->SetActorLocation(FVector(Player->GetActorLocation().X, TransitionPosition.Y, Player->GetActorLocation().Z));
+			Player->SetActorLocation(FVector(Player->GetActorLocation().X, Gameplay_TransitionPosition.Y, Player->GetActorLocation().Z));
 			Player->CustomTimeDilation = 1.0f;
 		}
 	}
@@ -228,7 +228,6 @@ void ARadioactiveSpire_GameModeBase::PlayerDied()
 
 		State = EGameState::EndGame;
 		BlackenActors();
-		SpawnDeathAnimation(Player->GetActorLocation());
 	}
 }
 
@@ -288,46 +287,6 @@ void ARadioactiveSpire_GameModeBase::GamePause()
 			PauseActors();
 			Camera->CustomTimeDilation = 1.0f;
 			APlayableController* PlayableController = Cast<APlayableController>(Player->GetController());
-		}
-	}
-}
-
-void ARadioactiveSpire_GameModeBase::SpawnDeathAnimation(FVector location)
-{
-	//PauseActors();
-
-	APlayableCharacter* player = GetWorld()->GetFirstPlayerController()->GetPawn<APlayableCharacter>();
-	if (player)
-	{
-		// HANDLE TYPE OF PLAYER
-		if (player->Type == EPlayerType::Test)
-		{
-			if (DeadTestTemplate != nullptr)
-			{
-				UWorld* const world = GetWorld();
-				if (world != nullptr)
-				{
-					FActorSpawnParameters SpawnParams;
-					SpawnParams.Owner = this;
-					SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-					FTransform SpawnTransform(location);
-
-					ADeadActor* deadActor = world->SpawnActor<ADeadActor>(DeadTestTemplate, SpawnTransform, SpawnParams);
-				}
-			}
-		}
-		else if (player->Type == EPlayerType::Batter)
-		{
-			UWorld* const world = GetWorld();
-			if (world != nullptr)
-			{
-				FActorSpawnParameters SpawnParams;
-				SpawnParams.Owner = this;
-				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-				FTransform SpawnTransform(location);
-
-				ADeadActor* deadActor = world->SpawnActor<ADeadActor>(DeadBatterTemplate, SpawnTransform, SpawnParams);
-			}
 		}
 	}
 }
@@ -405,15 +364,15 @@ void ARadioactiveSpire_GameModeBase::UnblackenActors()
 void ARadioactiveSpire_GameModeBase::TransitionToNextLevel()
 {
 	IncrementLevelPosition();
-	APaperTileMapActor* tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(GetRandomRedDesertLevel(), LevelPosition, FRotator::ZeroRotator);
-	TransitionPosition = FVector(Player->GetActorLocation().X, tilemap->GetActorLocation().Y + GameConstants::LevelPosYIncrement, Player->GetActorLocation().Z + 64.0f);
+	APaperTileMapActor* tilemap = GetWorld()->SpawnActor<APaperTileMapActor>(GetRandomRedDesertLevel(), Gameplay_LevelPosition, FRotator::ZeroRotator);
+	Gameplay_TransitionPosition = FVector(Player->GetActorLocation().X, tilemap->GetActorLocation().Y + GameConstants::LevelPosYIncrement, Player->GetActorLocation().Z + 64.0f);
 	//Player->SetActorLocation(FVector(Player->GetActorLocation().X, tilemap->GetActorLocation().Y, Player->GetActorLocation().Z + 64.0f));
-	MaxEnemiesSpawn += FMath::RandRange(7, 10);
-	Level++;
-	CurrentEnemiesSpawned = 0;
+	Gameplay_MaxEnemiesSpawn += FMath::RandRange(7, 10);
+	Gameplay_Level++;
+	Gameplay_CurrentEnemiesSpawned = 0;
 	EnemiesKilled = 0;
-	WaitTimer = GameConstants::WaitMax;
-	SpawnDelay = 0.2f;
+	Gameplay_WaitTimer = GameConstants::WaitMax;
+	Gameplay_SpawnDelay = 0.2f;
 
 	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
@@ -429,7 +388,7 @@ void ARadioactiveSpire_GameModeBase::TransitionToNextLevel()
 
 void ARadioactiveSpire_GameModeBase::SpawnEnemy()
 {
-	if (CurrentEnemiesSpawned < MaxEnemiesSpawn)
+	if (Gameplay_CurrentEnemiesSpawned < Gameplay_MaxEnemiesSpawn)
 	{
 		int32 index = FMath::RandRange(0, 10) % 2;
 		float x[] = { 50.0f, 940.0f };
@@ -440,17 +399,17 @@ void ARadioactiveSpire_GameModeBase::SpawnEnemy()
 		else
 			AFlying_Spiter* spitter = GetWorld()->SpawnActor<AFlying_Spiter>(FlyingSpitter, FVector(x[index], Player->GetActorLocation().Y, 940.0f + Camera->LevelZIncrease), FRotator::ZeroRotator);
 
-		CurrentEnemiesSpawned++;
-		SpawnDelay = FMath::RandRange(0.5f, 2.5f) - (0.1f * Level);
-		if (SpawnDelay < 0.0f)
-			SpawnDelay = 0.0f;
+		Gameplay_CurrentEnemiesSpawned++;
+		Gameplay_SpawnDelay = FMath::RandRange(0.5f, 2.5f) - (0.1f * Gameplay_Level);
+		if (Gameplay_SpawnDelay < 0.0f)
+			Gameplay_SpawnDelay = 0.0f;
 	}
 }
 
 void ARadioactiveSpire_GameModeBase::IncrementLevelPosition()
 {
-	LevelPosition.Y -= GameConstants::LevelPosYIncrement;
-	LevelPosition.Z += GameConstants::LevelPosZIncrement;
+	Gameplay_LevelPosition.Y -= GameConstants::LevelPosYIncrement;
+	Gameplay_LevelPosition.Z += GameConstants::LevelPosZIncrement;
 	Camera->LevelZIncrease += GameConstants::LevelPosZIncrement;
 }
 
