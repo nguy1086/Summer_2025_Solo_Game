@@ -766,10 +766,12 @@ void UPlayableWidget::PauseMenuPressed()
         UGameplayStatics::PlaySoundAtLocation(this, GameInstance->SelectSound, FVector());
 
     if (GameModeBase->Game_IsPaused)
+    {
         if (State == EPauseMenuState::PauseMenu)
             PauseButtons[Increment]->OnClicked.Broadcast();
         else if (State == EPauseMenuState::OptionsMenu)
             PauseVolumeButtons[OptionsIncrement]->OnClicked.Broadcast();
+    }
     else if (GameModeBase->State == EGameState::EndGame)
         GameOverButtons[GameOverIncrement]->OnClicked.Broadcast();
 }
@@ -783,6 +785,8 @@ void UPlayableWidget::PauseMenuBackPressed()
 
         State = EPauseMenuState::PauseMenu;
     }
+    else if (State == EPauseMenuState::PauseMenu)
+        GameModeBase->GamePause();
 }
 
 void UPlayableWidget::PauseMoveWidget(float posx, float posy, float DeltaTime, float speed)

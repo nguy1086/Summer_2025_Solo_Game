@@ -93,10 +93,10 @@ void ARadioactiveSpire_GameModeBase::BeginPlay()
 	}
 
 
-	//if (GameInstance && GameInstance->LevelMusic != nullptr)
-	//	LevelAudioComponent = UGameplayStatics::SpawnSound2D(this, GameInstance->LevelMusic);
-	if (GameInstance->LevelMusic != nullptr)
-		UGameplayStatics::PlaySoundAtLocation(this, GameInstance->LevelMusic, FVector());
+	if (GameInstance && GameInstance->LevelMusic != nullptr)
+		LevelAudioComponent = UGameplayStatics::SpawnSound2D(this, GameInstance->LevelMusic);
+	//if (GameInstance->LevelMusic != nullptr)
+	//	UGameplayStatics::PlaySoundAtLocation(this, GameInstance->LevelMusic, FVector());
 
 	//#include "Sound/SoundClass.h"
 	//LevelSound->SoundClassObject->Properties.Volume = 0.0f;
