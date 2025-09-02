@@ -226,6 +226,7 @@ void ARadioactiveSpire_GameModeBase::PlayerDied()
 {
 	if (Player)
 	{
+		Game_IsPaused = false;
 		if (LevelAudioComponent != nullptr)
 			LevelAudioComponent->Stop();
 

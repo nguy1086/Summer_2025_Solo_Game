@@ -56,19 +56,32 @@ public:
 	void PauseMoveWidget(float posx, float posy, float DeltaTime, float speed = 48.0f);
 
 	UFUNCTION()
-	void OnPauseVolumeChange(float v);
+	void OnPauseMusicChange(float v);
+	UFUNCTION()
+	void OnPauseMusicPressed();
+	UFUNCTION()
+	void OnPauseSFXChange(float v);
+	UFUNCTION()
+	void OnPauseSFXPressed();
+	UFUNCTION()
+	void OnPauseAmbienceChange(float v);
+	UFUNCTION()
+	void OnPauseAmbiencePressed();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float FadeTimer = 2.5f;
 
 private:
+	void ResetPauseIncrement();
 	void UpdatePauseSoundChange();
 	class URadioactive_Spire_GameInstance* GameInstance;
 	EPauseMenuState State;
 	TArray<class UButton*> PauseButtons;
 	TArray<class UButton*> GameOverButtons;
 	TArray<class USlider*> PauseVolumeSliders;
+	TArray<class UButton*> PauseVolumeButtons;
 	int Increment;
+	int OptionsIncrement;
 	int GameOverIncrement;
 	float GameOverDelay;
 	class ARadioactiveSpire_GameModeBase* GameModeBase;

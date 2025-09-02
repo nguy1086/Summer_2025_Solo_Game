@@ -41,12 +41,12 @@ bool UPlayableWidget::Initialize()
     SetIsFocusable(true);
     SetKeyboardFocus();
 
-    if (GameInstance && GameInstance->SelectSound != nullptr)
-        UGameplayStatics::PrimeSound(GameInstance->SelectSound);
-    if (GameInstance && GameInstance->NavigationSound != nullptr)
-        UGameplayStatics::PrimeSound(GameInstance->NavigationSound);
-    if (GameInstance && GameInstance->CancelSound != nullptr)
-        UGameplayStatics::PrimeSound(GameInstance->CancelSound);
+    //if (GameInstance && GameInstance->SelectSound != nullptr)
+    //    UGameplayStatics::PrimeSound(GameInstance->SelectSound);
+    //if (GameInstance && GameInstance->NavigationSound != nullptr)
+    //    UGameplayStatics::PrimeSound(GameInstance->NavigationSound);
+    //if (GameInstance && GameInstance->CancelSound != nullptr)
+    //    UGameplayStatics::PrimeSound(GameInstance->CancelSound);
 
     bool bResult = Super::Initialize();
     if (!bResult)
@@ -168,11 +168,78 @@ bool UPlayableWidget::Initialize()
     if (Slider)
     {
         Slider->SetVisibility(ESlateVisibility::Visible);
-        Slider->OnValueChanged.AddDynamic(this, &UPlayableWidget::OnPauseVolumeChange);
+        Slider->OnValueChanged.AddDynamic(this, &UPlayableWidget::OnPauseMusicChange);
         if (GameInstance)
             Slider->SetValue(GameInstance->MusicValue);
 
+        Slider->SetVisibility(ESlateVisibility::Hidden);
+
         PauseVolumeSliders.Add(Slider);
+    }
+    Slider = Cast<USlider>(GetWidgetFromName("SoundEffectsSlider"));
+    if (Slider)
+    {
+        Slider->SetVisibility(ESlateVisibility::Visible);
+        Slider->OnValueChanged.AddDynamic(this, &UPlayableWidget::OnPauseSFXChange);
+        if (GameInstance)
+            Slider->SetValue(GameInstance->SFXValue);
+
+        Slider->SetVisibility(ESlateVisibility::Hidden);
+
+        PauseVolumeSliders.Add(Slider);
+    }
+    Slider = Cast<USlider>(GetWidgetFromName("AmbienceSlider"));
+    if (Slider)
+    {
+        Slider->SetVisibility(ESlateVisibility::Visible);
+        Slider->OnValueChanged.AddDynamic(this, &UPlayableWidget::OnPauseAmbienceChange);
+        if (GameInstance)
+            Slider->SetValue(GameInstance->AmbienceValue);
+
+        Slider->SetVisibility(ESlateVisibility::Hidden);
+
+        PauseVolumeSliders.Add(Slider);
+    }
+
+    Button = Cast<UButton>(GetWidgetFromName("MusicButton"));
+    if (Button)
+    {
+        Button->SetVisibility(ESlateVisibility::Hidden);
+        Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnPauseMusicPressed);
+        PauseVolumeButtons.Add(Button);
+    }
+    Button = Cast<UButton>(GetWidgetFromName("SoundEffectsButton"));
+    if (Button)
+    {
+        Button->SetVisibility(ESlateVisibility::Hidden);
+        Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnPauseSFXPressed);
+        PauseVolumeButtons.Add(Button);
+    }
+    Button = Cast<UButton>(GetWidgetFromName("AmbienceButton"));
+    if (Button)
+    {
+        Button->SetVisibility(ESlateVisibility::Hidden);
+        Button->OnClicked.AddDynamic(this, &UPlayableWidget::OnPauseAmbiencePressed);
+        PauseVolumeButtons.Add(Button);
+    }
+
+    Widget = Cast<UTextBlock>(GetWidgetFromName("MusicValue"));
+    if (Widget)
+    {
+        Widget->SetText(FText::FromString("Music"));
+        Widget->SetVisibility(ESlateVisibility::Hidden);
+    }
+    Widget = Cast<UTextBlock>(GetWidgetFromName("SFXValue"));
+    if (Widget)
+    {
+        Widget->SetText(FText::FromString("SFX"));
+        Widget->SetVisibility(ESlateVisibility::Hidden);
+    }
+    Widget = Cast<UTextBlock>(GetWidgetFromName("AmbienceValue"));
+    if (Widget)
+    {
+        Widget->SetText(FText::FromString("Ambience"));
+        Widget->SetVisibility(ESlateVisibility::Hidden);
     }
 
     return true;
@@ -341,22 +408,35 @@ void UPlayableWidget::UpdatePause()
         Image = Cast<UImage>(GetWidgetFromName("OptionsScreen1"));
         if (Image)
             Image->SetVisibility(ESlateVisibility::Visible);
+        for (int i = 0; i < PauseVolumeButtons.Num(); i++)
+            PauseVolumeButtons[i]->SetVisibility(ESlateVisibility::Visible);
+        for (int i = 0; i < PauseVolumeSliders.Num(); i++)
+            PauseVolumeSliders[i]->SetVisibility(ESlateVisibility::Visible);
+        Widget = Cast<UTextBlock>(GetWidgetFromName("MusicValue"));
+        if (Widget)
+            Widget->SetVisibility(ESlateVisibility::Visible);
+        Widget = Cast<UTextBlock>(GetWidgetFromName("SFXValue"));
+        if (Widget)
+            Widget->SetVisibility(ESlateVisibility::Visible);
+        Widget = Cast<UTextBlock>(GetWidgetFromName("AmbienceValue"));
+        if (Widget)
+            Widget->SetVisibility(ESlateVisibility::Visible);
 
+
+        FSlateBrush brush;
+        UTexture2D* NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_ButtonHover.Game_ButtonHover")));
+
+        brush.SetResourceObject(NormalTexture);
+        brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.724268f, 0.724268f, 0.724268f, 1.0f)));
+        FButtonStyle style;
+        style.SetNormal(brush);
+        style.SetHovered(brush);
+
+        NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_ButtonPressed.Game_ButtonPressed")));
+        brush.SetResourceObject(NormalTexture);
+        style.SetPressed(brush);
         if (State == EPauseMenuState::PauseMenu)
         {
-
-            FSlateBrush brush;
-            UTexture2D* NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_ButtonHover.Game_ButtonHover")));
-
-            brush.SetResourceObject(NormalTexture);
-            brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.724268f, 0.724268f, 0.724268f, 1.0f)));
-            FButtonStyle style;
-            style.SetNormal(brush);
-            style.SetHovered(brush);
-
-            NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_ButtonPressed.Game_ButtonPressed")));
-            brush.SetResourceObject(NormalTexture);
-            style.SetPressed(brush);
             PauseButtons[Increment]->SetStyle(style);
 
             for (int i = 0; i < PauseButtons.Num(); i++)
@@ -375,7 +455,36 @@ void UPlayableWidget::UpdatePause()
         }
         else if (State == EPauseMenuState::OptionsMenu)
         {
+            PauseVolumeButtons[OptionsIncrement]->SetStyle(style);
 
+            for (int i = 0; i < PauseVolumeButtons.Num(); i++)
+            {
+                if (PauseVolumeButtons[i]->IsHovered())
+                    OptionsIncrement = i;
+                if (i != OptionsIncrement)
+                {
+                    NormalTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Game/UI/Game_Button.Game_Button")));
+                    brush.SetResourceObject(NormalTexture);
+                    brush.TintColor = FSlateColor(brush.TintColor = FSlateColor(FLinearColor(0.495466f, 0.495466f, 0.495466f, 1.0f)));
+                    style.SetNormal(brush);
+                    PauseVolumeButtons[i]->SetStyle(style);
+                }
+            }
+
+            FString Value = FString::Printf(TEXT("%d"), (FMath::RoundToInt(GameInstance->MusicValue * 10.0f)));
+            Widget = Cast<UTextBlock>(GetWidgetFromName("MusicValue"));
+            if (Widget)
+                Widget->SetText(FText::FromString(Value));
+            Value = FString::Printf(TEXT("%d"), (FMath::RoundToInt(GameInstance->SFXValue * 10.0f)));
+            Widget = Cast<UTextBlock>(GetWidgetFromName("SFXValue"));
+            if (Widget)
+                Widget->SetText(FText::FromString(Value));
+            Value = FString::Printf(TEXT("%d"), (FMath::RoundToInt(GameInstance->AmbienceValue * 10.0f)));
+            Widget = Cast<UTextBlock>(GetWidgetFromName("AmbienceValue"));
+            if (Widget)
+                Widget->SetText(FText::FromString(Value));
+
+            UpdatePauseSoundChange();
         }
     }
     else if (!GameModeBase->Game_IsPaused)
@@ -438,6 +547,19 @@ void UPlayableWidget::UpdatePause()
         Image = Cast<UImage>(GetWidgetFromName("OptionsScreen1"));
         if (Image)
             Image->SetVisibility(ESlateVisibility::Hidden);
+        for (int i = 0; i < PauseVolumeButtons.Num(); i++)
+            PauseVolumeButtons[i]->SetVisibility(ESlateVisibility::Hidden);
+        for (int i = 0; i < PauseVolumeSliders.Num(); i++)
+            PauseVolumeSliders[i]->SetVisibility(ESlateVisibility::Hidden);
+        Widget = Cast<UTextBlock>(GetWidgetFromName("MusicValue"));
+        if (Widget)
+            Widget->SetVisibility(ESlateVisibility::Hidden);
+        Widget = Cast<UTextBlock>(GetWidgetFromName("SFXValue"));
+        if (Widget)
+            Widget->SetVisibility(ESlateVisibility::Hidden);
+        Widget = Cast<UTextBlock>(GetWidgetFromName("AmbienceValue"));
+        if (Widget)
+            Widget->SetVisibility(ESlateVisibility::Hidden);
 
         Increment = 0;
         State = EPauseMenuState::PauseMenu;
@@ -574,7 +696,10 @@ void UPlayableWidget::OnResume()
 void UPlayableWidget::OnPauseOptions()
 {
     if (State == EPauseMenuState::PauseMenu)
+    {
         State = EPauseMenuState::OptionsMenu;
+        ResetPauseIncrement();
+    }
 }
 
 void UPlayableWidget::OnRetry()
@@ -605,11 +730,22 @@ void UPlayableWidget::PauseMenuNavigation(float dir)//tried FReply UPlayableWidg
         if (GameInstance && GameInstance->NavigationSound != nullptr)
             UGameplayStatics::PlaySoundAtLocation(this, GameInstance->NavigationSound, FVector());
 
-        Increment += dir;
-        if (Increment < 0)
-            Increment = PauseButtons.Num() - 1;
-        else if (Increment >= PauseButtons.Num())
-            Increment = 0;
+        if (State == EPauseMenuState::PauseMenu)
+        {
+            Increment += dir;
+            if (Increment < 0)
+                Increment = PauseButtons.Num() - 1;
+            else if (Increment >= PauseButtons.Num())
+                Increment = 0;
+        }
+        else if (State == EPauseMenuState::OptionsMenu)
+        {
+            OptionsIncrement += dir;
+            if (OptionsIncrement < 0)
+                OptionsIncrement = PauseVolumeButtons.Num() - 1;
+            else if (OptionsIncrement >= PauseVolumeButtons.Num())
+                OptionsIncrement = 0;
+        }
     }
     else if (GameModeBase->State == EGameState::EndGame)
     {
@@ -630,14 +766,17 @@ void UPlayableWidget::PauseMenuPressed()
         UGameplayStatics::PlaySoundAtLocation(this, GameInstance->SelectSound, FVector());
 
     if (GameModeBase->Game_IsPaused)
-        PauseButtons[Increment]->OnClicked.Broadcast();
+        if (State == EPauseMenuState::PauseMenu)
+            PauseButtons[Increment]->OnClicked.Broadcast();
+        else if (State == EPauseMenuState::OptionsMenu)
+            PauseVolumeButtons[OptionsIncrement]->OnClicked.Broadcast();
     else if (GameModeBase->State == EGameState::EndGame)
         GameOverButtons[GameOverIncrement]->OnClicked.Broadcast();
 }
 
 void UPlayableWidget::PauseMenuBackPressed()
 {
-    if (State == EPauseMenuState::OptionsMenu)
+    if (State == EPauseMenuState::OptionsMenu && GameModeBase->State != EGameState::EndGame)
     {
         if (GameInstance && GameInstance->CancelSound != nullptr)
             UGameplayStatics::PlaySoundAtLocation(this, GameInstance->CancelSound, FVector());
@@ -657,8 +796,70 @@ void UPlayableWidget::PauseMoveWidget(float posx, float posy, float DeltaTime, f
     SetRenderTransform(CurrentTransform);
 }
 
-void UPlayableWidget::OnPauseVolumeChange(float v)
+void UPlayableWidget::OnPauseMusicChange(float v)
 {
+    GameInstance->MusicValue = v;
+}
+
+void UPlayableWidget::OnPauseMusicPressed()
+{
+    if (GameInstance)
+    {
+        #define musVal GameInstance->MusicValue 
+
+        musVal += 0.1;
+        musVal = truncf(musVal * 1000.0f) / 1000.0f;
+        if (musVal > 1.0)
+            musVal = 0.0f;
+
+        PauseVolumeSliders[0]->SetValue(musVal);
+    }
+}
+
+void UPlayableWidget::OnPauseSFXChange(float v)
+{
+    GameInstance->SFXValue = v;
+}
+
+void UPlayableWidget::OnPauseSFXPressed()
+{
+    if (GameInstance)
+    {
+        #define sfxVal GameInstance->SFXValue 
+
+        sfxVal += 0.1;
+        sfxVal = truncf(sfxVal * 1000.0f) / 1000.0f;
+        if (sfxVal > 1.0)
+            sfxVal = 0.0f;
+
+        PauseVolumeSliders[1]->SetValue(sfxVal);
+    }
+}
+
+void UPlayableWidget::OnPauseAmbienceChange(float v)
+{
+    GameInstance->AmbienceValue = v;
+}
+
+void UPlayableWidget::OnPauseAmbiencePressed()
+{
+    if (GameInstance)
+    {
+        #define ambienceVal GameInstance->AmbienceValue 
+
+        ambienceVal += 0.1;
+        ambienceVal = truncf(ambienceVal * 1000.0f) / 1000.0f;
+        if (ambienceVal > 1.0)
+            ambienceVal = 0.0f;
+
+        PauseVolumeSliders[2]->SetValue(ambienceVal);
+    }
+}
+
+void UPlayableWidget::ResetPauseIncrement()
+{
+    Increment = 0;
+    OptionsIncrement = 0;
 }
 
 void UPlayableWidget::UpdatePauseSoundChange()
