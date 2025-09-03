@@ -613,14 +613,10 @@ void UMainMenuWidget::ResetIncrement()
 
 void UMainMenuWidget::UpdateMainSoundChange()
 {
-    if (GameInstance->SelectSound != nullptr && GameInstance != nullptr)
-        GameInstance->SelectSound->GetSoundClass()->Properties.Volume = GameInstance->SFXValue;
-    if (GameInstance->NavigationSound != nullptr && GameInstance != nullptr)
-        GameInstance->NavigationSound->GetSoundClass()->Properties.Volume = GameInstance->SFXValue;
-    if (GameInstance->CancelSound != nullptr && GameInstance != nullptr)
-        GameInstance->CancelSound->GetSoundClass()->Properties.Volume = GameInstance->SFXValue;
-    if (GameInstance->MainMenuMusic != nullptr && GameInstance != nullptr)
-        GameInstance->MainMenuMusic->GetSoundClass()->Properties.Volume = GameInstance->MusicValue;
-    if (GameInstance->LevelMusic != nullptr && GameInstance != nullptr)
-        GameInstance->LevelMusic->GetSoundClass()->Properties.Volume = GameInstance->MusicValue;
+    if (GameInstance->Music != nullptr && GameInstance != nullptr)
+        GameInstance->Music->Properties.Volume = GameInstance->MusicValue;
+    if (GameInstance->SFX != nullptr && GameInstance != nullptr)
+        GameInstance->SFX->Properties.Volume = GameInstance->SFXValue;
+    if (GameInstance->Ambience != nullptr && GameInstance != nullptr)
+        GameInstance->Ambience->Properties.Volume = GameInstance->MusicValue;
 }

@@ -34,4 +34,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level Music")
 	class USoundBase* LevelMusic;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
+	class USoundClass* Music;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SFX")
+	class USoundClass* SFX;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ambience")
+	class USoundClass* Ambience;
+
 };
