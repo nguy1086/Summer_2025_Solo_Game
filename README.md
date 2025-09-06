@@ -34,3 +34,7 @@ This project is entirely made by Brendon Nguyen and not intended to get help fro
 • Nuclear Throne<br/>
 • Sundered: Eldritch Edition<br/>
 • Tunche<br/>
+
+## Disclaimer
+
+I did not create any of the sound effects and music, they are found online and should be royalty-free. They server as a placeholder for the demo and will be replaced when a full version is made.
